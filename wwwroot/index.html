@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Internship Application Manager</title>
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-rect glisten">
+        <div class="header-inner">
+          <div class="brand">Internship Application Manager</div>
+          <div class="subtitle">Keep resumes, postings, and due dates in one place</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <aside class="panel left">
+        <div class="card">
+          <h3>Resumes</h3>
+          <form id="uploadForm" class="form-inline">
+            <input type="file" name="resume" />
+            <button class="btn primary">Upload</button>
+          </form>
+          <div id="resumes" class="list"></div>
+        </div>
+
+        <!-- Preview Modal -->
+        <div id="previewModal" class="modal" aria-hidden="true">
+          <div class="modal-window">
+                <div class="modal-body">
+                  <div id="previewContent" class="preview-content">No preview</div>
+                </div>
+                <div class="modal-meta" style="padding:10px 16px;border-top:1px solid #eef5ff;display:flex;gap:8px;align-items:center;">
+                  <label style="font-size:13px;color:#374151;">Name</label>
+                  <input id="resumeName" placeholder="e.g. Software Engineer Resume - Fall 2025" style="flex:1;padding:8px;border:1px solid #e6eef8;border-radius:8px" />
+                </div>
+                <div class="modal-actions">
+                  <button id="cancelPreview" type="button" class="btn">Cancel</button>
+                  <button id="confirmUpload" type="button" class="btn primary">Upload</button>
+                </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Add Posting</h3>
+          <form id="postingForm" class="form-vertical">
+            <input name="title" placeholder="Title" required />
+            <input name="company" placeholder="Company" />
+            <input name="url" placeholder="Job URL" />
+            <input name="due_date" type="date" />
+            <button class="btn">Add Posting</button>
+          </form>
+        </div>
+      </aside>
+
+      <section class="panel right">
+        <div class="card">
+          <h3>Calendar</h3>
+          <div id='calendar'></div>
+        </div>
+
+        <div class="card">
+          <h3>Postings</h3>
+          <div id="postings" class="list"></div>
+        </div>
+      </section>
+    </main>
+
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
+  <script src="main.js"></script>
+  </body>
+  </html>
