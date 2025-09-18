@@ -17,6 +17,7 @@ What this prototype provides:
 - Resume upload and listing (files saved to `uploads/`).
 - Add internship postings with optional due dates.
 - Calendar view showing posting due dates (FullCalendar).
+   - Calendar-related frontend code has been moved into `wwwroot/calendar/` to isolate the calendar feature and avoid merge conflicts with other work.
 - A mocked "tailor" endpoint that returns keywords from the posting URL.
 
 Notes:

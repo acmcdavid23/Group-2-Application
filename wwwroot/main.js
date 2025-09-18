@@ -65,7 +65,6 @@ document.getElementById('postingForm').addEventListener('submit', async (e)=>{
   loadPostings();
 });
 
-let calendar;
 async function loadPostings(){
   const posts = await api('/api/postings');
   const container = document.getElementById('postings'); container.innerHTML='';
@@ -86,12 +85,7 @@ async function tailor(post){
   alert('Tailored keywords: ' + resp.keywords.join(', '));
 }
 
-function renderCalendar(posts){
-  const calendarEl = document.getElementById('calendar'); calendarEl.innerHTML='';
-  if(calendar) calendar.destroy();
-  calendar = new FullCalendar.Calendar(calendarEl, { initialView: 'dayGridMonth', height: 600, events: posts.filter(p=>p.dueDate).map(p=>({ title: p.title + ' - ' + p.company, start: p.dueDate, extendedProps: p })) });
-  calendar.render();
-}
+// calendar rendering moved to `wwwroot/calendar/calendar.js`
 
 loadResumes(); loadPostings();
 
