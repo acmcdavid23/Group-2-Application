@@ -1,0 +1,77 @@
+{
+  "Version": 1,
+  "Hash": "rtdELY/pxDGwayt2DgbCLjLb2K7Un4H492MOy8cHKCs=",
+  "Source": "InternApp",
+  "BasePath": "_content/InternApp",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "InternApp\\wwwroot",
+      "Source": "InternApp",
+      "ContentRoot": "C:\\Users\\Gunba\\Documents\\Source\\expo.2025\\mis321\\Group-2-Application\\wwwroot\\",
+      "BasePath": "_content/InternApp",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\Users\\Gunba\\Documents\\Source\\expo.2025\\mis321\\Group-2-Application\\wwwroot\\index.html",
+      "SourceId": "InternApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Gunba\\Documents\\Source\\expo.2025\\mis321\\Group-2-Application\\wwwroot\\",
+      "BasePath": "_content/InternApp",
+      "RelativePath": "index.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\index.html"
+    },
+    {
+      "Identity": "C:\\Users\\Gunba\\Documents\\Source\\expo.2025\\mis321\\Group-2-Application\\wwwroot\\main.js",
+      "SourceId": "InternApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Gunba\\Documents\\Source\\expo.2025\\mis321\\Group-2-Application\\wwwroot\\",
+      "BasePath": "_content/InternApp",
+      "RelativePath": "main.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\main.js"
+    },
+    {
+      "Identity": "C:\\Users\\Gunba\\Documents\\Source\\expo.2025\\mis321\\Group-2-Application\\wwwroot\\styles.css",
+      "SourceId": "InternApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Gunba\\Documents\\Source\\expo.2025\\mis321\\Group-2-Application\\wwwroot\\",
+      "BasePath": "_content/InternApp",
+      "RelativePath": "styles.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\styles.css"
+    }
+  ]
+}
