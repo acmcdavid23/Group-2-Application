@@ -4,9 +4,145 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Calendar - Internship Application Manager</title>
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="styles.css" rel="stylesheet" />
+    <style>
+      .calendar-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 0 20px;
+      }
+      .calendar-controls {
+        display: flex;
+        gap: 10px;
+      }
+      .calendar-section {
+        padding: 0 20px;
+      }
+      .calendar-card {
+        min-height: 600px;
+      }
+      
+      /* Custom Calendar Styles */
+      .custom-calendar {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        font-family: 'Inter', sans-serif;
+      }
+      
+      .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 0 10px;
+      }
+      
+      .calendar-title {
+        font-size: 1.5em;
+        font-weight: 600;
+        color: #1f2937;
+      }
+      
+      .calendar-nav-btn {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s;
+      }
+      
+      .calendar-nav-btn:hover {
+        background: #2563eb;
+      }
+      
+      .calendar-nav-btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+      }
+      
+      .calendar-weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 1px;
+        margin-bottom: 1px;
+      }
+      
+      .weekday {
+        background: #f3f4f6;
+        padding: 12px 8px;
+        text-align: center;
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.9em;
+      }
+      
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 1px;
+        background: #e5e7eb;
+        border: 1px solid #e5e7eb;
+      }
+      
+      .calendar-day {
+        background: white;
+        min-height: 100px;
+        padding: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        position: relative;
+      }
+      
+      .calendar-day:hover {
+        background: #f9fafb;
+      }
+      
+      .calendar-day.other-month {
+        background: #f9fafb;
+        color: #9ca3af;
+      }
+      
+      .calendar-day.today {
+        background: #dbeafe;
+        border: 2px solid #3b82f6;
+      }
+      
+      .day-number {
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      
+      .day-events {
+        font-size: 0.75em;
+      }
+      
+      .event {
+        background: #3b82f6;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 3px;
+        margin-bottom: 2px;
+        cursor: pointer;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      
+      .event.posting {
+        background: #10b981;
+      }
+      
+      .event.custom {
+        background: #8b5cf6;
+      }
+    </style>
   </head>
   <body>
     <header class="site-header">
@@ -29,7 +165,25 @@
 
       <section class="calendar-section">
         <div class="card calendar-card">
-          <div id='calendar'></div>
+          <div class="calendar-header">
+            <button id="prevMonth" class="calendar-nav-btn">← Previous</button>
+            <div id="calendarTitle" class="calendar-title">September 2025</div>
+            <button id="nextMonth" class="calendar-nav-btn">Next →</button>
+          </div>
+          
+          <div class="calendar-weekdays">
+            <div class="weekday">Sunday</div>
+            <div class="weekday">Monday</div>
+            <div class="weekday">Tuesday</div>
+            <div class="weekday">Wednesday</div>
+            <div class="weekday">Thursday</div>
+            <div class="weekday">Friday</div>
+            <div class="weekday">Saturday</div>
+          </div>
+          
+          <div id="calendarGrid" class="calendar-grid">
+            <!-- Calendar days will be generated here -->
+          </div>
         </div>
       </section>
     </main>
@@ -46,16 +200,39 @@
             <input name="date" type="date" required />
             <input name="time" type="time" />
             <textarea name="description" placeholder="Description (optional)"></textarea>
+            
+            <div class="color-picker-section">
+              <label for="eventColor">Event Color:</label>
+              <div class="color-options">
+                <input type="radio" name="color" value="#3b82f6" id="color-blue" checked>
+                <label for="color-blue" class="color-option" style="background-color: #3b82f6;"></label>
+                
+                <input type="radio" name="color" value="#10b981" id="color-green">
+                <label for="color-green" class="color-option" style="background-color: #10b981;"></label>
+                
+                <input type="radio" name="color" value="#8b5cf6" id="color-purple">
+                <label for="color-purple" class="color-option" style="background-color: #8b5cf6;"></label>
+                
+                <input type="radio" name="color" value="#f59e0b" id="color-orange">
+                <label for="color-orange" class="color-option" style="background-color: #f59e0b;"></label>
+                
+                <input type="radio" name="color" value="#ef4444" id="color-red">
+                <label for="color-red" class="color-option" style="background-color: #ef4444;"></label>
+                
+                <input type="radio" name="color" value="#06b6d4" id="color-cyan">
+                <label for="color-cyan" class="color-option" style="background-color: #06b6d4;"></label>
+              </div>
+            </div>
           </form>
         </div>
         <div class="modal-actions">
           <button id="cancelEvent" type="button" class="btn">Cancel</button>
+          <button id="deleteEvent" type="button" class="btn danger" style="display: none;">Delete Event</button>
           <button id="saveEvent" type="button" class="btn primary">Save Event</button>
         </div>
       </div>
     </div>
 
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
     <script src="calendar.js"></script>
   </body>
 </html>
