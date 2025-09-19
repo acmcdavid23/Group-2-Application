@@ -21,6 +21,12 @@
       footer {
         margin-top: auto;
       }
+      .app-footer {
+        height: 28px;
+        width: 100%;
+        background: #212529;
+        border-top: 1px solid rgba(255,255,255,.08);
+      }
       .navbar-toggler {
         border: none;
         padding: 0.25rem 0.5rem;
@@ -31,33 +37,73 @@
       .navbar-toggler-icon {
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
       }
-      /* Always show burger menu, hide nav links on desktop */
-      .navbar-toggler {
-        display: block !important;
+      /* Keep title centered and fixed; show menu below burger without shifting */
+      .navbar { position: relative; }
+      .navbar .container-fluid { position: relative; }
+      .navbar .centered-brand {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
       }
-      .navbar-collapse {
-        display: none !important;
+      .navbar .navbar-collapse {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        background-color: #212529;
+        padding: .5rem 1rem;
+        border-radius: 0;
+        border-top: 1px solid rgba(255,255,255,.08);
+        z-index: 1000;
+        /* Smooth open/close */
+        transform: translateY(-8px);
+        opacity: 0;
+        transition: transform .28s cubic-bezier(.2,.7,.2,1), opacity .28s ease;
       }
-      .navbar-collapse.show {
-        display: block !important;
+      .navbar .navbar-collapse.show {
+        transform: translateY(0);
+        opacity: 1;
       }
-      .navbar-nav {
-        margin-left: auto !important;
+      /* Ensure Bootstrap's intermediate state doesn't jump height */
+      .navbar .navbar-collapse.collapsing {
+        height: auto !important;
       }
+      /* Themed pills for burger menu links */
+      .navbar .navbar-nav .nav-link {
+        color: #e9ecef;
+        padding: .375rem .75rem;
+        border-radius: .375rem;
+        transition: background-color .15s ease, color .15s ease;
+      }
+      .navbar .navbar-nav .nav-link.resume-link { background-color: rgba(13,110,253,.12); }
+      .navbar .navbar-nav .nav-link.resume-link:hover { background-color: rgba(13,110,253,.28); color: #fff; }
+      .navbar .navbar-nav .nav-link.jobs-link { background-color: rgba(25,135,84,.12); }
+      .navbar .navbar-nav .nav-link.jobs-link:hover { background-color: rgba(25,135,84,.28); color: #fff; }
+      .navbar .navbar-nav .nav-link.calendar-link { background-color: rgba(13,202,240,.12); }
+      .navbar .navbar-nav .nav-link.calendar-link:hover { background-color: rgba(13,202,240,.28); color: #fff; }
+      /* Navbar layout tweaks */
+      .navbar .container {
+        display: flex;
+        align-items: center;
+      }
+      .navbar-brand { margin-right: auto; }
+      /* Let Bootstrap handle collapse animation (no overrides) */
     </style>
   </head>
   <body>
     <!-- Navigation -->
     <nav class="navbar navbar-dark bg-dark">
-      <div class="container">
-        <a class="navbar-brand fw-bold" href="#">Internship Application Manager</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="container-fluid">
+        <button class="navbar-toggler me-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
+          <ul class="navbar-nav flex-row gap-3 flex-nowrap align-items-center">
             <li class="nav-item">
-              <a class="nav-link" href="features/resume/pages/resume.html">
+              <a class="nav-link resume-link" href="features/resume/pages/resume.html">
                 <svg width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 20 20">
                   <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/>
                 </svg>
@@ -65,7 +111,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="features/jobs/pages/jobs.html">
+              <a class="nav-link jobs-link" href="features/jobs/pages/jobs.html">
                 <svg width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 20 20">
                   <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
@@ -73,7 +119,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="features/calendar/pages/calendar.html">
+              <a class="nav-link calendar-link" href="features/calendar/pages/calendar.html">
                 <svg width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
                 </svg>
@@ -82,6 +128,7 @@
             </li>
           </ul>
         </div>
+        <a class="navbar-brand fw-bold ms-auto centered-brand" href="#">Internship Application Manager</a>
       </div>
     </nav>
 
@@ -181,20 +228,8 @@
     </section>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-4">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-6">
-            <h5>Internship Application Manager</h5>
-            <p class="text-muted">Keep your internship applications organized and never miss an opportunity.</p>
-          </div>
-          <div class="col-md-6 text-md-end">
-            <p class="text-muted mb-0">&copy; 2025 Internship Application Manager. All rights reserved.</p>
-          </div>
-        </div>
-      </div>
-    </footer>
+    <!-- Footer (theming bar only) -->
+    <footer class="app-footer bg-dark"></footer>
 
     <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>
