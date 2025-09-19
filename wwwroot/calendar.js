@@ -19,6 +19,7 @@ let cancelEvent = document.getElementById('cancelEvent');
 let saveEvent = document.getElementById('saveEvent');
 let deleteEvent = document.getElementById('deleteEvent');
 let notesTextarea = document.getElementById('notesTextarea');
+let todoBtn = document.getElementById('todoBtn');
 
 // Initialize calendar
 document.addEventListener('DOMContentLoaded', function() {
@@ -42,6 +43,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     addEventBtn.addEventListener('click', () => {
         openEventModal();
+    });
+    
+    todoBtn.addEventListener('click', () => {
+        window.location.href = 'todo.html';
     });
     
     cancelEvent.addEventListener('click', () => {
