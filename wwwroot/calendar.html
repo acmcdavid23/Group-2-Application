@@ -18,11 +18,63 @@
         display: flex;
         gap: 10px;
       }
-      .calendar-section {
+      .calendar-layout {
+        display: flex;
+        gap: 20px;
         padding: 0 20px;
       }
+      
+      .calendar-section {
+        flex: 2;
+      }
+      
       .calendar-card {
         min-height: 600px;
+      }
+      
+      .notes-section {
+        flex: 1;
+        min-width: 300px;
+      }
+      
+      .notes-card {
+        height: 600px;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .notes-card h3 {
+        margin: 0 0 15px 0;
+        color: #1f2937;
+        font-size: 1.2em;
+        font-weight: 600;
+      }
+      
+      .notes-textarea {
+        flex: 1;
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 12px;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+        resize: none;
+        outline: none;
+        transition: border-color 0.2s;
+        background-image: 
+          linear-gradient(transparent 0%, transparent 1.5em, #e5e7eb 0%);
+        background-size: 100% 1.5em;
+        background-attachment: local;
+      }
+      
+      .notes-textarea:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+      
+      .notes-textarea::placeholder {
+        color: #9ca3af;
       }
       
       /* Custom Calendar Styles */
@@ -142,6 +194,66 @@
       .event.custom {
         background: #8b5cf6;
       }
+      
+      /* Color Picker Styles */
+      .color-picker-section {
+        margin-top: 15px;
+      }
+      
+      .color-picker-section label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #374151;
+      }
+      
+      .color-dropdown {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        background-color: white;
+        font-size: 14px;
+        cursor: pointer;
+        transition: border-color 0.2s;
+      }
+      
+      .color-dropdown:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+      
+      .color-dropdown option {
+        padding: 8px;
+        color: white;
+        font-weight: 500;
+      }
+      
+      /* Modal scrolling */
+      .modal-body {
+        max-height: 60vh;
+        overflow-y: auto;
+        padding: 20px;
+      }
+      
+      .modal-body::-webkit-scrollbar {
+        width: 6px;
+      }
+      
+      .modal-body::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+      }
+      
+      .modal-body::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+      }
+      
+      .modal-body::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+      }
     </style>
   </head>
   <body>
@@ -163,29 +275,38 @@
         </div>
       </nav>
 
-      <section class="calendar-section">
-        <div class="card calendar-card">
-          <div class="calendar-header">
-            <button id="prevMonth" class="calendar-nav-btn">← Previous</button>
-            <div id="calendarTitle" class="calendar-title">September 2025</div>
-            <button id="nextMonth" class="calendar-nav-btn">Next →</button>
+      <div class="calendar-layout">
+        <section class="calendar-section">
+          <div class="card calendar-card">
+            <div class="calendar-header">
+              <button id="prevMonth" class="calendar-nav-btn">← Previous</button>
+              <div id="calendarTitle" class="calendar-title">September 2025</div>
+              <button id="nextMonth" class="calendar-nav-btn">Next →</button>
+            </div>
+            
+            <div class="calendar-weekdays">
+              <div class="weekday">Sunday</div>
+              <div class="weekday">Monday</div>
+              <div class="weekday">Tuesday</div>
+              <div class="weekday">Wednesday</div>
+              <div class="weekday">Thursday</div>
+              <div class="weekday">Friday</div>
+              <div class="weekday">Saturday</div>
+            </div>
+            
+            <div id="calendarGrid" class="calendar-grid">
+              <!-- Calendar days will be generated here -->
+            </div>
           </div>
-          
-          <div class="calendar-weekdays">
-            <div class="weekday">Sunday</div>
-            <div class="weekday">Monday</div>
-            <div class="weekday">Tuesday</div>
-            <div class="weekday">Wednesday</div>
-            <div class="weekday">Thursday</div>
-            <div class="weekday">Friday</div>
-            <div class="weekday">Saturday</div>
+        </section>
+
+        <aside class="notes-section">
+          <div class="card notes-card">
+            <h3>Notes</h3>
+            <textarea id="notesTextarea" class="notes-textarea" placeholder="Write your notes here..."></textarea>
           </div>
-          
-          <div id="calendarGrid" class="calendar-grid">
-            <!-- Calendar days will be generated here -->
-          </div>
-        </div>
-      </section>
+        </aside>
+      </div>
     </main>
 
     <!-- Add Event Modal -->
@@ -203,25 +324,14 @@
             
             <div class="color-picker-section">
               <label for="eventColor">Event Color:</label>
-              <div class="color-options">
-                <input type="radio" name="color" value="#3b82f6" id="color-blue" checked>
-                <label for="color-blue" class="color-option" style="background-color: #3b82f6;"></label>
-                
-                <input type="radio" name="color" value="#10b981" id="color-green">
-                <label for="color-green" class="color-option" style="background-color: #10b981;"></label>
-                
-                <input type="radio" name="color" value="#8b5cf6" id="color-purple">
-                <label for="color-purple" class="color-option" style="background-color: #8b5cf6;"></label>
-                
-                <input type="radio" name="color" value="#f59e0b" id="color-orange">
-                <label for="color-orange" class="color-option" style="background-color: #f59e0b;"></label>
-                
-                <input type="radio" name="color" value="#ef4444" id="color-red">
-                <label for="color-red" class="color-option" style="background-color: #ef4444;"></label>
-                
-                <input type="radio" name="color" value="#06b6d4" id="color-cyan">
-                <label for="color-cyan" class="color-option" style="background-color: #06b6d4;"></label>
-              </div>
+              <select name="color" id="eventColor" class="color-dropdown">
+                <option value="#3b82f6" style="background-color: #3b82f6; color: white;">Blue</option>
+                <option value="#10b981" style="background-color: #10b981; color: white;">Green</option>
+                <option value="#8b5cf6" style="background-color: #8b5cf6; color: white;">Purple</option>
+                <option value="#f59e0b" style="background-color: #f59e0b; color: white;">Orange</option>
+                <option value="#ef4444" style="background-color: #ef4444; color: white;">Red</option>
+                <option value="#06b6d4" style="background-color: #06b6d4; color: white;">Cyan</option>
+              </select>
             </div>
           </form>
         </div>

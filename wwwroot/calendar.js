@@ -3,6 +3,8 @@ const api = (path, opts) => fetch(path, opts).then(r=>{ if(!r.ok) return r.json(
 // Calendar state
 let currentDate = new Date(2025, 8, 1); // September 2025
 let events = [];
+let customEvents = []; // Separate array for custom events
+let editingEvent = null; // Track which event we're editing
 
 // DOM elements
 let calendarTitle = document.getElementById('calendarTitle');
@@ -15,6 +17,8 @@ let eventModal = document.getElementById('eventModal');
 let eventForm = document.getElementById('eventForm');
 let cancelEvent = document.getElementById('cancelEvent');
 let saveEvent = document.getElementById('saveEvent');
+let deleteEvent = document.getElementById('deleteEvent');
+let notesTextarea = document.getElementById('notesTextarea');
 
 // Initialize calendar
 document.addEventListener('DOMContentLoaded', function() {
@@ -48,7 +52,18 @@ document.addEventListener('DOMContentLoaded', function() {
         await saveEventToCalendar();
     });
     
+    deleteEvent.addEventListener('click', async () => {
+        await deleteEventFromCalendar();
+    });
+    
+    // Notes functionality
+    notesTextarea.addEventListener('input', () => {
+        saveNotes();
+    });
+    
     // Initial render
+    loadCustomEvents(); // Load saved custom events first
+    loadNotes(); // Load saved notes
     renderCalendar();
     loadEvents();
 });
@@ -124,7 +139,9 @@ function createDayElement(dayNumber, isOtherMonth, date) {
     const eventsContainer = document.createElement('div');
     eventsContainer.className = 'day-events';
     
-    const dayEvents = events.filter(event => {
+    // Combine server events and custom events
+    const allEvents = [...events, ...customEvents];
+    const dayEvents = allEvents.filter(event => {
         const eventDate = new Date(event.start);
         return eventDate.toDateString() === date.toDateString();
     });
@@ -134,9 +151,15 @@ function createDayElement(dayNumber, isOtherMonth, date) {
         eventElement.className = `event ${event.extendedProps?.type || 'custom'}`;
         eventElement.textContent = event.title;
         eventElement.title = event.title;
+        
+        // Apply custom color if set
+        if (event.color) {
+            eventElement.style.backgroundColor = event.color;
+        }
+        
         eventElement.addEventListener('click', (e) => {
             e.stopPropagation();
-            showEventDetails(event);
+            editEvent(event);
         });
         eventsContainer.appendChild(eventElement);
     });
@@ -151,6 +174,49 @@ function createDayElement(dayNumber, isOtherMonth, date) {
     });
     
     return dayElement;
+}
+
+// Load custom events from localStorage
+function loadCustomEvents() {
+    try {
+        const saved = localStorage.getItem('calendar-custom-events');
+        if (saved) {
+            customEvents = JSON.parse(saved);
+        }
+    } catch (error) {
+        console.error('Failed to load custom events:', error);
+        customEvents = [];
+    }
+}
+
+// Save custom events to localStorage
+function saveCustomEvents() {
+    try {
+        localStorage.setItem('calendar-custom-events', JSON.stringify(customEvents));
+    } catch (error) {
+        console.error('Failed to save custom events:', error);
+    }
+}
+
+// Load notes from localStorage
+function loadNotes() {
+    try {
+        const saved = localStorage.getItem('calendar-notes');
+        if (saved) {
+            notesTextarea.value = saved;
+        }
+    } catch (error) {
+        console.error('Failed to load notes:', error);
+    }
+}
+
+// Save notes to localStorage
+function saveNotes() {
+    try {
+        localStorage.setItem('calendar-notes', notesTextarea.value);
+    } catch (error) {
+        console.error('Failed to save notes:', error);
+    }
 }
 
 // Load events from server
@@ -177,16 +243,60 @@ async function loadEvents() {
 
 // Modal functions
 function openEventModal(dateStr = null) {
+    editingEvent = null;
     eventForm.reset();
     if (dateStr) {
         eventForm.date.value = dateStr;
     }
+    
+    // Reset to default color
+    document.getElementById('eventColor').value = '#3b82f6';
+    
+    // Hide delete button for new events
+    deleteEvent.style.display = 'none';
+    
+    // Update modal title
+    document.querySelector('.modal-header h3').textContent = 'Add Event';
+    
+    eventModal.setAttribute('aria-hidden', 'false');
+}
+
+function editEvent(event) {
+    editingEvent = event;
+    
+    // Fill form with event data
+    eventForm.title.value = event.title;
+    eventForm.date.value = event.start.split('T')[0];
+    
+    if (event.start.includes('T')) {
+        eventForm.time.value = event.start.split('T')[1].substring(0, 5);
+    }
+    
+    if (event.extendedProps?.description) {
+        eventForm.description.value = event.extendedProps.description;
+    }
+    
+    // Set color
+    if (event.color) {
+        document.getElementById('eventColor').value = event.color;
+    } else {
+        document.getElementById('eventColor').value = '#3b82f6';
+    }
+    
+    // Show delete button for existing events
+    deleteEvent.style.display = 'inline-block';
+    
+    // Update modal title
+    document.querySelector('.modal-header h3').textContent = 'Edit Event';
+    
     eventModal.setAttribute('aria-hidden', 'false');
 }
 
 function closeEventModal() {
     eventModal.setAttribute('aria-hidden', 'true');
     eventForm.reset();
+    editingEvent = null;
+    deleteEvent.style.display = 'none';
 }
 
 async function saveEventToCalendar() {
@@ -195,6 +305,7 @@ async function saveEventToCalendar() {
     const date = formData.get('date');
     const time = formData.get('time');
     const description = formData.get('description');
+    const color = formData.get('color');
     
     if (!title || !date) {
         alert('Title and date are required');
@@ -203,22 +314,72 @@ async function saveEventToCalendar() {
     
     const startDateTime = time ? `${date}T${time}` : date;
     
-    const event = {
-        id: `custom-${Date.now()}`,
-        title: title,
-        start: startDateTime,
-        extendedProps: {
-            type: 'custom',
+    if (editingEvent) {
+        // Update existing event
+        editingEvent.title = title;
+        editingEvent.start = startDateTime;
+        editingEvent.color = color;
+        editingEvent.extendedProps = {
+            ...editingEvent.extendedProps,
             description: description
+        };
+        
+        // Update in customEvents array if it's a custom event
+        if (editingEvent.extendedProps?.type === 'custom') {
+            const index = customEvents.findIndex(e => e.id === editingEvent.id);
+            if (index > -1) {
+                customEvents[index] = editingEvent;
+            }
         }
-    };
+    } else {
+        // Create new event
+        const event = {
+            id: `custom-${Date.now()}`,
+            title: title,
+            start: startDateTime,
+            color: color,
+            extendedProps: {
+                type: 'custom',
+                description: description
+            }
+        };
+        customEvents.push(event);
+    }
     
-    events.push(event);
+    // Save to localStorage
+    saveCustomEvents();
+    
     renderCalendar();
     closeEventModal();
     
     // TODO: Save to server if you want persistence
     // await api('/api/events', { method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify(event) });
+}
+
+async function deleteEventFromCalendar() {
+    if (!editingEvent) return;
+    
+    if (!confirm(`Are you sure you want to delete "${editingEvent.title}"?`)) {
+        return;
+    }
+    
+    // Only allow deletion of custom events (not server postings)
+    if (editingEvent.extendedProps?.type === 'custom') {
+        // Remove from customEvents array
+        const index = customEvents.findIndex(e => e.id === editingEvent.id);
+        if (index > -1) {
+            customEvents.splice(index, 1);
+        }
+        
+        // Save to localStorage
+        saveCustomEvents();
+    } else {
+        alert('Cannot delete job postings. They are managed by the server.');
+        return;
+    }
+    
+    renderCalendar();
+    closeEventModal();
 }
 
 function showEventDetails(event) {
