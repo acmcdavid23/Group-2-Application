@@ -7,74 +7,89 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="styles.css" rel="stylesheet" />
     <style>
-      .calendar-nav {
+      .calendar-main {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 120px);
+        margin: 0;
+        padding: 0;
+      }
+      
+      .calendar-control-panel {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
-        padding: 0 20px;
+        padding: 16px 24px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-bottom: none;
+        flex-shrink: 0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       }
-      .calendar-controls {
+      
+      .control-buttons {
         display: flex;
         gap: 10px;
       }
-      .calendar-layout {
+      
+      .control-buttons .btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+        transition: all 0.2s;
+      }
+      
+      .control-buttons .btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-1px);
+      }
+      
+      .control-buttons .btn.primary {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+      }
+      
+      .calendar-header {
         display: flex;
-        gap: 20px;
-        padding: 0 20px;
-      }
-      
-      .calendar-section {
-        flex: 2;
-      }
-      
-      .calendar-card {
-        min-height: 600px;
-      }
-      
-      .notes-section {
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
         flex: 1;
-        min-width: 300px;
       }
       
-      .notes-card {
-        height: 600px;
+      .view-buttons {
         display: flex;
-        flex-direction: column;
+        gap: 8px;
       }
       
-      .notes-card h3 {
-        margin: 0 0 15px 0;
-        color: #1f2937;
-        font-size: 1.2em;
+      .view-buttons .btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+        transition: all 0.2s;
+      }
+      
+      .view-buttons .btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-1px);
+      }
+      
+      .view-buttons .btn.active {
+        background: rgba(255, 255, 255, 0.4);
+        border-color: rgba(255, 255, 255, 0.6);
+        color: white;
         font-weight: 600;
       }
       
-      .notes-textarea {
+      .fullscreen-calendar {
         flex: 1;
-        width: 100%;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        padding: 12px;
-        font-family: 'Inter', sans-serif;
-        font-size: 14px;
-        line-height: 1.5;
-        resize: none;
-        outline: none;
-        transition: border-color 0.2s;
-        background-image: 
-          linear-gradient(transparent 0%, transparent 1.5em, #e5e7eb 0%);
-        background-size: 100% 1.5em;
-        background-attachment: local;
-      }
-      
-      .notes-textarea:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-      }
-      
-      .notes-textarea::placeholder {
-        color: #9ca3af;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        overflow: hidden;
       }
       
       /* Custom Calendar Styles */
@@ -85,75 +100,97 @@
         font-family: 'Inter', sans-serif;
       }
       
-      .calendar-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding: 0 10px;
-      }
-      
       .calendar-title {
-        font-size: 1.5em;
+        color: white;
         font-weight: 600;
-        color: #1f2937;
+        font-size: 1.3em;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       }
       
       .calendar-nav-btn {
-        background: #3b82f6;
+        background: rgba(255, 255, 255, 0.2);
         color: white;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 8px 12px;
+        border-radius: 8px;
         cursor: pointer;
         font-weight: 500;
-        transition: background-color 0.2s;
+        transition: all 0.2s;
+        backdrop-filter: blur(10px);
       }
       
       .calendar-nav-btn:hover {
-        background: #2563eb;
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-1px);
       }
       
       .calendar-nav-btn:disabled {
-        background: #9ca3af;
+        background: rgba(255, 255, 255, 0.1);
         cursor: not-allowed;
+        opacity: 0.5;
+      }
+      
+      .calendar-title {
+        color: white;
+        font-weight: 600;
+        font-size: 1.3em;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       }
       
       .calendar-weekdays {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 1px;
-        margin-bottom: 1px;
+        flex-shrink: 0;
+        border-bottom: 1px solid #dadce0;
       }
       
       .weekday {
-        background: #f3f4f6;
+        background: #f8f9fa;
         padding: 12px 8px;
         text-align: center;
-        font-weight: 600;
-        color: #374151;
-        font-size: 0.9em;
+        font-weight: 500;
+        color: #5f6368;
+        font-size: 11px;
+        text-transform: uppercase;
+        border-right: 1px solid #dadce0;
+        border-bottom: 1px solid #dadce0;
+      }
+      
+      .weekday:last-child {
+        border-right: none;
       }
       
       .calendar-grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 1px;
-        background: #e5e7eb;
-        border: 1px solid #e5e7eb;
+        flex: 1;
+        min-height: 400px;
+        border-left: 1px solid #dadce0;
+        border-right: 1px solid #dadce0;
       }
       
       .calendar-day {
         background: white;
-        min-height: 100px;
-        padding: 8px;
+        min-height: 120px;
+        padding: 4px;
         cursor: pointer;
-        transition: background-color 0.2s;
+        transition: all 0.2s ease;
         position: relative;
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid #dadce0;
+        border-bottom: 1px solid #dadce0;
+      }
+      
+      .calendar-day:nth-child(7n) {
+        border-right: none;
       }
       
       .calendar-day:hover {
-        background: #f9fafb;
+        background: #f0f9ff;
+        transform: scale(1.02);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       }
       
       .calendar-day.other-month {
@@ -161,14 +198,42 @@
         color: #9ca3af;
       }
       
+      .calendar-day.other-month:hover {
+        background: #f0f9ff;
+        color: #6b7280;
+      }
+      
       .calendar-day.today {
         background: #dbeafe;
         border: 2px solid #3b82f6;
+        box-shadow: 0 0 0 1px #3b82f6;
+      }
+      
+      .calendar-day.today:hover {
+        background: #bfdbfe;
+        transform: scale(1.02);
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
       }
       
       .day-number {
-        font-weight: 600;
+        font-weight: 400;
+        font-size: 13px;
+        color: #3c4043;
         margin-bottom: 4px;
+        padding: 4px 8px;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        align-self: flex-start;
+      }
+      
+      .calendar-day.today .day-number {
+        background: #1a73e8;
+        color: white;
+        font-weight: 500;
       }
       
       .day-events {
@@ -261,52 +326,55 @@
       <div class="header-rect glisten">
         <div class="header-inner">
           <div class="brand">Internship Application Manager</div>
-          <div class="subtitle">Calendar View</div>
+          <div class="subtitle">Keep resumes, postings, and due dates in one place</div>
         </div>
       </div>
     </header>
 
-    <main class="container">
-      <nav class="calendar-nav">
-        <a href="index.html" class="btn">← Back to Dashboard</a>
-        <div class="calendar-controls">
+    <nav class="nav-banner">
+      <div class="nav-banner-rect">
+                <div class="nav-banner-inner">
+                  <button class="nav-btn" data-panel="job-postings">Job Postings</button>
+                  <button class="nav-btn" data-panel="resumes">Resumes</button>
+                  <button class="nav-btn active" data-panel="calendar">Calendar</button>
+                </div>
+      </div>
+    </nav>
+
+    <main class="calendar-main">
+      <!-- Small control panel -->
+      <div class="calendar-control-panel">
+        <div class="control-buttons">
           <button id="todayBtn" class="btn">Today</button>
           <button id="addEventBtn" class="btn primary">Add Event</button>
-          <button id="todoBtn" class="btn primary">To Do</button>
         </div>
-      </nav>
+        <div class="calendar-header">
+          <button id="prevMonth" class="calendar-nav-btn">←</button>
+          <div id="calendarTitle" class="calendar-title">September 2025</div>
+          <button id="nextMonth" class="calendar-nav-btn">→</button>
+        </div>
+        <div class="view-buttons">
+          <button id="dayViewBtn" class="btn">Day</button>
+          <button id="weekViewBtn" class="btn">Week</button>
+          <button id="monthViewBtn" class="btn active">Month</button>
+        </div>
+      </div>
 
-      <div class="calendar-layout">
-        <section class="calendar-section">
-          <div class="card calendar-card">
-            <div class="calendar-header">
-              <button id="prevMonth" class="calendar-nav-btn">← Previous</button>
-              <div id="calendarTitle" class="calendar-title">September 2025</div>
-              <button id="nextMonth" class="calendar-nav-btn">Next →</button>
-            </div>
-            
-            <div class="calendar-weekdays">
-              <div class="weekday">Sunday</div>
-              <div class="weekday">Monday</div>
-              <div class="weekday">Tuesday</div>
-              <div class="weekday">Wednesday</div>
-              <div class="weekday">Thursday</div>
-              <div class="weekday">Friday</div>
-              <div class="weekday">Saturday</div>
-            </div>
-            
-            <div id="calendarGrid" class="calendar-grid">
-              <!-- Calendar days will be generated here -->
-            </div>
-          </div>
-        </section>
-
-        <aside class="notes-section">
-          <div class="card notes-card">
-            <h3>Notes</h3>
-            <textarea id="notesTextarea" class="notes-textarea" placeholder="Write your notes here..."></textarea>
-          </div>
-        </aside>
+      <!-- Fullscreen calendar -->
+      <div class="fullscreen-calendar">
+        <div class="calendar-weekdays">
+          <div class="weekday">Sunday</div>
+          <div class="weekday">Monday</div>
+          <div class="weekday">Tuesday</div>
+          <div class="weekday">Wednesday</div>
+          <div class="weekday">Thursday</div>
+          <div class="weekday">Friday</div>
+          <div class="weekday">Saturday</div>
+        </div>
+        
+        <div id="calendarGrid" class="calendar-grid">
+          <!-- Calendar days will be generated here -->
+        </div>
       </div>
     </main>
 
@@ -345,5 +413,25 @@
     </div>
 
     <script src="calendar.js"></script>
+    <script>
+      // Navigation handling
+      document.addEventListener('DOMContentLoaded', function() {
+        const navButtons = document.querySelectorAll('.nav-btn');
+        navButtons.forEach(btn => {
+          btn.addEventListener('click', function() {
+            const panel = this.getAttribute('data-panel');
+            navButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            if (panel === 'job-postings') {
+              window.location.href = 'index.html';
+            } else if (panel === 'resumes') {
+              window.location.href = 'resumes.html';
+            }
+            // Calendar is the current page, no action needed
+          });
+        });
+      });
+    </script>
   </body>
 </html>

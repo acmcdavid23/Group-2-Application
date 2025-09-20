@@ -7,6 +7,8 @@
   <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link href="styles.css" rel="stylesheet" />
+  <style>
+  </style>
   </head>
   <body>
     <header class="site-header">
@@ -18,63 +20,61 @@
       </div>
     </header>
 
+    <nav class="nav-banner">
+      <div class="nav-banner-rect">
+                <div class="nav-banner-inner">
+                  <button class="nav-btn active" data-panel="job-postings">Job Postings</button>
+                  <button class="nav-btn" data-panel="resumes">Resumes</button>
+                  <button class="nav-btn" data-panel="calendar">Calendar</button>
+                </div>
+      </div>
+    </nav>
+
     <main class="container">
-      <aside class="panel left">
-        <div class="card">
-          <h3>Resumes</h3>
-          <form id="uploadForm" class="form-inline">
-            <input type="file" name="resume" />
-            <button class="btn primary">Upload</button>
-          </form>
-          <div id="resumes" class="list"></div>
-        </div>
-
-        <!-- Preview Modal -->
-        <div id="previewModal" class="modal" aria-hidden="true">
-          <div class="modal-window">
-                <div class="modal-body">
-                  <div id="previewContent" class="preview-content">No preview</div>
-                </div>
-                <div class="modal-meta" style="padding:10px 16px;border-top:1px solid #eef5ff;display:flex;gap:8px;align-items:center;">
-                  <label style="font-size:13px;color:#374151;">Name</label>
-                  <input id="resumeName" placeholder="e.g. Software Engineer Resume - Fall 2025" style="flex:1;padding:8px;border:1px solid #e6eef8;border-radius:8px" />
-                </div>
-                <div class="modal-actions">
-                  <button id="cancelPreview" type="button" class="btn">Cancel</button>
-                  <button id="confirmUpload" type="button" class="btn primary">Upload</button>
-                </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>Add Posting</h3>
+      <div class="panel full-width" style="margin-top: 20px; display: flex; gap: 20px;">
+        
+        <div class="card" style="flex: 0 0 300px;">
+          <h3>Add Job Posting</h3>
           <form id="postingForm" class="form-vertical">
-            <input name="title" placeholder="Title" required />
-            <input name="company" placeholder="Company" />
-            <input name="url" placeholder="Job URL" />
+            <input name="title" placeholder="Job Title" required />
+            <input name="company" placeholder="Company Name" />
+            <textarea name="description" placeholder="Job description" rows="4"></textarea>
             <input name="due_date" type="date" />
-            <button class="btn">Add Posting</button>
+            <button class="btn primary">Add Posting</button>
           </form>
         </div>
-      </aside>
 
-      <section class="panel right">
-        <div class="card">
-          <h3>Calendar</h3>
-          <div id='calendar'></div>
-          <div style="margin-top: 10px;">
-            <a href="calendar.html" class="btn primary">View Full Calendar</a>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>Postings</h3>
+        <div class="card" style="flex: 1;">
+          <h3>Job Postings</h3>
           <div id="postings" class="list"></div>
         </div>
-      </section>
+      </div>
     </main>
 
+  <!-- Edit Posting Modal -->
+  <div id="editModal" class="modal" style="display: none;">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3>Edit Job Posting</h3>
+        <button id="closeEditModal" class="btn-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm" class="form-vertical">
+          <input name="title" placeholder="Job Title" required />
+          <input name="company" placeholder="Company Name" />
+          <textarea name="description" placeholder="Job description" rows="4"></textarea>
+          <input name="due_date" type="date" />
+          <input type="hidden" name="id" />
+        </form>
+      </div>
+      <div class="modal-actions">
+        <button id="cancelEdit" class="btn">Cancel</button>
+        <button id="saveEdit" class="btn primary">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
-  <script src="main.js"></script>
+  <script src="main.js?v=3"></script>
   </body>
   </html>

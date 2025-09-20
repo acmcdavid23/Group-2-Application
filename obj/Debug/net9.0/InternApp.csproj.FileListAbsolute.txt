@@ -16,8 +16,6 @@ C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\rjimswa.dswa.cache.j
 C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\rjsmrazor.dswa.cache.json
 C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\rjsmcshtml.dswa.cache.json
 C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\scopedcss\bundle\InternApp.styles.css
-C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\compressed\wz4obi22x4-l6hfreb7bl.gz
-C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\compressed\tyik80z0dv-7pqze63r16.gz
 C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\staticwebassets.build.json
 C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\staticwebassets.build.json.cache
 C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\staticwebassets.development.json
@@ -27,4 +25,10 @@ C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\refint\InternApp.dll
 C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\InternApp.pdb
 C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\InternApp.genruntimeconfig.cache
 C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\ref\InternApp.dll
-C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\compressed\2wqrdp7z17-gondg0adpv.gz
+C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\compressed\v21z5y07hu-2sh9swyeiu.gz
+C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\compressed\bcfp668v5u-wvz7qtz3q1.gz
+C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\compressed\vf8g5hpqpt-suj2xxx1wz.gz
+C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\compressed\9a46gxlqzx-d1e5ecuh7k.gz
+C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\compressed\tyik80z0dv-pevwwxjzh1.gz
+C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\compressed\wz4obi22x4-aucvtocibt.gz
+C:\Users\acmcdavid\MIS\Group-2-Application\obj\Debug\net9.0\compressed\2wqrdp7z17-e4a1xve7tr.gz

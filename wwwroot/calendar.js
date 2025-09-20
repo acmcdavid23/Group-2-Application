@@ -6,84 +6,195 @@ let events = [];
 let customEvents = []; // Separate array for custom events
 let editingEvent = null; // Track which event we're editing
 
-// DOM elements
-let calendarTitle = document.getElementById('calendarTitle');
-let calendarGrid = document.getElementById('calendarGrid');
-let prevMonthBtn = document.getElementById('prevMonth');
-let nextMonthBtn = document.getElementById('nextMonth');
-let todayBtn = document.getElementById('todayBtn');
-let addEventBtn = document.getElementById('addEventBtn');
-let eventModal = document.getElementById('eventModal');
-let eventForm = document.getElementById('eventForm');
-let cancelEvent = document.getElementById('cancelEvent');
-let saveEvent = document.getElementById('saveEvent');
-let deleteEvent = document.getElementById('deleteEvent');
-let notesTextarea = document.getElementById('notesTextarea');
-let todoBtn = document.getElementById('todoBtn');
+// DOM elements - will be initialized in DOMContentLoaded
+let calendarTitle, calendarGrid, prevMonthBtn, nextMonthBtn, todayBtn, addEventBtn;
+let eventModal, eventForm, cancelEvent, saveEvent, deleteEvent, notesTextarea, todoBtn;
+let dayViewBtn, weekViewBtn, monthViewBtn;
+
+// Current view state
+let currentView = 'month';
 
 // Initialize calendar
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Initializing custom calendar...');
     
-    // Event listeners
-    prevMonthBtn.addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() - 1);
-        renderCalendar();
+    // Initialize DOM elements
+    calendarTitle = document.getElementById('calendarTitle');
+    calendarGrid = document.getElementById('calendarGrid');
+    prevMonthBtn = document.getElementById('prevMonth');
+    nextMonthBtn = document.getElementById('nextMonth');
+    todayBtn = document.getElementById('todayBtn');
+    addEventBtn = document.getElementById('addEventBtn');
+    eventModal = document.getElementById('eventModal');
+    eventForm = document.getElementById('eventForm');
+    cancelEvent = document.getElementById('cancelEvent');
+    saveEvent = document.getElementById('saveEvent');
+    deleteEvent = document.getElementById('deleteEvent');
+    notesTextarea = document.getElementById('notesTextarea');
+    todoBtn = document.getElementById('todoBtn');
+    dayViewBtn = document.getElementById('dayViewBtn');
+    weekViewBtn = document.getElementById('weekViewBtn');
+    monthViewBtn = document.getElementById('monthViewBtn');
+    
+    // Check if elements exist
+    console.log('Calendar elements:', {
+        calendarTitle: !!calendarTitle,
+        calendarGrid: !!calendarGrid,
+        prevMonthBtn: !!prevMonthBtn,
+        nextMonthBtn: !!nextMonthBtn
     });
     
-    nextMonthBtn.addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() + 1);
-        renderCalendar();
-    });
+    // Event listeners - only add if elements exist
+    if (prevMonthBtn) {
+        prevMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+    }
     
-    todayBtn.addEventListener('click', () => {
-        currentDate = new Date();
-        renderCalendar();
-    });
+    if (nextMonthBtn) {
+        nextMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+    }
     
-    addEventBtn.addEventListener('click', () => {
-        openEventModal();
-    });
+    if (todayBtn) {
+        todayBtn.addEventListener('click', () => {
+            currentDate = new Date();
+            renderCalendar();
+        });
+    }
     
-    todoBtn.addEventListener('click', () => {
-        window.location.href = 'todo.html';
-    });
+    if (addEventBtn) {
+        addEventBtn.addEventListener('click', () => {
+            openEventModal();
+        });
+    }
     
-    cancelEvent.addEventListener('click', () => {
-        closeEventModal();
-    });
+    if (todoBtn) {
+        todoBtn.addEventListener('click', () => {
+            window.location.href = 'todo.html';
+        });
+    }
     
-    saveEvent.addEventListener('click', async () => {
-        await saveEventToCalendar();
-    });
+    // View button event listeners
+    if (dayViewBtn) {
+        dayViewBtn.addEventListener('click', () => {
+            setView('day');
+        });
+    }
     
-    deleteEvent.addEventListener('click', async () => {
-        await deleteEventFromCalendar();
-    });
+    if (weekViewBtn) {
+        weekViewBtn.addEventListener('click', () => {
+            setView('week');
+        });
+    }
+    
+    if (monthViewBtn) {
+        monthViewBtn.addEventListener('click', () => {
+            setView('month');
+        });
+    }
+    
+    if (cancelEvent) {
+        cancelEvent.addEventListener('click', () => {
+            closeEventModal();
+        });
+    }
+    
+    if (saveEvent) {
+        saveEvent.addEventListener('click', async () => {
+            await saveEventToCalendar();
+        });
+    }
+    
+    if (deleteEvent) {
+        deleteEvent.addEventListener('click', async () => {
+            await deleteEventFromCalendar();
+        });
+    }
     
     // Notes functionality
-    notesTextarea.addEventListener('input', () => {
-        saveNotes();
-    });
+    if (notesTextarea) {
+        notesTextarea.addEventListener('input', () => {
+            saveNotes();
+        });
+    }
     
     // Initial render
     loadCustomEvents(); // Load saved custom events first
     loadNotes(); // Load saved notes
-    renderCalendar();
-    loadEvents();
+    
+    // Ensure calendar renders
+    setTimeout(() => {
+        renderCalendar();
+        loadEvents();
+    }, 100);
 });
+
+// Set calendar view
+function setView(view) {
+    currentView = view;
+    
+    // Update button states
+    if (dayViewBtn) dayViewBtn.classList.toggle('active', view === 'day');
+    if (weekViewBtn) weekViewBtn.classList.toggle('active', view === 'week');
+    if (monthViewBtn) monthViewBtn.classList.toggle('active', view === 'month');
+    
+    // Re-render calendar
+    renderCalendar();
+}
 
 // Render the calendar
 function renderCalendar() {
+    console.log('Rendering calendar...', currentView);
+    
+    if (!calendarGrid) {
+        console.error('Calendar grid element not found!');
+        return;
+    }
+    
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     
     // Update title
-    const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    calendarTitle.textContent = `${monthNames[month]} ${year}`;
+    if (calendarTitle) {
+        const monthNames = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        calendarTitle.textContent = `${monthNames[month]} ${year}`;
+    }
+    
+    // Clear grid
+    calendarGrid.innerHTML = '';
+    
+    console.log('About to render calendar view:', currentView);
+    
+    if (currentView === 'month') {
+        console.log('Rendering month view for:', year, month);
+        renderMonthView(year, month);
+    } else if (currentView === 'week') {
+        console.log('Rendering week view for:', year, month);
+        renderWeekView(year, month);
+    } else if (currentView === 'day') {
+        console.log('Rendering day view for:', year, month);
+        renderDayView(year, month);
+    }
+    
+    console.log('Calendar grid children count:', calendarGrid.children.length);
+    
+    // Fallback: if no children were added, create a simple grid
+    if (calendarGrid.children.length === 0) {
+        console.log('No calendar children found, creating fallback grid');
+        createFallbackCalendar();
+    }
+}
+
+// Render month view
+function renderMonthView(year, month) {
+    console.log('renderMonthView called with:', year, month);
     
     // Get first day of month and number of days
     const firstDay = new Date(year, month, 1);
@@ -91,8 +202,7 @@ function renderCalendar() {
     const daysInMonth = lastDay.getDate();
     const startingDayOfWeek = firstDay.getDay(); // 0 = Sunday
     
-    // Clear grid
-    calendarGrid.innerHTML = '';
+    console.log('Month details:', { firstDay, lastDay, daysInMonth, startingDayOfWeek });
     
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < startingDayOfWeek; i++) {
@@ -119,8 +229,59 @@ function renderCalendar() {
     }
 }
 
+// Render week view (placeholder)
+function renderWeekView(year, month) {
+    calendarGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px;">Week view - Coming soon!</div>';
+}
+
+// Render day view (placeholder)
+function renderDayView(year, month) {
+    calendarGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px;">Day view - Coming soon!</div>';
+}
+
+// Fallback calendar creation
+function createFallbackCalendar() {
+    console.log('Creating fallback calendar');
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < startingDayOfWeek; i++) {
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day other-month';
+        dayElement.innerHTML = '<div class="day-number"></div>';
+        calendarGrid.appendChild(dayElement);
+    }
+    
+    // Add days of the current month
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day';
+        dayElement.innerHTML = `<div class="day-number">${day}</div>`;
+        calendarGrid.appendChild(dayElement);
+    }
+    
+    // Add empty cells to complete the grid
+    const totalCells = startingDayOfWeek + daysInMonth;
+    const remainingCells = 42 - totalCells;
+    
+    for (let i = 1; i <= remainingCells; i++) {
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day other-month';
+        dayElement.innerHTML = `<div class="day-number">${i}</div>`;
+        calendarGrid.appendChild(dayElement);
+    }
+    
+    console.log('Fallback calendar created with', calendarGrid.children.length, 'cells');
+}
+
 // Create a day element
 function createDayElement(dayNumber, isOtherMonth, date) {
+    console.log('Creating day element:', dayNumber, isOtherMonth, date);
     const dayElement = document.createElement('div');
     dayElement.className = 'calendar-day';
     
