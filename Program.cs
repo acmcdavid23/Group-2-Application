@@ -33,6 +33,23 @@ app.MapPost("/api/resumes", async (HttpRequest req) => {
 
 app.MapGet("/api/resumes", () => Results.Ok(store.GetResumes().Select(r => new { r.Id, r.FileName, r.OriginalName, DisplayName = r.DisplayName, Url = "/uploads/" + r.FileName, r.CreatedAt })));
 
+// Get resume content
+app.MapGet("/api/resumes/{id:int}/content", (int id) => {
+    var resume = store.GetResumes().FirstOrDefault(r => r.Id == id);
+    if (resume == null) return Results.NotFound();
+    
+    var filePath = Path.Combine(uploadDir, resume.FileName);
+    if (!File.Exists(filePath)) return Results.NotFound();
+    
+    try {
+        // Try to extract text from PDF
+        var text = ExtractTextFromPdf(filePath);
+        return Results.Ok(new { content = text });
+    } catch {
+        return Results.Ok(new { content = "Unable to extract text from this file type" });
+    }
+});
+
 // Delete a resume (remove metadata and delete uploaded file)
 app.MapDelete("/api/resumes/{id:int}", (int id) => {
     var removed = store.RemoveResume(id);
@@ -45,11 +62,25 @@ app.MapDelete("/api/resumes/{id:int}", (int id) => {
 });
 
 app.MapPost("/api/postings", (Posting p) => {
-    var rec = store.AddPosting(p.Title, p.Company, p.Url, p.DueDate);
+    var rec = store.AddPosting(p.Title, p.Company, p.Description, p.DueDate, p.Status);
     return Results.Ok(rec);
 });
 
 app.MapGet("/api/postings", () => Results.Ok(store.GetPostings()));
+
+// Update a posting
+app.MapPut("/api/postings/{id:int}", (int id, Posting p) => {
+    var updated = store.UpdatePosting(id, p.Title, p.Company, p.Description, p.DueDate, p.Status);
+    if (updated == null) return Results.NotFound();
+    return Results.Ok(updated);
+});
+
+// Delete a posting
+app.MapDelete("/api/postings/{id:int}", (int id) => {
+    var removed = store.RemovePosting(id);
+    if (removed == null) return Results.NotFound();
+    return Results.Ok(new { success = true });
+});
 
 app.MapPost("/api/tailor", (TailorRequest req) => {
     if (string.IsNullOrEmpty(req.PostingUrl) || req.ResumeId == 0) return Results.BadRequest(new { error = "postingUrl and resumeId required" });
@@ -67,10 +98,21 @@ app.MapGet("/uploads/{file}", (string file) => {
     return Results.File(File.ReadAllBytes(path), contentType);
 });
 
+// Simple PDF text extraction (basic implementation)
+string ExtractTextFromPdf(string filePath) {
+    try {
+        // For now, return a placeholder - in a real implementation you'd use a PDF library
+        // like iTextSharp or PdfPig to extract text from PDFs
+        return "PDF content extraction not implemented yet. Please copy and paste your resume content manually.";
+    } catch {
+        return "Unable to extract text from this file.";
+    }
+}
+
 app.Run();
 
 record Resume(int Id, string FileName, string OriginalName, string? DisplayName, DateTime CreatedAt);
-record Posting(int Id, string Title, string Company, string Url, string? DueDate, string Status, DateTime CreatedAt);
+record Posting(int Id, string Title, string Company, string Description, string? DueDate, string Status, DateTime CreatedAt);
 record TailorRequest(string PostingUrl, int ResumeId);
 
 class DataStore
@@ -82,8 +124,11 @@ class DataStore
     public Resume AddResume(string filename, string original, string? displayName){ var id = ++_data.LastId; var r = new Resume(id, filename, original, displayName, DateTime.UtcNow); _data.Resumes.Add(r); Flush(); return r; }
     public IEnumerable<Resume> GetResumes() => _data.Resumes.OrderByDescending(r=>r.CreatedAt);
     public Resume? RemoveResume(int id){ var r = _data.Resumes.FirstOrDefault(x=>x.Id==id); if(r==null) return null; _data.Resumes.Remove(r); Flush(); return r; }
-    public Posting AddPosting(string title, string company, string url, string? due){ var id = ++_data.LastId; var p = new Posting(id, title, company, url, due, "not-applied", DateTime.UtcNow); _data.Postings.Add(p); Flush(); return p; }
+    public Posting AddPosting(string title, string company, string description, string? due, string status){ var id = ++_data.LastId; var p = new Posting(id, title, company, description, due, status, DateTime.UtcNow); _data.Postings.Add(p); Flush(); return p; }
     public IEnumerable<Posting> GetPostings() => _data.Postings.OrderByDescending(p=>p.CreatedAt);
+    public Posting? UpdatePosting(int id, string title, string company, string description, string? due, string status){ var p = _data.Postings.FirstOrDefault(x=>x.Id==id); if(p==null) return null; var updated = p with { Title = title, Company = company, Description = description, DueDate = due, Status = status }; var index = _data.Postings.IndexOf(p); _data.Postings[index] = updated; Flush(); return updated; }
+    public Posting? RemovePosting(int id){ var p = _data.Postings.FirstOrDefault(x=>x.Id==id); if(p==null) return null; _data.Postings.Remove(p); Flush(); return p; }
 }
 
 class AppData{ public int LastId {get; set;} = 0; public List<Resume> Resumes {get; set;} = new(); public List<Posting> Postings {get; set;} = new(); }
+
