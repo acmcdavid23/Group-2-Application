@@ -62,7 +62,7 @@ app.MapDelete("/api/resumes/{id:int}", (int id) => {
 });
 
 app.MapPost("/api/postings", (Posting p) => {
-    var rec = store.AddPosting(p.Title, p.Company, p.Description, p.DueDate);
+    var rec = store.AddPosting(p.Title, p.Company, p.Description, p.DueDate, p.Status);
     return Results.Ok(rec);
 });
 
@@ -70,7 +70,7 @@ app.MapGet("/api/postings", () => Results.Ok(store.GetPostings()));
 
 // Update a posting
 app.MapPut("/api/postings/{id:int}", (int id, Posting p) => {
-    var updated = store.UpdatePosting(id, p.Title, p.Company, p.Description, p.DueDate);
+    var updated = store.UpdatePosting(id, p.Title, p.Company, p.Description, p.DueDate, p.Status);
     if (updated == null) return Results.NotFound();
     return Results.Ok(updated);
 });
@@ -124,9 +124,9 @@ class DataStore
     public Resume AddResume(string filename, string original, string? displayName){ var id = ++_data.LastId; var r = new Resume(id, filename, original, displayName, DateTime.UtcNow); _data.Resumes.Add(r); Flush(); return r; }
     public IEnumerable<Resume> GetResumes() => _data.Resumes.OrderByDescending(r=>r.CreatedAt);
     public Resume? RemoveResume(int id){ var r = _data.Resumes.FirstOrDefault(x=>x.Id==id); if(r==null) return null; _data.Resumes.Remove(r); Flush(); return r; }
-    public Posting AddPosting(string title, string company, string description, string? due){ var id = ++_data.LastId; var p = new Posting(id, title, company, description, due, "not-applied", DateTime.UtcNow); _data.Postings.Add(p); Flush(); return p; }
+    public Posting AddPosting(string title, string company, string description, string? due, string status){ var id = ++_data.LastId; var p = new Posting(id, title, company, description, due, status, DateTime.UtcNow); _data.Postings.Add(p); Flush(); return p; }
     public IEnumerable<Posting> GetPostings() => _data.Postings.OrderByDescending(p=>p.CreatedAt);
-    public Posting? UpdatePosting(int id, string title, string company, string description, string? due){ var p = _data.Postings.FirstOrDefault(x=>x.Id==id); if(p==null) return null; var updated = p with { Title = title, Company = company, Description = description, DueDate = due }; var index = _data.Postings.IndexOf(p); _data.Postings[index] = updated; Flush(); return updated; }
+    public Posting? UpdatePosting(int id, string title, string company, string description, string? due, string status){ var p = _data.Postings.FirstOrDefault(x=>x.Id==id); if(p==null) return null; var updated = p with { Title = title, Company = company, Description = description, DueDate = due, Status = status }; var index = _data.Postings.IndexOf(p); _data.Postings[index] = updated; Flush(); return updated; }
     public Posting? RemovePosting(int id){ var p = _data.Postings.FirstOrDefault(x=>x.Id==id); if(p==null) return null; _data.Postings.Remove(p); Flush(); return p; }
 }
 

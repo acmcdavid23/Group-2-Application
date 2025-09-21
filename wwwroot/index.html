@@ -8,6 +8,284 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link href="styles.css" rel="stylesheet" />
   <style>
+    /* Status Dropdown Styles */
+    .status-dropdown {
+      padding: 12px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 16px;
+      transition: all 0.2s;
+      background: white;
+      backdrop-filter: blur(10px);
+      font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .status-dropdown:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Status Badge Styles */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .status-interested { background: #f3f4f6; color: #374151; }
+    .status-applied { background: #dbeafe; color: #1e40af; }
+    .status-phone_screen { background: #fef3c7; color: #92400e; }
+    .status-interview { background: #fce7f3; color: #be185d; }
+    .status-offer { background: #d1fae5; color: #065f46; }
+    .status-rejected { background: #fee2e2; color: #991b1b; }
+    
+    /* Posting Header Layout */
+    .posting-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    
+    .posting-status {
+      flex-shrink: 0;
+      margin-left: 12px;
+    }
+    
+    /* Search and Filter Styles */
+    .postings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    
+    .search-filter-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .search-input {
+      padding: 8px 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 14px;
+      min-width: 200px;
+      transition: all 0.2s;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .status-filter {
+      padding: 8px 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 14px;
+      background: white;
+      min-width: 120px;
+      transition: all 0.2s;
+    }
+    
+    .status-filter:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      color: #6b7280;
+      font-style: italic;
+    }
+    
+    /* Analytics Dashboard Styles */
+    .analytics-dashboard {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 16px;
+      border: 1px solid #e2e8f0;
+    }
+    
+    .analytics-dashboard h4 {
+      margin: 0 0 12px 0;
+      color: #1e293b;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .analytics-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+    }
+    
+    .stat-label {
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 500;
+    }
+    
+    .stat-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e293b;
+      background: #e2e8f0;
+      padding: 2px 8px;
+      border-radius: 12px;
+      min-width: 30px;
+      text-align: center;
+    }
+    
+    /* Help System Styles */
+    .site-header {
+      position: relative;
+    }
+    
+    .header-rect {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .help-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid #3b82f6;
+      background: #3b82f6;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+    }
+    
+    .help-btn:hover {
+      background: #2563eb;
+      border-color: #2563eb;
+      transform: scale(1.1);
+    }
+    
+    .help-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .help-modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      margin: 20px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .help-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .help-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0;
+    }
+    
+    .help-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #64748b;
+      padding: 4px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    
+    .help-close:hover {
+      background: #f1f5f9;
+      color: #1e293b;
+    }
+    
+    .help-section {
+      margin-bottom: 20px;
+    }
+    
+    .help-section h4 {
+      color: #3b82f6;
+      font-size: 16px;
+      margin: 0 0 8px 0;
+      font-weight: 600;
+    }
+    
+    .help-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    
+    .help-section li {
+      margin-bottom: 4px;
+      color: #475569;
+      line-height: 1.5;
+    }
+    
+    .help-tip {
+      background: #f0f9ff;
+      border-left: 4px solid #3b82f6;
+      padding: 12px;
+      margin: 12px 0;
+      border-radius: 0 6px 6px 0;
+    }
+    
+    .help-tip strong {
+      color: #1e40af;
+    }
   </style>
   </head>
   <body>
@@ -17,18 +295,34 @@
           <div class="brand">Internship Application Manager</div>
           <div class="subtitle">Keep resumes, postings, and due dates in one place</div>
         </div>
+        <button id="helpBtn" class="help-btn" title="Help & Tips">?</button>
       </div>
     </header>
 
-    <nav class="nav-banner">
-      <div class="nav-banner-rect">
-                <div class="nav-banner-inner">
-                  <button class="nav-btn active" data-panel="job-postings">Job Postings</button>
-                  <button class="nav-btn" data-panel="resumes">Resumes</button>
-                  <button class="nav-btn" data-panel="calendar">Calendar</button>
-                </div>
-      </div>
-    </nav>
+    <!-- Hamburger Menu -->
+    <div class="hamburger-menu">
+      <button id="hamburgerBtn" class="hamburger-btn">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu">
+      <a href="index.html" class="mobile-menu-item active" data-page="index.html">
+        📋 Job Postings
+      </a>
+      <a href="resumes.html" class="mobile-menu-item" data-page="resumes.html">
+        📄 Resumes
+      </a>
+      <a href="calendar.html" class="mobile-menu-item" data-page="calendar.html">
+        📅 Calendar
+      </a>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay"></div>
 
     <main class="container">
       <div class="panel full-width" style="margin-top: 20px; display: flex; gap: 20px;">
@@ -38,14 +332,64 @@
           <form id="postingForm" class="form-vertical">
             <input name="title" placeholder="Job Title" required />
             <input name="company" placeholder="Company Name" />
-            <textarea name="description" placeholder="Job description" rows="4"></textarea>
+            <textarea name="description" placeholder="Job description" rows="4" style="resize: none;"></textarea>
             <input name="due_date" type="date" />
+            <select name="status" class="status-dropdown">
+              <option value="interested">Interested</option>
+              <option value="applied">Applied</option>
+              <option value="phone_screen">Phone Screen</option>
+              <option value="interview">Interview</option>
+              <option value="offer">Offer</option>
+              <option value="rejected">Rejected</option>
+            </select>
             <button class="btn primary">Add Posting</button>
           </form>
+          
+          <!-- Analytics Dashboard -->
+          <div class="analytics-dashboard" style="margin-top: 20px;">
+            <h4>📊 Application Stats</h4>
+            <div id="analyticsStats" class="analytics-stats">
+              <div class="stat-item">
+                <span class="stat-label">Total Applications:</span>
+                <span class="stat-value" id="totalApplications">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Applied:</span>
+                <span class="stat-value" id="appliedCount">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Interviews:</span>
+                <span class="stat-value" id="interviewCount">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Offers:</span>
+                <span class="stat-value" id="offerCount">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Success Rate:</span>
+                <span class="stat-value" id="successRate">0%</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="card" style="flex: 1;">
-          <h3>Job Postings</h3>
+          <div class="postings-header">
+            <h3>Job Postings</h3>
+            <div class="search-filter-controls">
+              <input type="text" id="searchInput" placeholder="Search postings..." class="search-input" />
+              <select id="statusFilter" class="status-filter">
+                <option value="">All Statuses</option>
+                <option value="interested">Interested</option>
+                <option value="applied">Applied</option>
+                <option value="phone_screen">Phone Screen</option>
+                <option value="interview">Interview</option>
+                <option value="offer">Offer</option>
+                <option value="rejected">Rejected</option>
+              </select>
+              <button id="exportPostings" class="btn btn-sm">📊 Export</button>
+            </div>
+          </div>
           <div id="postings" class="list"></div>
         </div>
       </div>
@@ -62,8 +406,16 @@
         <form id="editForm" class="form-vertical">
           <input name="title" placeholder="Job Title" required />
           <input name="company" placeholder="Company Name" />
-          <textarea name="description" placeholder="Job description" rows="4"></textarea>
+          <textarea name="description" placeholder="Job description" rows="4" style="resize: none;"></textarea>
           <input name="due_date" type="date" />
+          <select name="status" class="status-dropdown">
+            <option value="interested">Interested</option>
+            <option value="applied">Applied</option>
+            <option value="phone_screen">Phone Screen</option>
+            <option value="interview">Interview</option>
+            <option value="offer">Offer</option>
+            <option value="rejected">Rejected</option>
+          </select>
           <input type="hidden" name="id" />
         </form>
       </div>
@@ -74,7 +426,101 @@
     </div>
   </div>
 
+  <!-- Help Modal -->
+  <div id="helpModal" class="help-modal">
+    <div class="help-modal-content">
+      <div class="help-header">
+        <h3 class="help-title">📋 Job Postings Help</h3>
+        <button id="closeHelpModal" class="help-close">&times;</button>
+      </div>
+      
+      <div class="help-section">
+        <h4>🎯 Application Status Pipeline</h4>
+        <ul>
+          <li><strong>Interested:</strong> Jobs you're considering applying to</li>
+          <li><strong>Applied:</strong> Applications you've submitted</li>
+          <li><strong>Phone Screen:</strong> Initial phone/video interviews</li>
+          <li><strong>Interview:</strong> In-person or final interviews</li>
+          <li><strong>Offer:</strong> Job offers received</li>
+          <li><strong>Rejected:</strong> Applications that didn't work out</li>
+        </ul>
+      </div>
+      
+      <div class="help-section">
+        <h4>🔍 Search & Filter</h4>
+        <ul>
+          <li>Search by job title, company name, or description</li>
+          <li>Filter by application status to see your progress</li>
+          <li>Use the search bar for quick finding of specific applications</li>
+        </ul>
+      </div>
+      
+      <div class="help-section">
+        <h4>📊 Analytics Dashboard</h4>
+        <ul>
+          <li><strong>Total Applications:</strong> All job postings in your system</li>
+          <li><strong>Applied:</strong> Applications you've actually submitted</li>
+          <li><strong>Interviews:</strong> Applications that reached interview stage</li>
+          <li><strong>Offers:</strong> Job offers you've received</li>
+          <li><strong>Success Rate:</strong> Percentage of applications that led to offers</li>
+        </ul>
+      </div>
+      
+      <div class="help-section">
+        <h4>💾 Export & Backup</h4>
+        <ul>
+          <li>Click the "📊 Export" button to download your data as CSV</li>
+          <li>Includes all application details, statuses, and dates</li>
+          <li>Perfect for backup or importing into other tools</li>
+        </ul>
+      </div>
+      
+      <div class="help-tip">
+        <strong>💡 Pro Tip:</strong> Update your application status regularly to get accurate analytics and track your job search progress effectively!
+      </div>
+    </div>
+  </div>
+
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
+  <script src="hamburger-menu.js"></script>
   <script src="main.js?v=3"></script>
+  
+  <!-- Help Modal JavaScript -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+      console.log('Help modal script loading...');
+      
+      const helpBtn = document.getElementById('helpBtn');
+      const helpModal = document.getElementById('helpModal');
+      const closeHelpModal = document.getElementById('closeHelpModal');
+      
+      console.log('Help button found:', helpBtn);
+      console.log('Help modal found:', helpModal);
+      console.log('Close button found:', closeHelpModal);
+      
+      if (helpBtn && helpModal && closeHelpModal) {
+          console.log('Setting up help modal event listeners');
+          
+          helpBtn.addEventListener('click', function() {
+              console.log('Help button clicked');
+              helpModal.style.display = 'flex';
+          });
+          
+          closeHelpModal.addEventListener('click', function() {
+              console.log('Close button clicked');
+              helpModal.style.display = 'none';
+          });
+          
+          // Close modal when clicking outside
+          helpModal.addEventListener('click', function(e) {
+              if (e.target === helpModal) {
+                  helpModal.style.display = 'none';
+              }
+          });
+      } else {
+          console.log('Help modal elements not found');
+      }
+  });
+  </script>
   </body>
   </html>

@@ -8,6 +8,133 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link href="styles.css" rel="stylesheet" />
   <style>
+    /* Help System Styles */
+    .site-header {
+      position: relative;
+    }
+    
+    .header-rect {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .help-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid #3b82f6;
+      background: #3b82f6;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+    }
+    
+    .help-btn:hover {
+      background: #2563eb;
+      border-color: #2563eb;
+      transform: scale(1.1);
+    }
+    
+    .help-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .help-modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      margin: 20px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .help-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .help-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0;
+    }
+    
+    .help-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #64748b;
+      padding: 4px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    
+    .help-close:hover {
+      background: #f1f5f9;
+      color: #1e293b;
+    }
+    
+    .help-section {
+      margin-bottom: 20px;
+    }
+    
+    .help-section h4 {
+      color: #3b82f6;
+      font-size: 16px;
+      margin: 0 0 8px 0;
+      font-weight: 600;
+    }
+    
+    .help-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    
+    .help-section li {
+      margin-bottom: 4px;
+      color: #475569;
+      line-height: 1.5;
+    }
+    
+    .help-tip {
+      background: #f0f9ff;
+      border-left: 4px solid #3b82f6;
+      padding: 12px;
+      margin: 12px 0;
+      border-radius: 0 6px 6px 0;
+    }
+    
+    .help-tip strong {
+      color: #1e40af;
+    }
   </style>
   </head>
   <body>
@@ -17,18 +144,34 @@
           <div class="brand">Internship Application Manager</div>
           <div class="subtitle">Keep resumes, postings, and due dates in one place</div>
         </div>
+        <button id="helpBtn" class="help-btn" title="Help & Tips">?</button>
       </div>
     </header>
 
-    <nav class="nav-banner">
-      <div class="nav-banner-rect">
-                    <div class="nav-banner-inner">
-                      <button class="nav-btn" data-panel="job-postings">Job Postings</button>
-                      <button class="nav-btn active" data-panel="resumes">Resumes</button>
-                      <button class="nav-btn" data-panel="calendar">Calendar</button>
-                    </div>
-      </div>
-    </nav>
+    <!-- Hamburger Menu -->
+    <div class="hamburger-menu">
+      <button id="hamburgerBtn" class="hamburger-btn">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu">
+      <a href="index.html" class="mobile-menu-item" data-page="index.html">
+        📋 Job Postings
+      </a>
+      <a href="resumes.html" class="mobile-menu-item active" data-page="resumes.html">
+        📄 Resumes
+      </a>
+      <a href="calendar.html" class="mobile-menu-item" data-page="calendar.html">
+        📅 Calendar
+      </a>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay"></div>
 
     <main class="container">
       <div class="panel full-width" style="margin-top: 20px;">
@@ -65,7 +208,100 @@
       </div>
     </div>
 
-  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
+    <!-- Help Modal -->
+    <div id="helpModal" class="help-modal">
+      <div class="help-modal-content">
+        <div class="help-header">
+          <h3 class="help-title">📄 Resumes Help</h3>
+          <button id="closeHelpModal" class="help-close">&times;</button>
+        </div>
+        
+        <div class="help-section">
+          <h4>📤 Uploading Resumes</h4>
+          <ul>
+            <li>Click "Choose File" to select your resume (PDF, DOC, DOCX)</li>
+            <li>Click "Upload" to save your resume to the system</li>
+            <li>Give your resume a descriptive name for easy identification</li>
+            <li>Upload multiple versions for different job types</li>
+          </ul>
+        </div>
+        
+        <div class="help-section">
+          <h4>👁️ Preview & Management</h4>
+          <ul>
+            <li>Click "Preview" to see your resume content</li>
+            <li>Click "Download" to get a copy of your resume</li>
+            <li>Click "Delete" to remove resumes you no longer need</li>
+            <li>Use descriptive names like "Software Engineer Resume - Fall 2025"</li>
+          </ul>
+        </div>
+        
+        <div class="help-section">
+          <h4>🎯 Resume Tailoring</h4>
+          <ul>
+            <li>Go to Job Postings page and click "Tailor Resume"</li>
+            <li>The system will analyze the job description</li>
+            <li>Get suggestions for keywords and skills to highlight</li>
+            <li>Create customized versions for different job types</li>
+          </ul>
+        </div>
+        
+        <div class="help-section">
+          <h4>💡 Best Practices</h4>
+          <ul>
+            <li>Keep multiple versions for different industries</li>
+            <li>Update your resume regularly with new skills</li>
+            <li>Use clear, descriptive names for easy organization</li>
+            <li>Always preview before downloading to ensure quality</li>
+          </ul>
+        </div>
+        
+        <div class="help-tip">
+          <strong>💡 Pro Tip:</strong> Upload different versions of your resume for different job types (technical, business, creative) and use the tailoring feature to customize them for specific applications!
+        </div>
+      </div>
+    </div>
+
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
+  <script src="hamburger-menu.js"></script>
   <script src="resumes.js"></script>
+  
+  <!-- Help Modal JavaScript -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+      console.log('Help modal script loading...');
+      
+      const helpBtn = document.getElementById('helpBtn');
+      const helpModal = document.getElementById('helpModal');
+      const closeHelpModal = document.getElementById('closeHelpModal');
+      
+      console.log('Help button found:', helpBtn);
+      console.log('Help modal found:', helpModal);
+      console.log('Close button found:', closeHelpModal);
+      
+      if (helpBtn && helpModal && closeHelpModal) {
+          console.log('Setting up help modal event listeners');
+          
+          helpBtn.addEventListener('click', function() {
+              console.log('Help button clicked');
+              helpModal.style.display = 'flex';
+          });
+          
+          closeHelpModal.addEventListener('click', function() {
+              console.log('Close button clicked');
+              helpModal.style.display = 'none';
+          });
+          
+          // Close modal when clicking outside
+          helpModal.addEventListener('click', function(e) {
+              if (e.target === helpModal) {
+                  helpModal.style.display = 'none';
+              }
+          });
+      } else {
+          console.log('Help modal elements not found');
+      }
+  });
+  </script>
   </body>
 </html>

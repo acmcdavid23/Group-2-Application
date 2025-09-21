@@ -1,3 +1,4 @@
+console.log('Resumes.js is loading...');
 const api = (path, opts) => fetch(path, opts).then(r=>{ if(!r.ok) return r.json().then(e=>{throw e}); return r.json(); });
 
 const uploadForm = document.getElementById('uploadForm');
@@ -9,25 +10,39 @@ const confirmUpload = document.getElementById('confirmUpload');
 const resumeNameInput = document.getElementById('resumeName');
 let selectedFile = null;
 
-// Navigation handling
+// Navigation is now handled by hamburger-menu.js
+
+// Help modal functionality
 document.addEventListener('DOMContentLoaded', function() {
-  const navButtons = document.querySelectorAll('.nav-btn');
-  navButtons.forEach(btn => {
-    btn.addEventListener('click', function() {
-      const panel = this.getAttribute('data-panel');
-      navButtons.forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-      
-      if (panel === 'job-postings') {
-        window.location.href = 'index.html';
-      } else if (panel === 'calendar') {
-        window.location.href = 'calendar.html';
-      } else if (panel === 'todo') {
-        window.location.href = 'todo.html';
-      }
-      // Resumes is the current page, no action needed
+  const helpBtn = document.getElementById('helpBtn');
+  const helpModal = document.getElementById('helpModal');
+  const closeHelpModal = document.getElementById('closeHelpModal');
+  
+  console.log('Help button found:', helpBtn);
+  console.log('Help modal found:', helpModal);
+  console.log('Close button found:', closeHelpModal);
+  
+  if (helpBtn && helpModal && closeHelpModal) {
+    console.log('Setting up help modal event listeners');
+    helpBtn.addEventListener('click', function() {
+      console.log('Help button clicked');
+      helpModal.style.display = 'flex';
     });
-  });
+    
+    closeHelpModal.addEventListener('click', function() {
+      console.log('Close button clicked');
+      helpModal.style.display = 'none';
+    });
+    
+    // Close modal when clicking outside
+    helpModal.addEventListener('click', function(e) {
+      if (e.target === helpModal) {
+        helpModal.style.display = 'none';
+      }
+    });
+  } else {
+    console.log('Help modal elements not found');
+  }
 });
 
 fileInput.addEventListener('change', (e)=>{
