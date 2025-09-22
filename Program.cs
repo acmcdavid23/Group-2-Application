@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.StaticFiles;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options => options.AddDefaultPolicy(p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
@@ -61,9 +62,35 @@ app.MapDelete("/api/resumes/{id:int}", (int id) => {
     return Results.Ok(new { success = true });
 });
 
-app.MapPost("/api/postings", (Posting p) => {
+app.MapPost("/api/postings", (Posting p) =>
+{
     var rec = store.AddPosting(p.Title, p.Company, p.Description, p.DueDate, p.Status);
     return Results.Ok(rec);
+});
+
+app.MapPost("/api/ollama", async (HttpRequest req) => {
+    try {
+        var body = await JsonSerializer.DeserializeAsync<OllamaRequest>(req.Body);
+        if (body == null || string.IsNullOrWhiteSpace(body.Prompt))
+            return Results.BadRequest(new { error = "Prompt required" });
+
+        using var client = new HttpClient();
+        var ollamaReq = new {
+            model = "llama3.1:8b",
+            prompt = body.Prompt,
+            stream = false
+        };
+        var ollamaRes = await client.PostAsync(
+            "http://localhost:11434/api/generate",
+            new StringContent(JsonSerializer.Serialize(ollamaReq), System.Text.Encoding.UTF8, "application/json")
+        );
+        var ollamaJson = await ollamaRes.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(ollamaJson);
+        var response = doc.RootElement.GetProperty("response").GetString();
+        return Results.Ok(new { response });
+    } catch (Exception ex) {
+        return Results.BadRequest(new { error = ex.Message });
+    }
 });
 
 app.MapGet("/api/postings", () => Results.Ok(store.GetPostings()));
@@ -114,20 +141,21 @@ app.Run();
 record Resume(int Id, string FileName, string OriginalName, string? DisplayName, DateTime CreatedAt);
 record Posting(int Id, string Title, string Company, string Description, string? DueDate, string Status, DateTime CreatedAt);
 record TailorRequest(string PostingUrl, int ResumeId);
+record OllamaRequest([property: JsonPropertyName("prompt")] string Prompt);
 
 class DataStore
 {
     readonly string _path;
     AppData _data;
-    public DataStore(string path){ _path = path; if (File.Exists(path)) _data = JsonSerializer.Deserialize<AppData>(File.ReadAllText(path)) ?? new AppData(); else _data = new AppData(); }
-    void Flush(){ File.WriteAllText(_path, JsonSerializer.Serialize(_data)); }
-    public Resume AddResume(string filename, string original, string? displayName){ var id = ++_data.LastId; var r = new Resume(id, filename, original, displayName, DateTime.UtcNow); _data.Resumes.Add(r); Flush(); return r; }
-    public IEnumerable<Resume> GetResumes() => _data.Resumes.OrderByDescending(r=>r.CreatedAt);
-    public Resume? RemoveResume(int id){ var r = _data.Resumes.FirstOrDefault(x=>x.Id==id); if(r==null) return null; _data.Resumes.Remove(r); Flush(); return r; }
-    public Posting AddPosting(string title, string company, string description, string? due, string status){ var id = ++_data.LastId; var p = new Posting(id, title, company, description, due, status, DateTime.UtcNow); _data.Postings.Add(p); Flush(); return p; }
-    public IEnumerable<Posting> GetPostings() => _data.Postings.OrderByDescending(p=>p.CreatedAt);
-    public Posting? UpdatePosting(int id, string title, string company, string description, string? due, string status){ var p = _data.Postings.FirstOrDefault(x=>x.Id==id); if(p==null) return null; var updated = p with { Title = title, Company = company, Description = description, DueDate = due, Status = status }; var index = _data.Postings.IndexOf(p); _data.Postings[index] = updated; Flush(); return updated; }
-    public Posting? RemovePosting(int id){ var p = _data.Postings.FirstOrDefault(x=>x.Id==id); if(p==null) return null; _data.Postings.Remove(p); Flush(); return p; }
+    public DataStore(string path) { _path = path; if (File.Exists(path)) _data = JsonSerializer.Deserialize<AppData>(File.ReadAllText(path)) ?? new AppData(); else _data = new AppData(); }
+    void Flush() { File.WriteAllText(_path, JsonSerializer.Serialize(_data)); }
+    public Resume AddResume(string filename, string original, string? displayName) { var id = ++_data.LastId; var r = new Resume(id, filename, original, displayName, DateTime.UtcNow); _data.Resumes.Add(r); Flush(); return r; }
+    public IEnumerable<Resume> GetResumes() => _data.Resumes.OrderByDescending(r => r.CreatedAt);
+    public Resume? RemoveResume(int id) { var r = _data.Resumes.FirstOrDefault(x => x.Id == id); if (r == null) return null; _data.Resumes.Remove(r); Flush(); return r; }
+    public Posting AddPosting(string title, string company, string description, string? due, string status) { var id = ++_data.LastId; var p = new Posting(id, title, company, description, due, status, DateTime.UtcNow); _data.Postings.Add(p); Flush(); return p; }
+    public IEnumerable<Posting> GetPostings() => _data.Postings.OrderByDescending(p => p.CreatedAt);
+    public Posting? UpdatePosting(int id, string title, string company, string description, string? due, string status) { var p = _data.Postings.FirstOrDefault(x => x.Id == id); if (p == null) return null; var updated = p with { Title = title, Company = company, Description = description, DueDate = due, Status = status }; var index = _data.Postings.IndexOf(p); _data.Postings[index] = updated; Flush(); return updated; }
+    public Posting? RemovePosting(int id) { var p = _data.Postings.FirstOrDefault(x => x.Id == id); if (p == null) return null; _data.Postings.Remove(p); Flush(); return p; }
 }
 
 class AppData{ public int LastId {get; set;} = 0; public List<Resume> Resumes {get; set;} = new(); public List<Posting> Postings {get; set;} = new(); }
