@@ -587,6 +587,16 @@
           helpBtn.focus();
         }
       });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const promptBox = document.getElementById("aiPrompt");
+        const storedPrompt = localStorage.getItem("aiPrompt");
+        if (storedPrompt && promptBox) {
+          promptBox.value = storedPrompt;
+          promptBox.focus();
+          localStorage.removeItem("aiPrompt");
+        }
+      });
     </script>
   </body>
 </html>

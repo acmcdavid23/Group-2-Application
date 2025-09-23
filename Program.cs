@@ -1,8 +1,63 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Text.Json.Serialization;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+
+void TryStartOllama()
+{
+    string[] possiblePaths;
+
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+    {
+        possiblePaths = new[]
+        {
+            "ollama", // If in PATH
+            @"C:\Program Files\Ollama\ollama.exe",
+            @"C:\Program Files (x86)\Ollama\ollama.exe",
+            Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\Programs\Ollama\ollama.exe")
+        };
+    }
+    else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+    {
+        possiblePaths = new[]
+        {
+            "ollama", // If in PATH
+            "/Applications/Ollama.app/Contents/MacOS/ollama",
+            "/usr/local/bin/ollama",
+            "/opt/homebrew/bin/ollama"
+        };
+    }
+    else
+    {
+        possiblePaths = new[] { "ollama" };
+    }
+
+    foreach (var path in possiblePaths)
+    {
+        try
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = path,
+                Arguments = "serve",
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
+            Process.Start(psi);
+            Console.WriteLine($"Tried to start Ollama using: {path}");
+            break;
+        }
+        catch
+        {
+            // Try next path
+        }
+    }
+}
+
 
 var builder = WebApplication.CreateBuilder(args);
+TryStartOllama();
 builder.Services.AddCors(options => options.AddDefaultPolicy(p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 var app = builder.Build();
 app.UseCors();

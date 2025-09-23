@@ -53,7 +53,6 @@ C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\n
 C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\net9.0\scopedcss\bundle\InternApp.styles.css
 C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\net9.0\compressed\v21z5y07hu-8l84czy65w.gz
 C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\net9.0\compressed\oxcdwje8ns-2r66jld3l6.gz
-C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\net9.0\compressed\2wqrdp7z17-twxpv1e1yy.gz
 C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\net9.0\compressed\bcfp668v5u-2ydv2h4t80.gz
 C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\net9.0\compressed\tyik80z0dv-vodrk6e2sc.gz
 C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\net9.0\staticwebassets.build.json
@@ -65,7 +64,8 @@ C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\n
 C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\net9.0\InternApp.pdb
 C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\net9.0\InternApp.genruntimeconfig.cache
 C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\net9.0\ref\InternApp.dll
-C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\net9.0\compressed\wz4obi22x4-a9eo5hf2b8.gz
 C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\net9.0\compressed\9a46gxlqzx-3k1sa36su2.gz
 C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\net9.0\compressed\vf8g5hpqpt-z4lxexkmrl.gz
-C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\net9.0\compressed\bcw5n6duaf-74z2z4a6nw.gz
+C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\net9.0\compressed\bcw5n6duaf-wmx32tm59x.gz
+C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\net9.0\compressed\2wqrdp7z17-htbg4qa2w5.gz
+C:\Users\Gunba\Documents\Source\expo.2025\mis321\Group-2-Application\obj\Debug\net9.0\compressed\wz4obi22x4-9u1icekifc.gz
