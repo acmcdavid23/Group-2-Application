@@ -2,6 +2,7 @@ Internship Application Manager (C# prototype)
 
 Prerequisites:
 - .NET 7 SDK (or compatible)
+- Ollama
 
 Run:
 
@@ -13,38 +14,53 @@ Run:
 
    http://localhost:5000/
 
-🦙 Setting Up Ollama for Local AI Assistant
+**🦙 Setting Up Ollama for Local AI Assistant**
+[Download the Ollama Setup Guide (PDF)](./docs/Ollama_Setup_Guide_Final.pdf)
 
-Prerequisites
+Ollama is the local AI backend that powers the resume assistant in this project.
+Follow these steps to install it and pull the required model.
 
-1. **Install Ollama**
+1. Download Ollama (Windows & Mac)
 
-   - **Windows/macOS:** Download and install from [https://ollama.com/download](https://ollama.com/download)
-   - **Linux:**  
-     ```sh
-     curl -fsSL https://ollama.com/install.sh | sh
-     ```
+Windows:
+Download OllamaSetup.exe from ollama.com/download
+Click Install and follow the prompts. Allow Ollama to add itself to PATH if prompted.
 
-2. **Pull the Required Models**
-   After installing Ollama, close all open terminals and open a new one before running `ollama serve`. This ensures your system recognizes the new command.
-   Open a terminal and run:
+macOS:
+Download the .dmg, drag Ollama to Applications, then open it.
+
+2. Start Ollama
+Option 1: GUI App (Recommended):
+Open Ollama from Start Menu (Windows) or Applications (Mac). Keep it open while using the project.
+
+Option 2: Command Line: ollama serve
+
+3. Download the Required Models
+
+This app uses the llama3.1:8b model. You have two options:
+
+Via the Ollama App:
+   Search for llama3.1:8b and download it.
+
+Via Command Prompt / Terminal:
    ollama pull llama3.1:8b
-   ollama pull nomic-embed-text
 
-3. Running Ollama
-   ollama serve
-   This will start the Ollama API at [http://localhost:11434](http://localhost:11434).
+4. Use with the App
 
-4. Insure that both Ollama and the Program is running for full functionality.
-   Open the Ollama app (or run `ollama serve` in a terminal).
-   Keep the Ollama app open while using this project.
+Make sure both Ollama and the Internship Application Manager are running.
 
-What this prototype provides:
-- Resume upload and listing (files saved to `uploads/`).
-- Add internship postings with optional due dates.
-- Calendar view showing posting due dates (FullCalendar).
-- A mocked "tailor" endpoint that returns keywords from the posting URL.
-- A local Ai to help tailor your resume/job postings
+Ollama provides the AI backend, while your .NET app provides the interface.
 
-Notes:
-- This is a prototype. Integrate a proper DB and LLM service for production.
+Open http://localhost:5000/ai.html to chat with the AI Assistant.
+
+**What this Prototype Provides**
+
+Resume upload and listing (files saved to uploads/)
+
+Add internship postings with optional due dates
+
+Calendar view showing posting due dates (FullCalendar)
+
+Mock “tailor” endpoint that returns keywords from posting URLs
+
+Local AI integration to help tailor your resume/job postings
