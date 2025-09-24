@@ -1,6 +1,93 @@
 console.log('Calendar.js is loading...');
 const api = (path, opts) => fetch(path, opts).then(r=>{ if(!r.ok) return r.json().then(e=>{throw e}); return r.json(); });
 
+// Body scroll lock functions
+function lockBodyScroll() {
+  document.body.classList.add('scroll-locked');
+}
+
+function unlockBodyScroll() {
+  document.body.classList.remove('scroll-locked');
+}
+
+// Cleanup function to unlock scroll when leaving the page
+window.addEventListener('beforeunload', function() {
+  unlockBodyScroll();
+});
+
+// Get status color for styling
+function getStatusColor(status) {
+  const statusColors = {
+    'interested': '#3b82f6',      // Blue
+    'applied': '#8b5cf6',         // Purple
+    'phone_screen': '#f59e0b',    // Orange
+    'interview': '#ef4444',       // Red
+    'offer': '#10b981',          // Green
+    'rejected': '#6b7280'        // Gray
+  };
+  return statusColors[status] || '#6b7280';
+}
+
+// Email and SMS functionality for calendar events
+async function sendEventEmailReminder(event) {
+  const subject = `Reminder: ${event.title}`;
+  const body = `You have an upcoming event: ${event.title} on ${event.date}`;
+  
+  // Get current user's email
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  const emailAddress = currentUser.email || '';
+  
+  if (!emailAddress) {
+    alert('No email address found. Please log in with an email address.');
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        to: emailAddress,
+        subject: subject,
+        body: body
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      alert('Event reminder email sent successfully!');
+    } else {
+      alert('Failed to send email: ' + result.error);
+    }
+  } catch (error) {
+    console.error('Error sending email:', error);
+    alert('Failed to send email. Please try again.');
+  }
+}
+
+
+
+function sendEventEmailJSReminder(event) {
+  const templateParams = {
+    to_email: 'user@example.com',
+    subject: `Event Reminder: ${event.title}`,
+    message: `You have an upcoming event: ${event.title} on ${event.date}`
+  };
+  
+  emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+    .then(response => {
+      console.log('Event reminder email sent!', response);
+      alert('Event reminder email sent successfully!');
+    })
+    .catch(error => {
+      console.log('Error:', error);
+      alert('Failed to send event reminder email. Please try again.');
+    });
+}
+
 // Calendar state
 let currentDate = new Date(2025, 8, 1); // September 2025
 let events = [];
@@ -135,9 +222,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Initial render
-    loadCustomEvents(); // Load saved custom events first
-    loadNotes(); // Load saved notes
+    // Get current user first
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    
+    // Load user-specific custom events
+    loadCustomEvents();
+    loadNotes();
+    
+    // Only add sample events for demo users
+    if (currentUser.isDemo) {
+        addSampleEvents(); // Add sample events for demonstration
+    }
     
     // Set initial view class
     if (calendarGrid) {
@@ -197,8 +292,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Ensure calendar renders
     setTimeout(() => {
+        clearOldEvents(); // Clear any old/duplicate events first
         renderCalendar();
         loadEvents();
+        
+        // Lock scroll if starting in day view
+        if (currentView === 'day') {
+            lockBodyScroll();
+        }
     }, 100);
 });
 
@@ -215,6 +316,13 @@ function setView(view) {
     if (calendarGrid) {
         calendarGrid.classList.remove('day-view', 'week-view', 'month-view');
         calendarGrid.classList.add(`${view}-view`);
+    }
+    
+    // Lock body scroll for day view (since it has its own scrollable area)
+    if (view === 'day') {
+        lockBodyScroll();
+    } else {
+        unlockBodyScroll();
     }
     
     // Re-render calendar
@@ -454,6 +562,7 @@ function renderDayView(year, month) {
         padding: 4px 8px;
         overflow-y: auto;
         max-height: 450px;
+        min-height: 450px;
     `;
     
     // Create hourly time slots
@@ -464,8 +573,10 @@ function renderDayView(year, month) {
             display: flex;
             align-items: center;
             min-height: 28px;
+            height: 28px;
             border-bottom: 1px solid #e2e8f0;
-            padding: 2px 0;
+            padding: 0;
+            margin: 0;
         `;
         
         const timeLabel = document.createElement('div');
@@ -486,6 +597,7 @@ function renderDayView(year, month) {
         timeContent.style.cssText = `
             flex: 1;
             min-height: 20px;
+            height: 20px;
             border-radius: 3px;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
@@ -494,6 +606,7 @@ function renderDayView(year, month) {
             display: flex;
             align-items: center;
             padding: 0 6px;
+            margin: 0;
         `;
         
         timeContent.addEventListener('click', () => {
@@ -667,10 +780,10 @@ function createWeekDayElement(date) {
 // Fallback calendar creation
 function createFallbackCalendar() {
     console.log('Creating fallback calendar');
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const lastDay = new Date(currentYear, currentMonth + 1, 0);
     const daysInMonth = lastDay.getDate();
     const startingDayOfWeek = firstDay.getDay();
     
@@ -770,9 +883,24 @@ function createDayElement(dayNumber, isOtherMonth, date) {
 // Load custom events from localStorage
 function loadCustomEvents() {
     try {
-        const saved = localStorage.getItem('calendar-custom-events');
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        
+        // Ensure we have a valid user
+        if (!currentUser.id && !currentUser.isDemo) {
+            console.log('No valid user found, initializing empty events');
+            customEvents = [];
+            return;
+        }
+        
+        const userKey = currentUser.isDemo ? 'demo_calendar_events' : `user_${currentUser.id}_calendar_events`;
+        const saved = localStorage.getItem(userKey);
         if (saved) {
             customEvents = JSON.parse(saved);
+            console.log(`Loaded ${customEvents.length} events for user: ${currentUser.email || 'demo'}`);
+        } else {
+            // Initialize empty events for new users
+            customEvents = [];
+            console.log('No saved events found, initializing empty array');
         }
     } catch (error) {
         console.error('Failed to load custom events:', error);
@@ -783,7 +911,9 @@ function loadCustomEvents() {
 // Save custom events to localStorage
 function saveCustomEvents() {
     try {
-        localStorage.setItem('calendar-custom-events', JSON.stringify(customEvents));
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const userKey = currentUser.isDemo ? 'demo_calendar_events' : `user_${currentUser.id}_calendar_events`;
+        localStorage.setItem(userKey, JSON.stringify(customEvents));
     } catch (error) {
         console.error('Failed to save custom events:', error);
     }
@@ -792,7 +922,9 @@ function saveCustomEvents() {
 // Load notes from localStorage
 function loadNotes() {
     try {
-        const saved = localStorage.getItem('calendar-notes');
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const userKey = currentUser.isDemo ? 'demo_calendar_notes' : `user_${currentUser.id}_calendar_notes`;
+        const saved = localStorage.getItem(userKey);
         if (saved) {
             notesTextarea.value = saved;
         }
@@ -804,31 +936,86 @@ function loadNotes() {
 // Save notes to localStorage
 function saveNotes() {
     try {
-        localStorage.setItem('calendar-notes', notesTextarea.value);
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const userKey = currentUser.isDemo ? 'demo_calendar_notes' : `user_${currentUser.id}_calendar_notes`;
+        localStorage.setItem(userKey, notesTextarea.value);
     } catch (error) {
         console.error('Failed to save notes:', error);
     }
 }
 
-// Load events from server
+// Global function to refresh calendar from other pages
+window.refreshCalendar = function() {
+    console.log('Refreshing calendar from external call');
+    loadEvents();
+};
+
+// Clear old/duplicate events
+function clearOldEvents() {
+    try {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const userKey = currentUser.isDemo ? 'demo_calendar_events' : `user_${currentUser.id}_calendar_events`;
+        
+        // Clear old events that might be causing duplicates
+        localStorage.removeItem(userKey);
+        customEvents = [];
+        
+        console.log('Cleared old calendar events');
+    } catch (error) {
+        console.error('Failed to clear old events:', error);
+    }
+}
+
+// Load events from user-specific data
 async function loadEvents() {
     try {
-        const postings = await api('/api/postings');
-        events = postings
-            .filter(p => p.dueDate)
-            .map(p => ({
-                id: `posting-${p.id}`,
-                title: `${p.title} - ${p.company}`,
-                start: p.dueDate,
-                extendedProps: {
-                    type: 'posting',
-                    posting: p
-                }
-            }));
+        console.log('loadEvents() called - loading user-specific data');
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        console.log('Current user:', currentUser);
         
+        // Load user-specific job postings
+        let userPostings = [];
+        if (currentUser.isDemo) {
+            // Load demo data
+            userPostings = JSON.parse(localStorage.getItem('demo_user_postings') || '[]');
+            console.log('Loading demo data:', userPostings.length, 'postings');
+        } else if (currentUser.id) {
+            // Load user-specific data
+            userPostings = JSON.parse(localStorage.getItem(`user_${currentUser.id}_postings`) || '[]');
+            console.log('Loading user data:', userPostings.length, 'postings');
+        } else {
+            console.log('No valid user found, using empty array');
+        }
+        
+        // Convert job postings to calendar events
+        events = userPostings
+            .filter(p => p.dueDate) // Use dueDate to match job posting structure
+            .map(p => {
+                // Convert date to proper format (YYYY-MM-DD)
+                const dueDate = new Date(p.dueDate);
+                const formattedDate = dueDate.toISOString().split('T')[0];
+                
+                return {
+                    id: `posting-${p.id}`,
+                    title: `${p.title} - ${p.company}`,
+                    start: formattedDate,
+                    allDay: true,
+                    color: getStatusColor(p.status),
+                    extendedProps: {
+                        type: 'posting',
+                        posting: p
+                    }
+                };
+            });
+        
+        console.log(`Loaded ${events.length} job posting events for user: ${currentUser.email || 'demo'}`);
+        console.log('Job posting events:', events);
+        console.log('Custom events:', customEvents);
+        console.log('Total events:', events.length + customEvents.length);
         renderCalendar(); // Re-render to show events
     } catch (error) {
         console.error('Failed to load events:', error);
+        events = []; // Ensure events is empty on error
     }
 }
 
@@ -852,6 +1039,7 @@ function openEventModal(dateStr = null, timeStr = null) {
     document.querySelector('.modal-header h3').textContent = 'Add Event';
     
     eventModal.setAttribute('aria-hidden', 'false');
+    lockBodyScroll();
 }
 
 function editEvent(event) {
@@ -871,20 +1059,24 @@ function editEvent(event) {
     
     // Color picker removed - no need to set color
     
-    // Show delete button for existing events
+    // Show delete button and email button for existing events
     deleteEvent.style.display = 'inline-block';
+    document.getElementById('emailEvent').style.display = 'inline-block';
     
     // Update modal title
     document.querySelector('.modal-header h3').textContent = 'Edit Event';
     
     eventModal.setAttribute('aria-hidden', 'false');
+    lockBodyScroll();
 }
 
 function closeEventModal() {
     eventModal.setAttribute('aria-hidden', 'true');
+    unlockBodyScroll();
     eventForm.reset();
     editingEvent = null;
     deleteEvent.style.display = 'none';
+    document.getElementById('emailEvent').style.display = 'none';
 }
 
 // Create recurring events
@@ -1075,7 +1267,7 @@ function exportEvents() {
 function showEventDetails(event) {
     const props = event.extendedProps;
     let details = `Title: ${event.title}\n`;
-    details += `Date: ${new Date(event.start).toLocaleDateString()}\n`;
+    details += `Date: ${new Date(event.start).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' })}\n`;
     
     if (props.type === 'posting') {
         details += `Company: ${props.posting.company}\n`;
@@ -1086,4 +1278,104 @@ function showEventDetails(event) {
     }
     
     alert(details);
+}
+
+// Add sample events for demonstration
+function addSampleEvents() {
+    // Check if sample events already exist for this user
+    const existingSampleEvents = customEvents.filter(event => 
+        event.extendedProps?.isSample === true
+    );
+    
+    if (existingSampleEvents.length > 0) {
+        console.log('Sample events already exist for this user');
+        return; // Sample events already exist
+    }
+    
+    console.log('Adding sample events for demo user');
+    
+    const today = new Date();
+    const sampleEvents = [
+        {
+            id: `sample-${Date.now()}-1`,
+            title: 'Microsoft Interview - Round 1',
+            start: new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T10:00',
+            color: '#3b82f6',
+            extendedProps: {
+                type: 'custom',
+                description: 'Technical interview for Software Development Intern position',
+                category: 'interview',
+                isSample: true
+            }
+        },
+        {
+            id: `sample-${Date.now()}-2`,
+            title: 'Google Phone Screen',
+            start: new Date(today.getTime() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T14:00',
+            color: '#10b981',
+            extendedProps: {
+                type: 'custom',
+                description: 'Initial phone screening for Data Analytics Intern role',
+                category: 'interview',
+                isSample: true
+            }
+        },
+        {
+            id: `sample-${Date.now()}-3`,
+            title: 'Apple Application Deadline',
+            start: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            color: '#f59e0b',
+            extendedProps: {
+                type: 'custom',
+                description: 'Final deadline for Marketing Intern application',
+                category: 'deadline',
+                isSample: true
+            }
+        },
+        {
+            id: `sample-${Date.now()}-4`,
+            title: 'IBM Follow-up Call',
+            start: new Date(today.getTime() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T15:30',
+            color: '#8b5cf6',
+            extendedProps: {
+                type: 'custom',
+                description: 'Follow-up call regarding Cybersecurity Intern application',
+                category: 'follow-up',
+                isSample: true
+            }
+        },
+        {
+            id: `sample-${Date.now()}-5`,
+            title: 'Tech Career Fair',
+            start: new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T09:00',
+            color: '#ef4444',
+            extendedProps: {
+                type: 'custom',
+                description: 'Annual technology career fair - great networking opportunity',
+                category: 'networking',
+                isSample: true
+            }
+        },
+        {
+            id: `sample-${Date.now()}-6`,
+            title: 'Adobe Design Portfolio Review',
+            start: new Date(today.getTime() + 18 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T11:00',
+            color: '#06b6d4',
+            extendedProps: {
+                type: 'custom',
+                description: 'Portfolio review session for UX/UI Design Intern position',
+                category: 'interview',
+                isSample: true
+            }
+        }
+    ];
+    
+    // Add sample events to customEvents array
+    customEvents.push(...sampleEvents);
+    
+    // Save to localStorage
+    saveCustomEvents();
+    
+    // Re-render calendar to show sample events
+    renderCalendar();
 }

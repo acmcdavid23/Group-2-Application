@@ -4,376 +4,251 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Internship Application Manager</title>
-  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link href="styles.css" rel="stylesheet" />
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet" />
   <style>
-    /* Status Dropdown Styles */
-    .status-dropdown {
-      padding: 12px 16px;
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
-      margin-bottom: 16px;
-      font-size: 16px;
-      transition: all 0.2s;
-      background: white;
-      backdrop-filter: blur(10px);
-      font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
-      width: 100%;
-      box-sizing: border-box;
+    html {
+      overflow-y: scroll !important;
+    }
+    body {
+      overflow-y: auto !important;
     }
     
-    .status-dropdown:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-    
-    /* Status Badge Styles */
-    .status-badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    .status-interested { background: #f3f4f6; color: #374151; }
-    .status-applied { background: #dbeafe; color: #1e40af; }
-    .status-phone_screen { background: #fef3c7; color: #92400e; }
-    .status-interview { background: #fce7f3; color: #be185d; }
-    .status-offer { background: #d1fae5; color: #065f46; }
-    .status-rejected { background: #fee2e2; color: #991b1b; }
-    
-    /* Posting Header Layout */
-    .posting-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 8px;
-    }
-    
-    .posting-status {
-      flex-shrink: 0;
-      margin-left: 12px;
-    }
-    
-    /* Search and Filter Styles */
-    .postings-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    
-    .search-filter-controls {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-    
-    .search-input {
-      padding: 8px 12px;
-      border: 2px solid #e2e8f0;
-      border-radius: 6px;
-      font-size: 14px;
-      min-width: 200px;
-      transition: all 0.2s;
-    }
-    
-    .search-input:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-    
-    .status-filter {
-      padding: 8px 12px;
-      border: 2px solid #e2e8f0;
-      border-radius: 6px;
-      font-size: 14px;
-      background: white;
-      min-width: 120px;
-      transition: all 0.2s;
-    }
-    
-    .status-filter:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-    
-    .no-results {
-      text-align: center;
-      padding: 40px;
-      color: #6b7280;
-      font-style: italic;
-    }
-    
-    /* Analytics Dashboard Styles */
-    .analytics-dashboard {
-      background: #f8fafc;
-      border-radius: 8px;
-      padding: 16px;
-      border: 1px solid #e2e8f0;
-    }
-    
-    .analytics-dashboard h4 {
-      margin: 0 0 12px 0;
-      color: #1e293b;
-      font-size: 16px;
-      font-weight: 600;
-    }
-    
-    .analytics-stats {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    
-    .stat-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 4px 0;
-    }
-    
-    .stat-label {
-      font-size: 13px;
-      color: #64748b;
-      font-weight: 500;
-    }
-    
-    .stat-value {
-      font-size: 14px;
-      font-weight: 600;
-      color: #1e293b;
-      background: #e2e8f0;
-      padding: 2px 8px;
-      border-radius: 12px;
-      min-width: 30px;
-      text-align: center;
-    }
-    
-    /* Help System Styles */
-    .site-header {
-      position: relative;
-    }
-    
-    .header-rect {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .help-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: 2px solid #3b82f6;
-      background: #3b82f6;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      flex-shrink: 0;
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 1001;
-    }
-    
-    .help-btn:hover {
-      background: #2563eb;
-      border-color: #2563eb;
-      transform: scale(1.1);
-    }
-    
-    .help-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .help-modal-content {
-      background: white;
-      border-radius: 12px;
-      padding: 24px;
-      max-width: 600px;
-      max-height: 80vh;
-      overflow-y: auto;
-      margin: 20px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    }
-    
-    .help-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 2px solid #e2e8f0;
-    }
-    
-    .help-title {
-      font-size: 20px;
-      font-weight: 600;
-      color: #1e293b;
-      margin: 0;
-    }
-    
-    .help-close {
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: #64748b;
-      padding: 4px;
-      border-radius: 4px;
-      transition: all 0.2s;
-    }
-    
-    .help-close:hover {
-      background: #f1f5f9;
-      color: #1e293b;
-    }
-    
-    .help-section {
-      margin-bottom: 20px;
-    }
-    
-    .help-section h4 {
-      color: #3b82f6;
-      font-size: 16px;
-      margin: 0 0 8px 0;
-      font-weight: 600;
-    }
-    
-    .help-section ul {
-      margin: 0;
-      padding-left: 20px;
-    }
-    
-    .help-section li {
-      margin-bottom: 4px;
-      color: #475569;
-      line-height: 1.5;
-    }
-    
-    .help-tip {
-      background: #f0f9ff;
-      border-left: 4px solid #3b82f6;
-      padding: 12px;
-      margin: 12px 0;
-      border-radius: 0 6px 6px 0;
-    }
-    
-    .help-tip strong {
-      color: #1e40af;
+    /* Body scroll lock for modals */
+    body.scroll-locked {
+      overflow: hidden !important;
+      position: fixed !important;
+      width: 100% !important;
+      height: 100% !important;
     }
   </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>
+      // Initialize EmailJS
+      (function() {
+        emailjs.init("X80istNGO-VJ1Q9zZ");
+      })();
+    </script>
+    <style>
+      /* Help Modal Styles */
+      .help-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        animation: fadeIn 0.3s ease-out;
+      }
+      
+      .help-content {
+        background-color: #fff;
+        margin: 5% auto;
+        padding: 20px;
+        border-radius: 12px;
+        width: 80%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        position: relative;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      }
+      
+      .help-close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        position: absolute;
+        top: 10px;
+        right: 15px;
+      }
+      
+      .help-close:hover {
+        color: #000;
+      }
+      
+      .help-section {
+        margin-bottom: 20px;
+      }
+      
+      .help-section h3 {
+        color: #1e293b;
+        margin-bottom: 10px;
+        font-size: 16px;
+      }
+      
+      .help-section p {
+        color: #475569;
+        line-height: 1.6;
+        margin-bottom: 10px;
+      }
+      
+      .help-section ul {
+        color: #475569;
+        line-height: 1.6;
+        padding-left: 20px;
+      }
+      
+      .help-section li {
+        margin-bottom: 8px;
+      }
+      
+      .status-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        margin-right: 8px;
+      }
+      
+      .status-interested { background: #fef3c7; color: #92400e; }
+      .status-applied { background: #dbeafe; color: #1e40af; }
+      .status-phone_screen { background: #e0e7ff; color: #3730a3; }
+      .status-interview { background: #f3e8ff; color: #7c3aed; }
+      .status-offer { background: #d1fae5; color: #065f46; }
+      .status-rejected { background: #fee2e2; color: #991b1b; }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      /* Help Button Styles */
+      .help-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 2px solid #3b82f6;
+        background: #3b82f6;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 1001;
+      }
+      
+      .help-btn:hover {
+        background: #2563eb;
+        border-color: #2563eb;
+        transform: scale(1.1);
+      }
+    </style>
   </head>
   <body>
-    <header class="site-header">
-      <div class="header-rect glisten">
-        <div class="header-inner">
-          <div class="brand">Internship Application Manager</div>
-          <div class="subtitle">Keep resumes, postings, and due dates in one place</div>
+    <!-- Redirect to login if not authenticated -->
+    <script>
+      // Check if user is logged in (in a real app, this would check localStorage or cookies)
+      if (!localStorage.getItem('userLoggedIn')) {
+        window.location.href = 'login.html';
+      }
+    </script>
+    
+    <!-- Header -->
+    <div class="header-rect">
+      <div class="header-inner" style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
+        <div>
+          <div class="brand" onclick="window.location.href='index.html'" style="cursor: pointer;">Internship Application Manager</div>
+          <div class="subtitle">Track your internship applications and manage your career journey</div>
         </div>
-        <button id="helpBtn" class="help-btn" title="Help & Tips">?</button>
+        <div class="auth-buttons">
+          <button class="btn btn-sm" onclick="logout()" style="position: absolute; top: 20px; right: 20px; z-index: 1001;">Logout</button>
+        </div>
       </div>
-    </header>
-
-    <!-- Hamburger Menu -->
-    <div class="hamburger-menu">
-      <button id="hamburgerBtn" class="hamburger-btn">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-      </button>
     </div>
 
-    <!-- Mobile Menu -->
-    <div id="mobileMenu" class="mobile-menu">
-      <a href="index.html" class="mobile-menu-item active" data-page="index.html">
-        📋 Job Postings
-      </a>
-      <a href="resumes.html" class="mobile-menu-item" data-page="resumes.html">
-        📄 Resumes
-      </a>
-      <a href="calendar.html" class="mobile-menu-item" data-page="calendar.html">
-        📅 Calendar
-      </a>
-      <a href="ai.html" class="mobile-menu-item" data-page="ai.html">
-        🤖 AI Assistant
-      </a>
+    <!-- Navigation -->
+    <div class="nav-banner-rect">
+      <div class="nav-banner-inner">
+        <button class="nav-btn active" onclick="window.location.href='index.html'">📊 Dashboard</button>
+        <button class="nav-btn" onclick="window.location.href='resumes.html'">📄 Resumes</button>
+        <button class="nav-btn" onclick="window.location.href='calendar.html'">📅 Calendar</button>
+        <button class="nav-btn" onclick="window.location.href='ai.html'">🤖 AI Assistant</button>
+      </div>
     </div>
-
-    <!-- Mobile Menu Overlay -->
-    <div id="mobileMenuOverlay" class="mobile-menu-overlay"></div>
 
     <main class="container">
       <div class="panel full-width" style="margin-top: 20px; display: flex; gap: 20px;">
         
-        <div class="card" style="flex: 0 0 300px;">
-          <h3>Add Job Posting</h3>
-          <form id="postingForm" class="form-vertical">
-            <input name="title" placeholder="Job Title" required />
-            <input name="company" placeholder="Company Name" />
-            <textarea name="description" placeholder="Job description" rows="4" style="resize: none;"></textarea>
-            <input name="due_date" type="date" />
-            <select name="status" class="status-dropdown">
-              <option value="interested">Interested</option>
-              <option value="applied">Applied</option>
-              <option value="phone_screen">Phone Screen</option>
-              <option value="interview">Interview</option>
-              <option value="offer">Offer</option>
-              <option value="rejected">Rejected</option>
-            </select>
-            <button class="btn primary">Add Posting</button>
-          </form>
+        <div class="card" style="flex: 0 0 300px; max-height: fit-content; height: fit-content;">
+          <!-- Add Job Posting Section -->
+          <div class="form-section" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
+            <h3 style="margin-top: 0; color: #1e293b; font-size: 18px; font-weight: 600;">Add Job Posting</h3>
+            <form id="postingForm" class="form-vertical">
+              <!-- Add spacing above job title -->
+              <div style="margin-top: 70px;">
+                <input name="title" placeholder="Job Title" required />
+                <input name="company" placeholder="Company Name" />
+                <textarea name="description" placeholder="Job description" rows="4" style="resize: none;"></textarea>
+                <input name="due_date" type="date" />
+                <select name="status">
+                  <option value="interested">Interested</option>
+                  <option value="applied">Applied</option>
+                  <option value="phone_screen">Phone Screen</option>
+                  <option value="interview">Interview</option>
+                  <option value="offer">Offer</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+              
+            <!-- Email Notification Settings -->
+            <div style="border-top: 1px solid #e2e8f0; padding-top: 3px; margin-top: 3px;">
+              <h4 style="margin: 0 0 10px 0; color: #1e293b; font-size: 14px; font-weight: 600;">📧 Email Notifications</h4>
+              <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 13px; cursor: pointer;">
+                <input type="checkbox" name="emailNotifications" id="emailNotifications" onchange="toggleEmailFields()" style="width: 16px; height: 16px; accent-color: #3b82f6; margin: 0; vertical-align: middle;">
+                <span style="line-height: 16px; vertical-align: middle;">Send email reminders for this posting</span>
+              </label>
+              <div id="emailFields" style="height: 120px; opacity: 0; transition: opacity 0.3s ease;">
+                <input type="email" name="notificationEmail" id="notificationEmail" placeholder="Email for notifications" style="font-size: 13px; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 10px;">
+                <select name="notificationTiming" id="notificationTiming" style="font-size: 13px; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; width: 100%;">
+                  <option value="1_day">1 day before due date</option>
+                  <option value="3_days">3 days before due date</option>
+                  <option value="1_week">1 week before due date</option>
+                  <option value="2_weeks">2 weeks before due date</option>
+                  <option value="on_due_date">On due date</option>
+                </select>
+              </div>
+            </div>
+              
+              <button class="btn primary">Add Posting</button>
+            </form>
+          </div>
           
-          <!-- Analytics Dashboard -->
-          <div class="analytics-dashboard" style="margin-top: 20px;">
-            <h4>📊 Application Stats</h4>
-            <div id="analyticsStats" class="analytics-stats">
-              <div class="stat-item">
-                <span class="stat-label">Total Applications:</span>
-                <span class="stat-value" id="totalApplications">0</span>
+          <!-- Analytics Dashboard Section -->
+          <div class="analytics-section" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0;">
+            <h3 style="margin-top: 0; color: #1e293b; font-size: 18px; font-weight: 600;">📊 Application Analytics</h3>
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+              <!-- Status Distribution Chart -->
+              <div style="height: 200px;">
+                <canvas id="statusChart"></canvas>
               </div>
-              <div class="stat-item">
-                <span class="stat-label">Applied:</span>
-                <span class="stat-value" id="appliedCount">0</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Interviews:</span>
-                <span class="stat-value" id="interviewCount">0</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Offers:</span>
-                <span class="stat-value" id="offerCount">0</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Success Rate:</span>
-                <span class="stat-value" id="successRate">0%</span>
+              <!-- Quick Stats -->
+              <div id="quickStats" class="analytics-stats">
+                <div class="stat-item">
+                  <span class="stat-label">Total Applications:</span>
+                  <span class="stat-value" id="totalApplications">0</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Success Rate:</span>
+                  <span class="stat-value" id="successRate">0%</span>
+                </div>
               </div>
             </div>
           </div>
+          
         </div>
 
         <div class="card" style="flex: 1;">
@@ -381,7 +256,7 @@
             <h3>Job Postings</h3>
             <div class="search-filter-controls">
               <input type="text" id="searchInput" placeholder="Search postings..." class="search-input" />
-              <select id="statusFilter" class="status-filter">
+              <select id="statusFilter">
                 <option value="">All Statuses</option>
                 <option value="interested">Interested</option>
                 <option value="applied">Applied</option>
@@ -398,132 +273,173 @@
       </div>
     </main>
 
-  <!-- Edit Posting Modal -->
-  <div id="editModal" class="modal" style="display: none;">
-    <div class="modal-window">
-      <div class="modal-header">
-        <h3>Edit Job Posting</h3>
-        <button id="closeEditModal" class="btn-close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <form id="editForm" class="form-vertical">
-          <input name="title" placeholder="Job Title" required />
-          <input name="company" placeholder="Company Name" />
-          <textarea name="description" placeholder="Job description" rows="4" style="resize: none;"></textarea>
-          <input name="due_date" type="date" />
-          <select name="status" class="status-dropdown">
-            <option value="interested">Interested</option>
-            <option value="applied">Applied</option>
-            <option value="phone_screen">Phone Screen</option>
-            <option value="interview">Interview</option>
-            <option value="offer">Offer</option>
-            <option value="rejected">Rejected</option>
-          </select>
-          <input type="hidden" name="id" />
-        </form>
-      </div>
-      <div class="modal-actions">
-        <button id="cancelEdit" class="btn">Cancel</button>
-        <button id="saveEdit" class="btn primary">Save Changes</button>
+
+    <!-- Help Button -->
+    <button id="helpBtn" class="help-btn" title="Help & Tips">?</button>
+
+    <!-- Edit Job Posting Modal -->
+    <div id="editModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Edit Job Posting</h2>
+          <button id="closeEditModal" onclick="closeEditModal()" style="
+            background: #ef4444 !important;
+            border: none !important;
+            color: white !important;
+            cursor: pointer !important;
+            padding: 8px 12px !important;
+            border-radius: 6px;
+            font-size: 16px !important;
+            position: relative !important;
+            z-index: 9999 !important;
+            min-width: 32px !important;
+            min-height: 32px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+            user-select: none !important;
+            margin: 0 !important;
+          ">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="editForm" class="form-vertical">
+            <input type="hidden" id="editPostingId" name="id">
+            
+             <!-- Add spacing above job title -->
+             <div style="margin-top: 70px;">
+               <input id="editTitle" name="title" placeholder="Job Title" required />
+              <input id="editCompany" name="company" placeholder="Company Name" />
+              <textarea id="editDescription" name="description" placeholder="Job description" rows="4" style="resize: none;"></textarea>
+              <input id="editDueDate" name="due_date" type="date" />
+              <select id="editStatus" name="status">
+                <option value="interested">Interested</option>
+                <option value="applied">Applied</option>
+                <option value="phone_screen">Phone Screen</option>
+                <option value="interview">Interview</option>
+                <option value="offer">Offer</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+            
+            <!-- Email Notification Settings -->
+            <div style="border-top: 1px solid #e2e8f0; padding-top: 3px; margin-top: 3px;">
+              <h4 style="margin: 0 0 10px 0; color: #1e293b; font-size: 14px; font-weight: 600;">📧 Email Notifications</h4>
+              <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 13px; cursor: pointer;">
+                <input type="checkbox" id="editEmailNotifications" name="emailNotifications" onchange="toggleEditEmailFields()" style="width: 16px; height: 16px; accent-color: #3b82f6; margin: 0; vertical-align: middle;">
+                <span style="line-height: 16px; vertical-align: middle;">Send email reminders for this posting</span>
+              </label>
+              <div id="editEmailFields" style="height: 120px; opacity: 0; transition: opacity 0.3s ease;">
+                <input type="email" id="editNotificationEmail" name="notificationEmail" placeholder="Email for notifications" style="font-size: 13px; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 10px;">
+                <select id="editNotificationTiming" name="notificationTiming" style="font-size: 13px; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; width: 100%;">
+                  <option value="1_day">1 day before due date</option>
+                  <option value="3_days">3 days before due date</option>
+                  <option value="1_week">1 week before due date</option>
+                  <option value="2_weeks">2 weeks before due date</option>
+                  <option value="on_due_date">On due date</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="modal-actions">
+              <button type="button" id="cancelEdit" class="btn">Cancel</button>
+              <button type="submit" class="btn primary">Update Posting</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Help Modal -->
-  <div id="helpModal" class="help-modal">
-    <div class="help-modal-content">
-      <div class="help-header">
-        <h3 class="help-title">📋 Job Postings Help</h3>
-        <button id="closeHelpModal" class="help-close">&times;</button>
-      </div>
-      
-      <div class="help-section">
-        <h4>🎯 Application Status Pipeline</h4>
-        <ul>
-          <li><strong>Interested:</strong> Jobs you're considering applying to</li>
-          <li><strong>Applied:</strong> Applications you've submitted</li>
-          <li><strong>Phone Screen:</strong> Initial phone/video interviews</li>
-          <li><strong>Interview:</strong> In-person or final interviews</li>
-          <li><strong>Offer:</strong> Job offers received</li>
-          <li><strong>Rejected:</strong> Applications that didn't work out</li>
-        </ul>
-      </div>
-      
-      <div class="help-section">
-        <h4>🔍 Search & Filter</h4>
-        <ul>
-          <li>Search by job title, company name, or description</li>
-          <li>Filter by application status to see your progress</li>
-          <li>Use the search bar for quick finding of specific applications</li>
-        </ul>
-      </div>
-      
-      <div class="help-section">
-        <h4>📊 Analytics Dashboard</h4>
-        <ul>
-          <li><strong>Total Applications:</strong> All job postings in your system</li>
-          <li><strong>Applied:</strong> Applications you've actually submitted</li>
-          <li><strong>Interviews:</strong> Applications that reached interview stage</li>
-          <li><strong>Offers:</strong> Job offers you've received</li>
-          <li><strong>Success Rate:</strong> Percentage of applications that led to offers</li>
-        </ul>
-      </div>
-      
-      <div class="help-section">
-        <h4>💾 Export & Backup</h4>
-        <ul>
-          <li>Click the "📊 Export" button to download your data as CSV</li>
-          <li>Includes all application details, statuses, and dates</li>
-          <li>Perfect for backup or importing into other tools</li>
-        </ul>
-      </div>
-      
-      <div class="help-tip">
-        <strong>💡 Pro Tip:</strong> Update your application status regularly to get accurate analytics and track your job search progress effectively!
+    <!-- Help Modal -->
+    <div id="helpModal" class="help-modal" style="display: none;">
+      <div class="help-content">
+        <span id="closeHelpModal" class="help-close">&times;</span>
+        <h2>Welcome to Internship Application Manager!</h2>
+        <div class="help-section">
+          <h3>🎯 About This Platform</h3>
+          <p>Internship Application Manager is your all-in-one solution for tracking internship applications, managing your career journey, and staying organized throughout the application process. Whether you're applying to your first internship or managing multiple opportunities, this platform helps you stay on top of deadlines, track your progress, and make data-driven decisions about your career.</p>
+        </div>
+        <div class="help-section">
+          <h3>📋 Getting Started</h3>
+          <p>This tool helps you track your internship applications. Here's how to use it:</p>
+          <ul>
+            <li><strong>Add Job Postings:</strong> Use the form on the left to add new internship opportunities</li>
+            <li><strong>Track Status:</strong> Update the status of your applications as you progress</li>
+            <li><strong>View Analytics:</strong> See charts showing your application progress</li>
+            <li><strong>Search & Filter:</strong> Use the search bar and status filter to find specific applications</li>
+          </ul>
+        </div>
+        <div class="help-section">
+          <h3>📊 Application Statuses</h3>
+          <ul>
+            <li><span class="status-badge status-interested">Interested</span> - You're considering applying</li>
+            <li><span class="status-badge status-applied">Applied</span> - Application submitted</li>
+            <li><span class="status-badge status-phone_screen">Phone Screen</span> - Initial screening call</li>
+            <li><span class="status-badge status-interview">Interview</span> - Formal interview scheduled</li>
+            <li><span class="status-badge status-offer">Offer</span> - Job offer received</li>
+            <li><span class="status-badge status-rejected">Rejected</span> - Application not successful</li>
+          </ul>
+        </div>
+        <div class="help-section">
+          <h3>💡 Tips for Success</h3>
+          <ul>
+            <li>Keep your applications organized by updating statuses regularly</li>
+            <li>Use the calendar to track important dates and deadlines</li>
+            <li>Upload your resumes to keep them organized and easily accessible</li>
+            <li>Use the AI assistant for help with applications and interview prep</li>
+          </ul>
+        </div>
       </div>
     </div>
-  </div>
 
-  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
-  <script src="hamburger-menu.js"></script>
-  <script src="main.js?v=101"></script>
-  
-  <!-- Help Modal JavaScript -->
-  <script>
-  document.addEventListener('DOMContentLoaded', function() {
-      console.log('Help modal script loading...');
-      
-      const helpBtn = document.getElementById('helpBtn');
-      const helpModal = document.getElementById('helpModal');
-      const closeHelpModal = document.getElementById('closeHelpModal');
-      
-      console.log('Help button found:', helpBtn);
-      console.log('Help modal found:', helpModal);
-      console.log('Close button found:', closeHelpModal);
-      
-      if (helpBtn && helpModal && closeHelpModal) {
-          console.log('Setting up help modal event listeners');
-          
+    <!-- Hidden Pages -->
+    <div id="resumesPage" class="page" style="display: none;">
+      <iframe src="resumes.html" width="100%" height="800px" frameborder="0"></iframe>
+    </div>
+
+    <div id="calendarPage" class="page" style="display: none;">
+      <iframe src="calendar.html" width="100%" height="800px" frameborder="0"></iframe>
+    </div>
+
+    <div id="aiPage" class="page" style="display: none;">
+      <iframe src="ai.html" width="100%" height="800px" frameborder="0"></iframe>
+    </div>
+
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
+    <script src="main.js?v=35"></script>
+    
+    <!-- Help Modal JavaScript -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const helpBtn = document.getElementById('helpBtn');
+        const helpModal = document.getElementById('helpModal');
+        const closeHelpModal = document.getElementById('closeHelpModal');
+        
+        if (helpBtn && helpModal && closeHelpModal) {
           helpBtn.addEventListener('click', function() {
-              console.log('Help button clicked');
-              helpModal.style.display = 'flex';
+            helpModal.style.display = 'block';
           });
           
           closeHelpModal.addEventListener('click', function() {
-              console.log('Close button clicked');
-              helpModal.style.display = 'none';
+            helpModal.style.display = 'none';
           });
           
           // Close modal when clicking outside
           helpModal.addEventListener('click', function(e) {
-              if (e.target === helpModal) {
-                  helpModal.style.display = 'none';
-              }
+            if (e.target === helpModal) {
+              helpModal.style.display = 'none';
+            }
           });
-      } else {
-          console.log('Help modal elements not found');
+        }
+      });
+    </script>
+    
+    <!-- Authentication Functions -->
+    <script>
+      function logout() {
+        localStorage.removeItem('userLoggedIn');
+        window.location.href = 'login.html';
       }
-  });
-  </script>
+    </script>
   </body>
-  </html>
+</html>

@@ -7,36 +7,26 @@
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="styles.css" rel="stylesheet" />
+  <style>
+    html {
+      overflow-y: scroll !important;
+    }
+    body {
+      overflow-y: auto !important;
+    }
+    
+    /* Body scroll lock for modals */
+    body.scroll-locked {
+      overflow: hidden !important;
+      position: fixed !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+  </style>
     <style>
-      /* Ensure header alignment consistency - override any conflicting styles */
-      .site-header .header-inner {
-        max-width: var(--max-width) !important;
-        margin: 0 auto !important;
-        padding: 16px 22px !important;
-        box-sizing: border-box !important;
-      }
+      /* Header alignment is now handled by styles.css */
       
-      .site-header .brand {
-        font-size: 20px !important;
-        font-weight: 700 !important;
-        color: #ffffff !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-      
-      .site-header .subtitle {
-        color: rgba(255,255,255,0.85) !important;
-        font-size: 13px !important;
-        margin-top: 4px !important;
-        margin-bottom: 0 !important;
-        padding: 0 !important;
-      }
-      
-      /* Ensure consistent header positioning */
-      .site-header {
-        position: relative !important;
-        margin-bottom: 0 !important;
-      }
+      /* Header styles are now handled by styles.css */
       
       .header-rect {
         position: relative !important;
@@ -150,8 +140,9 @@
       
       /* Ensure calendar page doesn't cause page scrolling */
       .container .panel.full-width {
-        height: 700px;
-        overflow: hidden;
+        min-height: 700px;
+        overflow: visible;
+        padding-bottom: 100px !important;
       }
       
       /* Custom Calendar Styles */
@@ -341,6 +332,97 @@
       .calendar-grid.day-view {
         grid-template-columns: 1fr;
       }
+      
+      /* Fix day view time panel spacing */
+      .time-slots {
+        max-height: 450px !important;
+        min-height: 450px !important;
+        height: 450px !important;
+        overflow-y: auto !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+      }
+      
+      .time-slot {
+        height: 28px !important;
+        min-height: 28px !important;
+        max-height: 28px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        align-items: center !important;
+        flex-shrink: 0 !important;
+      }
+      
+      .time-slot > div {
+        height: 20px !important;
+        min-height: 20px !important;
+        max-height: 20px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+        flex-shrink: 0 !important;
+      }
+      
+      /* Remove any extra spacing from day view container */
+      .calendar-grid.day-view .time-slots {
+        gap: 0 !important;
+      }
+      
+      /* Ensure no extra space at bottom */
+      .calendar-grid.day-view {
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+      
+      /* Remove the extra white space panel behind the time slots */
+      .calendar-grid.day-view {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      
+      /* Target the main calendar container */
+      .fullscreen-calendar {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+      
+      /* Remove hover zoom effect on calendar elements */
+      .calendar-grid.day-view:hover,
+      .calendar-grid.day-view *:hover,
+      .fullscreen-calendar:hover,
+      .fullscreen-calendar *:hover {
+        transform: none !important;
+        transition: none !important;
+      }
+      
+      /* Ensure time slots panel is clean */
+      .calendar-grid.day-view .time-slots {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      
+      /* Shift times to the left to avoid overlap */
+      .calendar-grid.day-view .time-slot {
+        padding-left: 8px !important;
+        margin-left: 0 !important;
+      }
+      
+      /* Target the time content specifically */
+      .calendar-grid.day-view .time-slot > div {
+        margin-left: 4px !important;
+        padding-left: 4px !important;
+      }
+      
       
       .calendar-grid.week-view {
         grid-template-columns: repeat(7, 1fr);
@@ -613,11 +695,6 @@
         position: relative;
       }
       
-      .header-rect {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
       
       .help-btn {
         width: 32px;
@@ -634,7 +711,7 @@
         justify-content: center;
         transition: all 0.2s;
         flex-shrink: 0;
-        position: fixed;
+        position: absolute;
         top: 20px;
         left: 20px;
         z-index: 1001;
@@ -644,6 +721,24 @@
         background: #2563eb;
         border-color: #2563eb;
         transform: scale(1.1);
+      }
+      
+      /* Ensure navigation bar is visible */
+      .nav-banner-rect {
+        display: block !important;
+        visibility: visible !important;
+        position: relative !important;
+        z-index: 100 !important;
+      }
+      
+      .nav-banner-inner {
+        display: flex !important;
+        visibility: visible !important;
+      }
+      
+      .nav-btn {
+        display: inline-block !important;
+        visibility: visible !important;
       }
       
       .help-modal {
@@ -738,46 +833,39 @@
     </style>
   </head>
   <body>
-    <header class="site-header">
-      <div class="header-rect glisten">
-        <div class="header-inner">
-          <div class="brand">Internship Application Manager</div>
-          <div class="subtitle">Keep resumes, postings, and due dates in one place</div>
+    <!-- Redirect to login if not authenticated -->
+    <script>
+      if (!localStorage.getItem('userLoggedIn')) {
+        window.location.href = 'login.html';
+      }
+    </script>
+    
+    <!-- Header -->
+    <div class="header-rect">
+      <div class="header-inner" style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
+        <div>
+          <div class="brand" onclick="window.location.href='index.html'" style="cursor: pointer;">Internship Application Manager</div>
+          <div class="subtitle">Track your internship applications and manage your career journey</div>
         </div>
-        <button id="helpBtn" class="help-btn" title="Help & Tips">?</button>
+        <div class="auth-buttons">
+          <button class="btn btn-sm" onclick="logout()" style="position: absolute; top: 20px; right: 20px; z-index: 1001;">Logout</button>
+        </div>
       </div>
-    </header>
-
-    <!-- Hamburger Menu -->
-    <div class="hamburger-menu">
-      <button id="hamburgerBtn" class="hamburger-btn">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-      </button>
     </div>
 
-    <!-- Mobile Menu -->
-    <div id="mobileMenu" class="mobile-menu">
-      <a href="index.html" class="mobile-menu-item" data-page="index.html">
-        📋 Job Postings
-      </a>
-      <a href="resumes.html" class="mobile-menu-item" data-page="resumes.html">
-        📄 Resumes
-      </a>
-      <a href="calendar.html" class="mobile-menu-item active" data-page="calendar.html">
-        📅 Calendar
-      </a>
-      <a href="ai.html" class="mobile-menu-item" data-page="ai.html">
-        🤖 AI Assistant
-      </a>
+    <!-- Navigation -->
+    <div class="nav-banner-rect">
+      <div class="nav-banner-inner">
+        <button class="nav-btn" onclick="window.location.href='index.html'">📊 Dashboard</button>
+        <button class="nav-btn" onclick="window.location.href='resumes.html'">📄 Resumes</button>
+        <button class="nav-btn active" onclick="window.location.href='calendar.html'">📅 Calendar</button>
+        <button class="nav-btn" onclick="window.location.href='ai.html'">🤖 AI Assistant</button>
+      </div>
     </div>
-
-    <!-- Mobile Menu Overlay -->
-    <div id="mobileMenuOverlay" class="mobile-menu-overlay"></div>
 
     <main class="container">
       <div class="panel full-width" style="margin-top: 20px;">
+        
         <!-- Small control panel -->
         <div class="calendar-control-panel">
           <div class="control-buttons">
@@ -793,7 +881,6 @@
             <button id="dayViewBtn" class="btn">Day</button>
             <button id="weekViewBtn" class="btn">Week</button>
             <button id="monthViewBtn" class="btn active">Month</button>
-            <button id="exportEvents" class="btn btn-sm">📊 Export</button>
           </div>
         </div>
 
@@ -815,6 +902,9 @@
         </div>
       </div>
     </main>
+
+    <!-- Help Button -->
+    <button id="helpBtn" class="help-btn" title="Help & Tips">?</button>
 
     <!-- Add Event Modal -->
     <div id="eventModal" class="modal" aria-hidden="true">
@@ -905,6 +995,7 @@
         <div class="modal-actions">
           <button id="cancelEvent" type="button" class="btn">Cancel</button>
           <button id="deleteEvent" type="button" class="btn danger" style="display: none;">Delete Event</button>
+          <button id="emailEvent" type="button" class="btn primary" style="display: none;" onclick="sendEventEmailReminder(editingEvent)">📧 Email Reminder</button>
           <button id="saveEvent" type="button" class="btn primary">Save Event</button>
         </div>
       </div>
@@ -976,8 +1067,14 @@
     </div>
 
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
-    <script src="hamburger-menu.js"></script>
-    <script src="calendar.js"></script>
+    <!-- Logout Function -->
+    <script>
+      function logout() {
+        localStorage.removeItem('userLoggedIn');
+        window.location.href = 'login.html';
+      }
+    </script>
+    <script src="calendar.js?v=48"></script>
     
     <!-- Help Modal JavaScript -->
     <script>

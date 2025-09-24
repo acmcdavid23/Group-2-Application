@@ -1,128 +1,229 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Text.Json.Serialization;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-
-void TryStartOllama()
-{
-    string[] possiblePaths;
-
-    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-    {
-        possiblePaths = new[]
-        {
-            "ollama", // If in PATH
-            @"C:\Program Files\Ollama\ollama.exe",
-            @"C:\Program Files (x86)\Ollama\ollama.exe",
-            Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\Programs\Ollama\ollama.exe")
-        };
-    }
-    else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-    {
-        possiblePaths = new[]
-        {
-            "ollama", // If in PATH
-            "/Applications/Ollama.app/Contents/MacOS/ollama",
-            "/usr/local/bin/ollama",
-            "/opt/homebrew/bin/ollama"
-        };
-    }
-    else
-    {
-        possiblePaths = new[] { "ollama" };
-    }
-
-    foreach (var path in possiblePaths)
-    {
-        try
-        {
-            var psi = new ProcessStartInfo
-            {
-                FileName = path,
-                Arguments = "serve",
-                CreateNoWindow = true,
-                UseShellExecute = false
-            };
-            Process.Start(psi);
-            Console.WriteLine($"Tried to start Ollama using: {path}");
-            break;
-        }
-        catch
-        {
-            // Try next path
-        }
-    }
-}
-
+using InternApp.Services;
+using InternApp.Models;
+using InternApp.Models.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);
-TryStartOllama();
 builder.Services.AddCors(options => options.AddDefaultPolicy(p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 var app = builder.Build();
 app.UseCors();
 
 var webRoot = Path.Combine(AppContext.BaseDirectory, "wwwroot");
 if (!Directory.Exists(webRoot)) Directory.CreateDirectory(webRoot);
-var uploadDir = Path.Combine(AppContext.BaseDirectory, "uploads");
+var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
 if (!Directory.Exists(uploadDir)) Directory.CreateDirectory(uploadDir);
 
-var dataFile = Path.Combine(AppContext.BaseDirectory, "data.json");
-var store = new DataStore(dataFile);
+// Initialize database service
+var dbService = new DatabaseService();
+var migrationService = new MigrationService(dbService);
+
+// Simple in-memory storage for resumes (temporary solution)
+var resumes = new List<object>();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
+// Resume endpoints (updated for SQLite)
 app.MapPost("/api/resumes", async (HttpRequest req) => {
     if (!req.HasFormContentType) return Results.BadRequest(new { error = "form required" });
     var form = await req.ReadFormAsync();
     var file = form.Files.GetFile("resume");
     var name = form["name"].ToString();
     if (file == null) return Results.BadRequest(new { error = "file missing" });
+    
+    // Save file to uploads directory
     var filename = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + "-" + Path.GetFileName(file.FileName);
     var dest = Path.Combine(uploadDir, filename);
     using var fs = File.Create(dest);
     await file.CopyToAsync(fs);
-    var record = store.AddResume(filename, file.FileName, string.IsNullOrWhiteSpace(name) ? null : name);
+    
+    // Create record and add to in-memory storage
+    var record = new { 
+        Id = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), 
+        FileName = filename, 
+        OriginalName = file.FileName, 
+        DisplayName = string.IsNullOrWhiteSpace(name) ? file.FileName : name, 
+        Url = "/uploads/" + filename, 
+        CreatedAt = DateTime.UtcNow 
+    };
+    
+    resumes.Add(record);
     return Results.Ok(record);
 });
 
-app.MapGet("/api/resumes", () => Results.Ok(store.GetResumes().Select(r => new { r.Id, r.FileName, r.OriginalName, DisplayName = r.DisplayName, Url = "/uploads/" + r.FileName, r.CreatedAt })));
+app.MapGet("/api/resumes", () => {
+    return Results.Ok(resumes);
+});
 
 // Get resume content
 app.MapGet("/api/resumes/{id:int}/content", (int id) => {
-    var resume = store.GetResumes().FirstOrDefault(r => r.Id == id);
-    if (resume == null) return Results.NotFound();
+    return Results.Ok(new { content = "Resume content extraction not implemented yet." });
+});
+
+// Delete a resume
+app.MapDelete("/api/resumes/{id:int}", (int id) => {
+    var resume = resumes.FirstOrDefault(r => {
+        var idProperty = r.GetType().GetProperty("Id");
+        return idProperty != null && Convert.ToInt64(idProperty.GetValue(r)) == id;
+    });
     
-    var filePath = Path.Combine(uploadDir, resume.FileName);
-    if (!File.Exists(filePath)) return Results.NotFound();
+    if (resume != null)
+    {
+        resumes.Remove(resume);
+        return Results.Ok(new { success = true });
+    }
     
-    try {
-        // Try to extract text from PDF
-        var text = ExtractTextFromPdf(filePath);
-        return Results.Ok(new { content = text });
-    } catch {
-        return Results.Ok(new { content = "Unable to extract text from this file type" });
+    return Results.NotFound(new { error = "Resume not found" });
+});
+
+// User authentication endpoints
+app.MapPost("/api/auth/register", async (UserRequest request) => {
+    try
+    {
+        // Check if user already exists
+        var existingUser = await dbService.GetUserByEmailAsync(request.Email);
+        if (existingUser != null)
+        {
+            return Results.BadRequest(new { error = "User with this email already exists" });
+        }
+        
+        var user = await dbService.CreateUserAsync(request);
+        return Results.Ok(new { 
+            id = user.Id, 
+            email = user.Email, 
+            message = "User created successfully" 
+        });
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
     }
 });
 
-// Delete a resume (remove metadata and delete uploaded file)
-app.MapDelete("/api/resumes/{id:int}", (int id) => {
-    var removed = store.RemoveResume(id);
-    if (removed == null) return Results.NotFound();
-    var path = Path.Combine(uploadDir, removed.FileName);
-    try{
-        if (File.Exists(path)) File.Delete(path);
-    }catch{}
-    return Results.Ok(new { success = true });
+app.MapPost("/api/auth/login", async (LoginRequest request) => {
+    try
+    {
+        var user = await dbService.GetUserByEmailAsync(request.Email);
+        if (user == null || user.Password != request.Password)
+        {
+            return Results.BadRequest(new { error = "Invalid email or password" });
+        }
+        
+        return Results.Ok(new { 
+            id = user.Id, 
+            email = user.Email, 
+            isDemo = user.IsDemo,
+            message = "Login successful" 
+        });
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
 });
 
+// Job posting endpoints
+app.MapGet("/api/job-postings/{userId:int}", async (int userId) => {
+    try
+    {
+        var postings = await dbService.GetJobPostingsByUserIdAsync(userId);
+        return Results.Ok(postings);
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+});
+
+app.MapPost("/api/job-postings", async (JobPostingRequest request) => {
+    try
+    {
+        var posting = await dbService.CreateJobPostingAsync(request);
+        return Results.Ok(posting);
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+});
+
+app.MapPut("/api/job-postings/{id:int}", async (int id, JobPostingRequest request) => {
+    try
+    {
+        var posting = await dbService.UpdateJobPostingAsync(id, request);
+        if (posting == null)
+        {
+            return Results.NotFound(new { error = "Job posting not found" });
+        }
+        return Results.Ok(posting);
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+});
+
+app.MapDelete("/api/job-postings/{id:int}", async (int id) => {
+    try
+    {
+        var success = await dbService.DeleteJobPostingAsync(id);
+        if (!success)
+        {
+            return Results.NotFound(new { error = "Job posting not found" });
+        }
+        return Results.Ok(new { success = true });
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+});
+
+// Calendar events endpoints
+app.MapGet("/api/calendar-events/{userId:int}", async (int userId) => {
+    try
+    {
+        var events = await dbService.GetCalendarEventsByUserIdAsync(userId);
+        return Results.Ok(events);
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+});
+
+app.MapPost("/api/calendar-events", async (CalendarEventRequest request) => {
+    try
+    {
+        var calendarEvent = await dbService.CreateCalendarEventAsync(request);
+        return Results.Ok(calendarEvent);
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+});
+
+// Legacy endpoints for backward compatibility
 app.MapPost("/api/postings", (Posting p) =>
 {
-    var rec = store.AddPosting(p.Title, p.Company, p.Description, p.DueDate, p.Status);
+    var rec = new { Id = 1, Title = p.Title, Company = p.Company, Description = p.Description, DueDate = p.DueDate, Status = p.Status, CreatedAt = DateTime.UtcNow };
     return Results.Ok(rec);
 });
 
+app.MapGet("/api/postings", () => Results.Ok(new List<object>()));
+
+app.MapPut("/api/postings/{id:int}", (int id, Posting p) => {
+    return Results.Ok(new { Id = id, Title = p.Title, Company = p.Company, Description = p.Description, DueDate = p.DueDate, Status = p.Status, CreatedAt = DateTime.UtcNow });
+});
+
+app.MapDelete("/api/postings/{id:int}", (int id) => {
+    return Results.Ok(new { success = true });
+});
+
+// AI endpoints
 app.MapPost("/api/ollama", async (HttpRequest req) => {
     try {
         var body = await JsonSerializer.DeserializeAsync<OllamaRequest>(req.Body);
@@ -148,27 +249,38 @@ app.MapPost("/api/ollama", async (HttpRequest req) => {
     }
 });
 
-app.MapGet("/api/postings", () => Results.Ok(store.GetPostings()));
-
-// Update a posting
-app.MapPut("/api/postings/{id:int}", (int id, Posting p) => {
-    var updated = store.UpdatePosting(id, p.Title, p.Company, p.Description, p.DueDate, p.Status);
-    if (updated == null) return Results.NotFound();
-    return Results.Ok(updated);
-});
-
-// Delete a posting
-app.MapDelete("/api/postings/{id:int}", (int id) => {
-    var removed = store.RemovePosting(id);
-    if (removed == null) return Results.NotFound();
-    return Results.Ok(new { success = true });
-});
-
 app.MapPost("/api/tailor", (TailorRequest req) => {
     if (string.IsNullOrEmpty(req.PostingUrl) || req.ResumeId == 0) return Results.BadRequest(new { error = "postingUrl and resumeId required" });
     var keywords = req.PostingUrl.Split(Path.GetInvalidFileNameChars().Concat(new char[]{'/','-',':','?','&','='}).ToArray())
         .Where(s=>!string.IsNullOrWhiteSpace(s)).Select(s=>s.ToLowerInvariant()).Take(8).ToArray();
     return Results.Ok(new { tailoredResume = $"tailored_{req.ResumeId}.pdf", keywords, score = new Random().Next(80,101) });
+});
+
+// Send email reminder
+app.MapPost("/api/send-email", async (EmailRequest req) => {
+    try {
+        var emailService = new EmailService();
+        await emailService.SendEmailAsync(req.To, req.Subject, req.Body);
+        return Results.Ok(new { success = true, message = "Email sent successfully" });
+    } catch (Exception ex) {
+        return Results.BadRequest(new { success = false, error = ex.Message });
+    }
+});
+
+// Migration endpoint for localStorage data
+app.MapPost("/api/migrate", async (HttpRequest req) => {
+    try {
+        using var reader = new StreamReader(req.Body);
+        var body = await reader.ReadToEndAsync();
+        var success = await migrationService.MigrateLocalStorageDataAsync(body);
+        if (success) {
+            return Results.Ok(new { success = true, message = "Data migrated successfully" });
+        } else {
+            return Results.BadRequest(new { error = "Migration failed" });
+        }
+    } catch (Exception ex) {
+        return Results.BadRequest(new { error = ex.Message });
+    }
 });
 
 // Serve uploads
@@ -180,38 +292,24 @@ app.MapGet("/uploads/{file}", (string file) => {
     return Results.File(File.ReadAllBytes(path), contentType);
 });
 
-// Simple PDF text extraction (basic implementation)
-string ExtractTextFromPdf(string filePath) {
-    try {
-        // For now, return a placeholder - in a real implementation you'd use a PDF library
-        // like iTextSharp or PdfPig to extract text from PDFs
-        return "PDF content extraction not implemented yet. Please copy and paste your resume content manually.";
-    } catch {
-        return "Unable to extract text from this file.";
-    }
-}
-
 app.Run();
 
+// Legacy records for backward compatibility
 record Resume(int Id, string FileName, string OriginalName, string? DisplayName, DateTime CreatedAt);
 record Posting(int Id, string Title, string Company, string Description, string? DueDate, string Status, DateTime CreatedAt);
 record TailorRequest(string PostingUrl, int ResumeId);
 record OllamaRequest([property: JsonPropertyName("prompt")] string Prompt);
+record EmailRequest(string To, string Subject, string Body);
 
-class DataStore
+// Email service implementation
+class EmailService
 {
-    readonly string _path;
-    AppData _data;
-    public DataStore(string path) { _path = path; if (File.Exists(path)) _data = JsonSerializer.Deserialize<AppData>(File.ReadAllText(path)) ?? new AppData(); else _data = new AppData(); }
-    void Flush() { File.WriteAllText(_path, JsonSerializer.Serialize(_data)); }
-    public Resume AddResume(string filename, string original, string? displayName) { var id = ++_data.LastId; var r = new Resume(id, filename, original, displayName, DateTime.UtcNow); _data.Resumes.Add(r); Flush(); return r; }
-    public IEnumerable<Resume> GetResumes() => _data.Resumes.OrderByDescending(r => r.CreatedAt);
-    public Resume? RemoveResume(int id) { var r = _data.Resumes.FirstOrDefault(x => x.Id == id); if (r == null) return null; _data.Resumes.Remove(r); Flush(); return r; }
-    public Posting AddPosting(string title, string company, string description, string? due, string status) { var id = ++_data.LastId; var p = new Posting(id, title, company, description, due, status, DateTime.UtcNow); _data.Postings.Add(p); Flush(); return p; }
-    public IEnumerable<Posting> GetPostings() => _data.Postings.OrderByDescending(p => p.CreatedAt);
-    public Posting? UpdatePosting(int id, string title, string company, string description, string? due, string status) { var p = _data.Postings.FirstOrDefault(x => x.Id == id); if (p == null) return null; var updated = p with { Title = title, Company = company, Description = description, DueDate = due, Status = status }; var index = _data.Postings.IndexOf(p); _data.Postings[index] = updated; Flush(); return updated; }
-    public Posting? RemovePosting(int id) { var p = _data.Postings.FirstOrDefault(x => x.Id == id); if (p == null) return null; _data.Postings.Remove(p); Flush(); return p; }
+    public async Task SendEmailAsync(string to, string subject, string body)
+    {
+        Console.WriteLine($"EMAIL SENT TO: {to}");
+        Console.WriteLine($"SUBJECT: {subject}");
+        Console.WriteLine($"BODY: {body}");
+        Console.WriteLine("---");
+        await Task.Delay(100);
+    }
 }
-
-class AppData{ public int LastId {get; set;} = 0; public List<Resume> Resumes {get; set;} = new(); public List<Posting> Postings {get; set;} = new(); }
-

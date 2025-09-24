@@ -13,14 +13,17 @@
       rel="stylesheet"
     />
     <link href="styles.css" rel="stylesheet" />
+  <style>
+    html {
+      overflow-y: scroll !important;
+    }
+    body {
+      overflow-y: auto !important;
+    }
+  </style>
     <style>
       .site-header {
         position: relative;
-      }
-      .header-rect {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
       }
       .help-btn {
         width: 32px;
@@ -37,7 +40,7 @@
         justify-content: center;
         transition: all 0.2s;
         flex-shrink: 0;
-        position: fixed;
+        position: absolute;
         top: 20px;
         left: 20px;
         z-index: 1001;
@@ -256,56 +259,35 @@
     </style>
   </head>
   <body>
-    <header class="site-header">
-      <div class="header-rect glisten">
-        <div class="header-inner">
-          <div class="brand">Internship Application Manager</div>
-          <div class="subtitle">
-            Keep resumes, postings, and due dates in one place
-          </div>
+    <!-- Redirect to login if not authenticated -->
+    <script>
+      if (!localStorage.getItem('userLoggedIn')) {
+        window.location.href = 'login.html';
+      }
+    </script>
+    
+    <!-- Header -->
+    <div class="header-rect">
+      <div class="header-inner" style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
+        <div>
+          <div class="brand" onclick="window.location.href='index.html'" style="cursor: pointer;">Internship Application Manager</div>
+          <div class="subtitle">Track your internship applications and manage your career journey</div>
         </div>
-        <button
-          id="helpBtn"
-          class="help-btn"
-          title="Help & Tips"
-          aria-label="Open AI Help"
-        >
-          ?
-        </button>
+        <div class="auth-buttons">
+          <button class="btn btn-sm" onclick="logout()" style="position: absolute; top: 20px; right: 20px; z-index: 1001;">Logout</button>
+        </div>
       </div>
-    </header>
-
-    <!-- Hamburger Menu -->
-    <div class="hamburger-menu">
-      <button id="hamburgerBtn" class="hamburger-btn" aria-label="Open Menu">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-      </button>
     </div>
 
-    <!-- Mobile Menu -->
-    <div id="mobileMenu" class="mobile-menu">
-      <a href="index.html" class="mobile-menu-item" data-page="index.html">
-        📋 Job Postings
-      </a>
-      <a href="resumes.html" class="mobile-menu-item" data-page="resumes.html">
-        📄 Resumes
-      </a>
-      <a
-        href="calendar.html"
-        class="mobile-menu-item"
-        data-page="calendar.html"
-      >
-        📅 Calendar
-      </a>
-      <a href="ai.html" class="mobile-menu-item active" data-page="ai.html">
-        🤖 AI Assistant
-      </a>
+    <!-- Navigation -->
+    <div class="nav-banner-rect">
+      <div class="nav-banner-inner">
+        <button class="nav-btn" onclick="window.location.href='index.html'">📊 Dashboard</button>
+        <button class="nav-btn" onclick="window.location.href='resumes.html'">📄 Resumes</button>
+        <button class="nav-btn" onclick="window.location.href='calendar.html'">📅 Calendar</button>
+        <button class="nav-btn active" onclick="window.location.href='ai.html'">🤖 AI Assistant</button>
+      </div>
     </div>
-
-    <!-- Mobile Menu Overlay -->
-    <div id="mobileMenuOverlay" class="mobile-menu-overlay"></div>
 
     <!-- Help Modal -->
     <div
@@ -412,7 +394,23 @@
       </div>
     </main>
 
-    <script src="hamburger-menu.js"></script>
+    <!-- Help Button -->
+    <button
+      id="helpBtn"
+      class="help-btn"
+      title="Help & Tips"
+      aria-label="Open AI Help"
+    >
+      ?
+    </button>
+
+    <!-- Logout Function -->
+    <script>
+      function logout() {
+        localStorage.removeItem('userLoggedIn');
+        window.location.href = 'login.html';
+      }
+    </script>
     <script>
       // --- Escape HTML to prevent XSS ---
       function escapeHTML(str) {
@@ -431,11 +429,15 @@
 
       // --- Chat History Persistence ---
       function saveHistory(history) {
-        localStorage.setItem("aiChatHistory", JSON.stringify(history));
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const userKey = currentUser.isDemo ? 'demo_ai_chat_history' : `user_${currentUser.id}_ai_chat_history`;
+        localStorage.setItem(userKey, JSON.stringify(history));
       }
       function loadHistory() {
         try {
-          return JSON.parse(localStorage.getItem("aiChatHistory")) || [];
+          const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+          const userKey = currentUser.isDemo ? 'demo_ai_chat_history' : `user_${currentUser.id}_ai_chat_history`;
+          return JSON.parse(localStorage.getItem(userKey)) || [];
         } catch {
           return [];
         }
@@ -585,16 +587,6 @@
         ) {
           helpModal.style.display = "none";
           helpBtn.focus();
-        }
-      });
-
-      document.addEventListener("DOMContentLoaded", function () {
-        const promptBox = document.getElementById("aiPrompt");
-        const storedPrompt = localStorage.getItem("aiPrompt");
-        if (storedPrompt && promptBox) {
-          promptBox.value = storedPrompt;
-          promptBox.focus();
-          localStorage.removeItem("aiPrompt");
         }
       });
     </script>

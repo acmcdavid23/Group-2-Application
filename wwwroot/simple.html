@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Internship Application Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🚀 Internship Application Manager</h1>
+            <p>Track your internship applications and manage your career journey</p>
+        </header>
+
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="form-section">
+                    <h3>Add New Job Posting</h3>
+                    <form id="postingForm">
+                        <div class="form-vertical">
+                            <input type="text" id="title" placeholder="Job Title" required />
+                            <input type="text" id="company" placeholder="Company" required />
+                            <textarea id="description" placeholder="Job Description" rows="4"></textarea>
+                            <input type="date" id="dueDate" />
+                            <select id="status" class="status-dropdown">
+                                <option value="interested">Interested</option>
+                                <option value="applied">Applied</option>
+                                <option value="phone_screen">Phone Screen</option>
+                                <option value="interview">Interview</option>
+                                <option value="offer">Offer</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                            <button type="submit" class="btn primary">Add Posting</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="analytics-dashboard">
+                    <h4>📊 Application Analytics</h4>
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <div style="height: 200px;">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                        <div style="height: 200px;">
+                            <canvas id="timelineChart"></canvas>
+                        </div>
+                        <div class="analytics-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Total Applications:</span>
+                                <span class="stat-value" id="totalApplications">3</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Success Rate:</span>
+                                <span class="stat-value" id="successRate">33%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="postings-header">
+                    <h3>Job Postings</h3>
+                    <div class="search-filter-controls">
+                        <input type="text" id="searchInput" placeholder="Search postings..." class="search-input" />
+                        <select id="statusFilter" class="status-filter">
+                            <option value="">All Statuses</option>
+                            <option value="interested">Interested</option>
+                            <option value="applied">Applied</option>
+                            <option value="phone_screen">Phone Screen</option>
+                            <option value="interview">Interview</option>
+                            <option value="offer">Offer</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="postings">
+                    <div class="posting">
+                        <h3>🚀 Software Development Intern</h3>
+                        <p><strong>Company:</strong> Microsoft</p>
+                        <p><strong>Status:</strong> Applied</p>
+                        <p><strong>Due Date:</strong> 2025-10-15</p>
+                        <p>Join our team as a Software Development Intern and work on cutting-edge projects that impact millions of users worldwide.</p>
+                    </div>
+                    <div class="posting">
+                        <h3>📊 Data Analytics Intern</h3>
+                        <p><strong>Company:</strong> Google</p>
+                        <p><strong>Status:</strong> Phone Screen</p>
+                        <p><strong>Due Date:</strong> 2025-10-30</p>
+                        <p>Gain hands-on experience in data analysis and visualization while working on real business problems.</p>
+                    </div>
+                    <div class="posting">
+                        <h3>🎨 UX/UI Design Intern</h3>
+                        <p><strong>Company:</strong> Apple</p>
+                        <p><strong>Status:</strong> Interview</p>
+                        <p><strong>Due Date:</strong> 2025-11-05</p>
+                        <p>Create exceptional user experiences while working with a team of talented designers.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('Simple page loaded successfully!');
+        
+        // Create charts when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, creating charts...');
+            
+            setTimeout(() => {
+                // Create pie chart
+                const statusCtx = document.getElementById('statusChart');
+                if (statusCtx && typeof Chart !== 'undefined') {
+                    new Chart(statusCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Applied', 'Interview', 'Offer'],
+                            datasets: [{
+                                data: [1, 1, 1],
+                                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                    console.log('Status chart created!');
+                }
+                
+                // Create bar chart
+                const timelineCtx = document.getElementById('timelineChart');
+                if (timelineCtx && typeof Chart !== 'undefined') {
+                    new Chart(timelineCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr'],
+                            datasets: [{
+                                label: 'Applications',
+                                data: [1, 1, 1, 0],
+                                backgroundColor: '#3b82f6'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                    console.log('Timeline chart created!');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
+
