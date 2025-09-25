@@ -1,0 +1,294 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Settings - Internship Application Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet" />
+    <style>
+      .settings-container { max-width: 960px; margin: 32px auto; padding: 16px; }
+      .settings-grid { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items:start; }
+      .settings-card { background: #fff; border-radius: 12px; padding: 18px; box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06); }
+      .settings-card h3 { margin-top: 0; }
+      .setting-row { margin-bottom: 14px; }
+      .small-note { color: #6b7280; font-size: 13px; }
+      .sidebar-help { font-size: 14px; color:#374151; }
+      .btn-group { display:flex; gap:8px; }
+      .reset-quiet { background:none; border: none; color:#6b7280; text-decoration:underline; cursor:pointer; padding:0; }
+      /* make dark-theme work on this page too */
+      .dark-theme .settings-card { background:#374151; color:#f9fafb; }
+      /* Toast (non-blocking) */
+      .toast-container { position: fixed; right: 20px; bottom: 24px; z-index: 2000; display:flex; flex-direction:column; gap:8px; }
+      .toast {
+        background: rgba(15,23,42,0.95);
+        color: #fff;
+        padding: 10px 14px;
+        border-radius: 10px;
+        box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+        font-weight: 600;
+        font-size: 14px;
+        opacity: 0;
+        transform: translateY(8px);
+        transition: all 260ms cubic-bezier(.2,.9,.2,1);
+      }
+      .toast.show { opacity: 1; transform: translateY(0); }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-rect glisten">
+        <div class="header-inner">
+          <div class="brand">Internship Application Manager</div>
+          <div class="subtitle">Settings</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hamburger Menu -->
+    <div class="hamburger-menu">
+      <button id="hamburgerBtn" class="hamburger-btn" aria-label="Open Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu">
+      <!-- menu items are injected by each page or by hamburger-menu.js -->
+    </div>
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay"></div>
+
+    <main class="settings-container">
+      <div class="settings-grid">
+        <div class="settings-card">
+          <h3>Appearance</h3>
+          <div class="setting-row">
+            <label for="themeSelect" data-i18n="appearance">Appearance</label>
+            <select id="themeSelect" class="form-control">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="auto">Auto (System)</option>
+            </select>
+            <div class="small-note">Choose your preferred color theme. "Auto" follows the operating system preference.</div>
+          </div>
+
+          <div class="setting-row">
+            <label for="fontSizeSelect">Base font size</label>
+            <select id="fontSizeSelect" class="form-control">
+              <option value="14">Small</option>
+              <option value="16">Default</option>
+              <option value="18">Large</option>
+              <option value="20">Larger</option>
+            </select>
+            <div class="small-note">Adjust the base font size for better readability.</div>
+          </div>
+
+          <div class="setting-row">
+            <label for="highContrast">High contrast</label>
+            <div class="btn-group" style="margin-top:6px;">
+              <button id="highContrastOn" class="btn btn-sm">Enable</button>
+              <button id="highContrastOff" class="btn btn-sm">Disable</button>
+            </div>
+            <div class="small-note">Turn on larger contrast for better legibility.</div>
+          </div>
+
+          <!-- Language selector removed; translations are not supported in this build -->
+
+          <div class="setting-row">
+            <label for="timezoneSelect">Timezone</label>
+            <select id="timezoneSelect" class="form-control"></select>
+            <div class="small-note">Used for reminders and calendar displays.</div>
+          </div>
+
+          <h3 style="margin-top:18px;">Reminders & Notifications</h3>
+          <div class="setting-row">
+            <label for="reminderDays">Reminder Days (before deadline)</label>
+            <input id="reminderDays" type="number" class="form-control" min="1" max="30" value="7" />
+          </div>
+          <div class="setting-row">
+            <label><input type="checkbox" id="autoSave" /> Auto-save changes</label>
+          </div>
+          <div class="setting-row">
+            <label><input type="checkbox" id="showNotifications" /> Show browser notifications</label>
+          </div>
+
+          <h3 style="margin-top:18px;">Accessibility & Text</h3>
+
+          <div style="margin-top:20px; display:flex; gap:10px;">
+            <button id="saveSettingsBtn" class="btn primary">Save Settings</button>
+            <button id="resetDefaultsBtn" class="btn">Reset to Defaults</button>
+          </div>
+        </div>
+
+        <aside class="settings-card sidebar-help">
+          <h4>Tips</h4>
+          <ul>
+            <li>Use Dark mode to reduce eye strain in low light.</li>
+            <li>Enable Auto-save to avoid losing changes while editing postings.</li>
+            <li>Set your timezone so deadline reminders match your locale.</li>
+            <li>If you need translations across the app, the backend must serve localized strings.</li>
+          </ul>
+          <div style="margin-top:12px;">
+            <button id="clearAllBtn" class="btn btn-sm" style="background:#fee2e2;color:#991b1b;">Clear all saved settings</button>
+            <button id="learnMore" class="reset-quiet">Learn more about settings</button>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="hamburger-menu.js"></script>
+  <script>
+      // Basic settings persistence and UI wiring. Uses localStorage first, then attempts /api/settings.
+      const defaults = {
+        theme: 'light',
+        language: 'en',
+        reminderDays: 7,
+        autoSave: true,
+        showNotifications: true,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+        fontSize: 16,
+        highContrast: false
+      };
+
+      function loadLocal() {
+        try { return JSON.parse(localStorage.getItem('appSettings')) || {}; } catch { return {}; }
+      }
+
+      function saveLocal(settings) {
+        localStorage.setItem('appSettings', JSON.stringify(settings));
+      }
+
+      function applySettings(s) {
+        const theme = s.theme || defaults.theme;
+        if (theme === 'dark') {
+          document.body.classList.add('dark-theme');
+          try { document.documentElement.classList.add('dark-theme'); } catch(_) {}
+        } else {
+          document.body.classList.remove('dark-theme');
+          try { document.documentElement.classList.remove('dark-theme'); } catch(_) {}
+        }
+        if (s.fontSize) document.documentElement.style.fontSize = (s.fontSize || defaults.fontSize) + 'px';
+        if (s.highContrast) {
+          document.body.classList.add('high-contrast');
+          try { document.documentElement.classList.add('high-contrast'); } catch(_) {}
+        } else {
+          document.body.classList.remove('high-contrast');
+          try { document.documentElement.classList.remove('high-contrast'); } catch(_) {}
+        }
+      }
+
+      // Non-blocking toast helper
+      function showToast(message, ms = 3000) {
+        try {
+          const container = document.getElementById('toastContainer');
+          if (!container) return;
+          const t = document.createElement('div');
+          t.className = 'toast';
+          t.textContent = message;
+          container.appendChild(t);
+          // force reflow to allow transition
+          // eslint-disable-next-line no-unused-expressions
+          t.offsetHeight;
+          t.classList.add('show');
+          setTimeout(() => {
+            t.classList.remove('show');
+            setTimeout(() => container.removeChild(t), 260);
+          }, ms);
+        } catch (_) {}
+      }
+
+      function setFormValues(s) {
+        document.getElementById('themeSelect').value = s.theme || defaults.theme;
+        const langEl = document.getElementById('languageSelect');
+        if (langEl) langEl.value = s.language || defaults.language;
+        document.getElementById('reminderDays').value = s.reminderDays || defaults.reminderDays;
+        document.getElementById('autoSave').checked = typeof s.autoSave === 'boolean' ? s.autoSave : defaults.autoSave;
+        document.getElementById('showNotifications').checked = typeof s.showNotifications === 'boolean' ? s.showNotifications : defaults.showNotifications;
+        document.getElementById('timezoneSelect').value = s.timezone || defaults.timezone;
+        document.getElementById('fontSizeSelect').value = s.fontSize || defaults.fontSize;
+      }
+
+      function getFormValues() {
+        const stored = loadLocal();
+        const langEl2 = document.getElementById('languageSelect');
+        return {
+          theme: document.getElementById('themeSelect').value,
+          language: langEl2 ? langEl2.value : (stored && stored.language ? stored.language : undefined),
+          reminderDays: parseInt(document.getElementById('reminderDays').value) || defaults.reminderDays,
+          autoSave: document.getElementById('autoSave').checked,
+          showNotifications: document.getElementById('showNotifications').checked,
+          timezone: document.getElementById('timezoneSelect').value,
+          fontSize: parseInt(document.getElementById('fontSizeSelect').value) || defaults.fontSize,
+          highContrast: document.body.classList.contains('high-contrast')
+        };
+      }
+
+      function populateTimezones() {
+        const tz = document.getElementById('timezoneSelect');
+        const zones = ['UTC', 'America/New_York','America/Chicago','America/Denver','America/Los_Angeles','Europe/London','Europe/Paris','Asia/Tokyo','Asia/Shanghai'];
+        zones.forEach(z => { const o = document.createElement('option'); o.value = z; o.textContent = z; tz.appendChild(o); });
+        tz.value = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+      }
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        populateTimezones();
+    const local = loadLocal();
+        const merged = Object.assign({}, defaults, local);
+        setFormValues(merged);
+        applySettings(merged);
+
+        document.getElementById('highContrastOn').addEventListener('click', () => {
+          document.body.classList.add('high-contrast');
+          try { document.documentElement.classList.add('high-contrast'); } catch(_) {}
+        });
+        document.getElementById('highContrastOff').addEventListener('click', () => {
+          document.body.classList.remove('high-contrast');
+          try { document.documentElement.classList.remove('high-contrast'); } catch(_) {}
+        });
+
+        document.getElementById('saveSettingsBtn').addEventListener('click', async (e) => {
+          // Prevent click from bubbling (some focus/keyboard interactions were opening the hamburger menu)
+          if (e && typeof e.preventDefault === 'function') e.preventDefault();
+          if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+
+          const settings = getFormValues();
+          saveLocal(settings);
+          applySettings(settings);
+          // Ensure html element also receives the class so full-bleed areas inherit dark styles
+          try { if (settings.theme === 'dark') document.documentElement.classList.add('dark-theme'); else document.documentElement.classList.remove('dark-theme'); } catch(_) {}
+          // try saving remotely but don't block if API isn't available
+          try {
+            await fetch('/api/settings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(settings) });
+          } catch (e) { /* ignore */ }
+
+          // Clear focus to avoid accidental activation of focused controls (e.g., hamburger button)
+          try { if (document.activeElement && typeof document.activeElement.blur === 'function') document.activeElement.blur(); } catch(_) {}
+
+          showToast('Settings saved');
+        });
+
+        document.getElementById('resetDefaultsBtn').addEventListener('click', () => {
+          // Immediately reset to defaults without confirmation
+          saveLocal(defaults);
+          setFormValues(defaults);
+          applySettings(defaults);
+          showToast('Settings reset to defaults');
+        });
+
+        // Language selector removed; no handler required
+
+        // Export/Import removed — simpler settings UI
+
+        document.getElementById('clearAllBtn').addEventListener('click', () => {
+          if (!confirm('Clear all saved settings from this browser?')) return;
+          localStorage.removeItem('appSettings');
+          setFormValues(defaults); applySettings(defaults); showToast('Settings cleared');
+        });
+      });
+    </script>
+  </body>
+</html>

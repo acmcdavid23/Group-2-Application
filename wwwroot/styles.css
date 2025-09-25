@@ -74,9 +74,96 @@ body{font-family:Inter,Segoe UI,Roboto,Arial; margin:0; background:linear-gradie
 .card:hover{transform:translateY(-2px);box-shadow:0 20px 60px rgba(0,0,0,0.15)}
 .card h3{margin:0 0 10px 0;font-size:15px}
 .form-inline{display:flex;gap:8px;align-items:center}
+
+/* Make overall page background match card color in dark theme for a cohesive look */
+html.dark-theme, body.dark-theme, .dark-theme, .dark-theme .container, .dark-theme main {
+  /* remove any gradient background and use a solid dark color so edges are consistent */
+  background: #374151 !important;
+  background-image: none !important;
+  color: #f9fafb;
+}
+
+/* Also override wide header/banner gradients that extend to the screen edges */
+.dark-theme .header-rect,
+.dark-theme .nav-banner-rect,
+.dark-theme .header-rect.glisten,
+html.dark-theme .header-rect,
+html.dark-theme .nav-banner-rect,
+html.dark-theme .header-rect.glisten {
+  background: #374151 !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure body full-bleed areas are covered */
+.dark-theme html, .dark-theme body { min-height: 100vh; }
+
+/* Make cards match the same dark color for visual continuity */
+.dark-theme .card, .dark-theme .settings-card {
+  background-color: #374151 !important;
+  border-color: #6b7280 !important;
+  color: #f9fafb !important;
+}
+
+/* High contrast mode: strong foreground/background contrast for accessibility */
+html.high-contrast, body.high-contrast, .high-contrast, html.high-contrast body, body.high-contrast html {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+.high-contrast .card, .high-contrast .settings-card, html.high-contrast .card, html.high-contrast .settings-card {
+  background: #000000 !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.high-contrast a, html.high-contrast a, body.high-contrast a { color: #ffff00 !important; text-decoration: underline !important; }
+
+.high-contrast .hamburger-menu, html.high-contrast .hamburger-menu, body.high-contrast .hamburger-menu { background: #000000 !important; box-shadow: none !important; }
+.high-contrast .hamburger-line, html.high-contrast .hamburger-line { background: #ffffff !important; }
+
+.high-contrast .mobile-menu, html.high-contrast .mobile-menu { background: #000000 !important; }
+.high-contrast .mobile-menu-item, html.high-contrast .mobile-menu-item { color: #ffffff !important; }
+
+.high-contrast .btn { background: #ffffff !important; color: #000000 !important; box-shadow:none !important; border:2px solid #ffffff !important; }
+.high-contrast .btn.primary { background: #ffea00 !important; color:#000000 !important; }
+
+.high-contrast .form-select, .high-contrast .form-control, html.high-contrast .form-select, html.high-contrast .form-control {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
+.high-contrast .posting-title, .high-contrast .posting-company { color: #ffffff !important; }
+
+/* Ensure toast remains readable in high-contrast */
+.high-contrast .toast, html.high-contrast .toast { background: #111111 !important; color: #ffffff !important; }
 .form-inline input[type=file]{flex:1}
 .form-vertical input, .form-vertical textarea{width:100%;padding:12px 16px;border:2px solid #e2e8f0;border-radius:12px;margin-bottom:12px;font-size:14px;transition:all 0.3s ease;background:rgba(255,255,255,0.8);backdrop-filter:blur(10px);font-family:inherit;resize:none}
 .form-vertical input:focus, .form-vertical textarea:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102, 126, 234, 0.1);background:white}
+
+/* Make selects match inputs (used by settings.html and other pages) */
+.form-select, .form-control, .form-vertical select, select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(6px);
+  font-family: inherit;
+  appearance: auto;
+}
+
+.form-select:focus, .form-control:focus, .form-vertical select:focus, select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  background: white;
+}
 .form-vertical input::placeholder, .form-vertical textarea::placeholder{color:#94a3b8}
 .btn{background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border:none;color:white;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:500;transition:all 0.3s ease;box-shadow:0 4px 15px rgba(102, 126, 234, 0.3)}
 .btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(102, 126, 234, 0.4)}

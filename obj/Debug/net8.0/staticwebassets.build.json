@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "XjDJfP6sPjGdzFolzgXzEYJthQ6lIHCCeR53e7WIfHI=",
+  "Hash": "tsNkPlUDvCvwvrl/Cfz736r9YQjXq6IuH+UXmiPX23Q=",
   "Source": "InternApp",
   "BasePath": "_content/InternApp",
   "Mode": "Default",
@@ -93,6 +93,25 @@
       "OriginalItemSpec": "wwwroot/hamburger-menu.js"
     },
     {
+      "Identity": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/i18n.js",
+      "SourceId": "InternApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/",
+      "BasePath": "_content/InternApp",
+      "RelativePath": "i18n.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/i18n.js"
+    },
+    {
       "Identity": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/index.html",
       "SourceId": "InternApp",
       "SourceType": "Discovered",
@@ -167,6 +186,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/resumes.js"
+    },
+    {
+      "Identity": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/settings.html",
+      "SourceId": "InternApp",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/",
+      "BasePath": "_content/InternApp",
+      "RelativePath": "settings.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/settings.html"
     },
     {
       "Identity": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/styles.css",

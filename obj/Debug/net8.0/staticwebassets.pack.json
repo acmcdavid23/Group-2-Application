@@ -17,6 +17,10 @@
       "PackagePath": "staticwebassets/hamburger-menu.js"
     },
     {
+      "Id": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/i18n.js",
+      "PackagePath": "staticwebassets/i18n.js"
+    },
+    {
       "Id": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/index.html",
       "PackagePath": "staticwebassets/index.html"
     },
@@ -31,6 +35,10 @@
     {
       "Id": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/resumes.js",
       "PackagePath": "staticwebassets/resumes.js"
+    },
+    {
+      "Id": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/settings.html",
+      "PackagePath": "staticwebassets/settings.html"
     },
     {
       "Id": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/styles.css",

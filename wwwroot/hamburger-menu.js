@@ -3,7 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const hamburgerBtn = document.getElementById('hamburgerBtn');
     const mobileMenu = document.getElementById('mobileMenu');
     const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
-    const mobileMenuItems = document.querySelectorAll('.mobile-menu-item');
+    // Query menu items dynamically so newly-injected items are handled
+    function getMobileMenuItems() { return mobileMenu ? mobileMenu.querySelectorAll('.mobile-menu-item') : []; }
 
     // Toggle menu function
     function toggleMenu() {
@@ -18,6 +19,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Open menu function
     function openMenu() {
+        // Repair menu and attach handlers before showing
+        ensureMenuIntegrity();
+        attachMenuItemHandlers();
+        setActiveMenuItem();
         hamburgerBtn.classList.add('active');
         mobileMenu.classList.add('active');
         mobileMenuOverlay.classList.add('active');
@@ -41,23 +46,25 @@ document.addEventListener('DOMContentLoaded', function() {
         mobileMenuOverlay.addEventListener('click', closeMenu);
     }
 
-    // Handle menu item clicks
-    mobileMenuItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetPage = this.getAttribute('data-page');
-            
-            // Close menu first
-            closeMenu();
-            
-            // Navigate to the target page
-            if (targetPage) {
-                setTimeout(() => {
-                    window.location.href = targetPage;
-                }, 300); // Wait for menu close animation
-            }
+
+    // Attach click handlers to current menu items (call after injection)
+    function attachMenuItemHandlers() {
+        const items = getMobileMenuItems();
+        items.forEach(item => {
+            // avoid attaching duplicate handlers
+            if (item.__menuHandlerAttached) return;
+            const handler = function(e) {
+                e.preventDefault();
+                const targetPage = this.getAttribute('data-page');
+                closeMenu();
+                if (targetPage) {
+                    setTimeout(() => { window.location.href = targetPage; }, 300);
+                }
+            };
+            item.addEventListener('click', handler);
+            item.__menuHandlerAttached = true;
         });
-    });
+    }
 
     // Close menu on escape key
     document.addEventListener('keydown', function(e) {
@@ -69,11 +76,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set active menu item based on current page
     function setActiveMenuItem() {
         const currentPage = window.location.pathname;
-        mobileMenuItems.forEach(item => {
+        const items = getMobileMenuItems();
+        items.forEach(item => {
             item.classList.remove('active');
             const itemPage = item.getAttribute('data-page');
-            
-            if (currentPage.includes(itemPage) || 
+            if (!itemPage) return;
+            if (currentPage.includes(itemPage) ||
                 (currentPage === '/' && itemPage === 'index.html') ||
                 (currentPage === '/index.html' && itemPage === 'index.html')) {
                 item.classList.add('active');
@@ -81,6 +89,110 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Set active menu item on page load
+    // If the mobile menu is empty, populate it with standard links to keep menu behavior consistent across pages
+    function populateDefaultMenuIfEmpty() {
+        if (!mobileMenu) return;
+        if (mobileMenu.children.length > 0) return; // already populated by page
+
+        const items = [
+            { href: 'index.html', text: '📋 Job Postings', page: 'index.html' },
+            { href: 'resumes.html', text: '📄 Resumes', page: 'resumes.html' },
+            { href: 'calendar.html', text: '📅 Calendar', page: 'calendar.html' },
+            { href: 'ai.html', text: '🤖 AI Assistant', page: 'ai.html' },
+            { href: 'settings.html', text: '⚙️ Settings', page: 'settings.html' }
+        ];
+
+        items.forEach(it => {
+            const a = document.createElement('a');
+            a.href = it.href;
+            a.className = 'mobile-menu-item';
+            a.setAttribute('data-page', it.page);
+            a.textContent = it.text;
+            // handler will be attached later via attachMenuItemHandlers
+            mobileMenu.appendChild(a);
+        });
+    }
+
+    // Ensure menu integrity: if any standard items were removed, restore them
+    const standardMenuItems = [
+        { href: 'index.html', text: '📋 Job Postings', page: 'index.html' },
+        { href: 'resumes.html', text: '📄 Resumes', page: 'resumes.html' },
+        { href: 'calendar.html', text: '📅 Calendar', page: 'calendar.html' },
+        { href: 'ai.html', text: '🤖 AI Assistant', page: 'ai.html' },
+        { href: 'settings.html', text: '⚙️ Settings', page: 'settings.html' }
+    ];
+
+    function ensureMenuIntegrity() {
+        if (!mobileMenu) return;
+        // for each standard item, ensure an element with the same data-page exists
+        standardMenuItems.forEach(it => {
+            const selector = `.mobile-menu-item[data-page="${it.page}"]`;
+            if (!mobileMenu.querySelector(selector)) {
+                const a = document.createElement('a');
+                a.href = it.href;
+                a.className = 'mobile-menu-item';
+                a.setAttribute('data-page', it.page);
+                a.textContent = it.text;
+                mobileMenu.appendChild(a);
+            }
+        });
+        // Re-attach handlers to any newly-added items
+        attachMenuItemHandlers();
+        // Update active state
+        setActiveMenuItem();
+    }
+
+    // Watch the mobileMenu for removals and restore if necessary
+    if (mobileMenu) {
+        try {
+            const mo = new MutationObserver(mutations => {
+                let needsRepair = false;
+                for (const m of mutations) {
+                    if (m.type === 'childList' && (m.removedNodes.length > 0)) {
+                        needsRepair = true;
+                        break;
+                    }
+                }
+                if (needsRepair) {
+                    // small debounce
+                    setTimeout(() => { ensureMenuIntegrity(); }, 30);
+                }
+            });
+            mo.observe(mobileMenu, { childList: true, subtree: false });
+        } catch (e) {
+            // MutationObserver might not be available in very old browsers; ignore
+        }
+    }
+
+    // Apply saved settings globally so pages reflect user's choices (theme, font size, high-contrast)
+    function applySavedSettings() {
+        try {
+            const s = JSON.parse(localStorage.getItem('appSettings') || '{}');
+            if (s.theme === 'dark') {
+                document.body.classList.add('dark-theme');
+                // also add to html element so wide/full-bleed selectors match
+                try { document.documentElement.classList.add('dark-theme'); } catch(_) {}
+            } else {
+                document.body.classList.remove('dark-theme');
+                try { document.documentElement.classList.remove('dark-theme'); } catch(_) {}
+            }
+            if (s.fontSize) document.documentElement.style.fontSize = (s.fontSize || 16) + 'px';
+            if (s.highContrast) {
+                document.body.classList.add('high-contrast');
+                try { document.documentElement.classList.add('high-contrast'); } catch(_) {}
+            } else {
+                document.body.classList.remove('high-contrast');
+                try { document.documentElement.classList.remove('high-contrast'); } catch(_) {}
+            }
+            // no i18n: language setting is ignored client-side
+        } catch (e) {
+            // ignore
+        }
+    }
+
+    // Set up menu after populating defaults
+    populateDefaultMenuIfEmpty();
+    attachMenuItemHandlers();
     setActiveMenuItem();
+    applySavedSettings();
 });
