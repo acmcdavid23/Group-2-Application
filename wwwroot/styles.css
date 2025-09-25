@@ -35,10 +35,10 @@ body{font-family:Inter,Segoe UI,Roboto,Arial; margin:0; background:linear-gradie
 .site-header{position:relative;margin-bottom:0}
 .header-rect{margin-top:0}
 .header-rect{position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;width:100vw;background:linear-gradient(90deg,#022543 0%, #093a6b 60%);box-shadow:0 8px 36px rgba(2,10,30,0.45)}
-.header-inner{max-width:var(--max-width);margin:0 auto;padding:16px 22px;display:flex;justify-content:space-between;align-items:center}
-.brand{font-size:20px;font-weight:700}
+.header-inner{max-width:var(--max-width);margin:0 auto;padding:16px 22px}
+.brand{font-size:1.25rem;font-weight:700}
 .header-inner .brand{color:#ffffff}
-.header-inner .subtitle{color:rgba(255,255,255,0.85);font-size:13px;margin-top:4px}
+.header-inner .subtitle{color:rgba(255,255,255,0.85);font-size:0.8125rem;margin-top:4px}
 
 .glisten{display:block;position:relative;overflow:hidden;border-radius:0}
 
@@ -99,56 +99,133 @@ body{font-family:Inter,Segoe UI,Roboto,Arial; margin:0; background:linear-gradie
 .panel.full-width{grid-column:1/-1}
 .card{background:var(--card);padding:20px;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.1);margin-bottom:20px;border:1px solid rgba(255,255,255,0.2);backdrop-filter:blur(10px);transition:all 0.3s ease}
 .card:hover{transform:translateY(-2px);box-shadow:0 20px 60px rgba(0,0,0,0.15)}
-.card h3{margin:0 0 10px 0;font-size:15px}
+.card h3{margin:0 0 10px 0;font-size:0.9375rem}
 .form-inline{display:flex;gap:8px;align-items:center}
-.form-inline input[type=file]{flex:1}
-.form-vertical input, .form-vertical textarea, .form-vertical select{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:12px;margin-bottom:12px;font-size:14px;transition:all 0.3s ease;background:rgba(255,255,255,0.8);backdrop-filter:blur(10px);font-family:inherit;resize:none;color:var(--text-primary)}
-.form-vertical input:focus, .form-vertical textarea:focus, .form-vertical select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light);background:white}
-.form-vertical input::placeholder, .form-vertical textarea::placeholder{color:var(--text-secondary)}
 
-/* Search and Filter Controls - Keep original layout but consistent styling */
-.search-filter-controls {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
+/* Make overall page background match card color in dark theme for a cohesive look */
+html.dark-theme, body.dark-theme, .dark-theme, .dark-theme .container, .dark-theme main {
+  /* remove any gradient background and use a solid dark color so edges are consistent */
+  background: #374151 !important;
+  background-image: none !important;
+  color: #f9fafb;
 }
 
-.search-filter-controls input, .search-filter-controls select {
-  padding: 8px 12px;
-  border: 2px solid var(--border);
-  border-radius: 8px;
+/* Also override wide header/banner gradients that extend to the screen edges */
+.dark-theme .header-rect,
+.dark-theme .nav-banner-rect,
+.dark-theme .header-rect.glisten,
+html.dark-theme .header-rect,
+html.dark-theme .nav-banner-rect,
+html.dark-theme .header-rect.glisten {
+  background: #374151 !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure body full-bleed areas are covered */
+.dark-theme html, .dark-theme body { min-height: 100vh; }
+
+/* Make cards match the same dark color for visual continuity */
+.dark-theme .card, .dark-theme .settings-card {
+  background-color: #374151 !important;
+  border-color: #6b7280 !important;
+  color: #f9fafb !important;
+}
+
+/* High contrast mode: strong foreground/background contrast for accessibility */
+html.high-contrast, body.high-contrast, .high-contrast, html.high-contrast body, body.high-contrast html {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+.high-contrast .card, .high-contrast .settings-card, html.high-contrast .card, html.high-contrast .settings-card {
+  background: #000000 !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.high-contrast a, html.high-contrast a, body.high-contrast a { color: #ffff00 !important; text-decoration: underline !important; }
+
+.high-contrast .hamburger-menu, html.high-contrast .hamburger-menu, body.high-contrast .hamburger-menu { background: #000000 !important; box-shadow: none !important; }
+.high-contrast .hamburger-line, html.high-contrast .hamburger-line { background: #ffffff !important; }
+
+.high-contrast .mobile-menu, html.high-contrast .mobile-menu { background: #000000 !important; }
+.high-contrast .mobile-menu-item, html.high-contrast .mobile-menu-item { color: #ffffff !important; }
+
+.high-contrast .btn { background: #ffffff !important; color: #000000 !important; box-shadow:none !important; border:2px solid #ffffff !important; }
+.high-contrast .btn.primary { background: #ffea00 !important; color:#000000 !important; }
+
+.high-contrast .form-select, .high-contrast .form-control, html.high-contrast .form-select, html.high-contrast .form-control {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
+.high-contrast .posting-title, .high-contrast .posting-company { color: #ffffff !important; }
+
+
+/* High contrast toggle button active state - filled style */
+.high-contrast-toggle {
+  background: white !important;
+  color: #374151 !important;
+  border: 2px solid #d1d5db !important;
+  transition: all 0.2s ease !important;
+}
+
+.high-contrast-toggle.active {
+  background: #667eea !important;
+  color: white !important;
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3) !important;
+}
+
+.high-contrast .high-contrast-toggle {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+}
+
+.high-contrast .high-contrast-toggle.active {
+  background: #ffea00 !important;
+  color: #000000 !important;
+  border-color: #ffea00 !important;
+  box-shadow: 0 0 0 2px rgba(255, 234, 0, 0.3) !important;
+}
+.form-inline input[type=file]{flex:1}
+.form-vertical input, .form-vertical textarea{width:100%;padding:12px 16px;border:2px solid #e2e8f0;border-radius:12px;margin-bottom:12px;font-size:0.875rem;transition:all 0.3s ease;background:rgba(255,255,255,0.8);backdrop-filter:blur(10px);font-family:inherit;resize:none}
+.form-vertical input:focus, .form-vertical textarea:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102, 126, 234, 0.1);background:white}
+
+/* Make selects match inputs (used by settings.html and other pages) */
+.form-select, .form-control, .form-vertical select, select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 12px;
   font-size: 14px;
   transition: all 0.3s ease;
-  background: rgba(255,255,255,0.8);
-  backdrop-filter: blur(10px);
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(6px);
   font-family: inherit;
-  color: var(--text-primary);
-  flex: 1;
-  min-width: 120px;
+  appearance: auto;
 }
 
-.search-filter-controls input:focus, .search-filter-controls select:focus {
+.form-select:focus, .form-control:focus, .form-vertical select:focus, select:focus {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-light);
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
   background: white;
 }
-
-.search-filter-controls input::placeholder {
-  color: var(--text-secondary);
-}
-.btn{background:var(--primary);border:none;color:white;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:500;transition:all 0.3s ease;box-shadow:0 4px 15px var(--shadow);border:2px solid var(--primary)}
-.btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px var(--shadow-hover);background:var(--primary-dark);border-color:var(--primary-dark)}
-.btn.primary{background:var(--secondary);border-color:var(--secondary);box-shadow:0 4px 15px var(--shadow)}
-.btn.primary:hover{background:var(--success);border-color:var(--success);box-shadow:0 8px 25px var(--shadow-hover)}
-.btn.danger{background:var(--danger);border-color:var(--danger)}
-.btn.danger:hover{background:#dc2626;border-color:#dc2626}
-.btn.btn-sm{padding:6px 12px;font-size:0.9em}
+.form-vertical input::placeholder, .form-vertical textarea::placeholder{color:#94a3b8}
+.btn{background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border:none;color:white;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:500;transition:all 0.3s ease;box-shadow:0 4px 15px rgba(102, 126, 234, 0.3)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(102, 126, 234, 0.4)}
+.btn.primary{background:linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);box-shadow:0 4px 15px rgba(255, 107, 107, 0.3)}
+.btn.primary:hover{box-shadow:0 8px 25px rgba(255, 107, 107, 0.4)}
 .list{display:flex;flex-direction:column;gap:8px}
 .resume, .posting{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;background:linear-gradient(180deg, rgba(2,6,23,0.02), rgba(2,6,23,0.01));}
 .resume a{color:var(--accent);font-weight:600;text-decoration:none}
-.posting small{color:var(--muted);font-size:12px}
+.posting small{color:var(--muted);font-size:0.75rem}
 
 /* Enhanced Posting styles */
 .posting {
@@ -171,12 +248,13 @@ body{font-family:Inter,Segoe UI,Roboto,Arial; margin:0; background:linear-gradie
   border-color: var(--primary);
 }
 
-.posting-header {
+.posting-content {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 6px;
   text-align: center;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .posting-title {
@@ -190,8 +268,7 @@ body{font-family:Inter,Segoe UI,Roboto,Arial; margin:0; background:linear-gradie
 .posting-company {
   color: var(--primary);
   font-weight: 500;
-  text-align: center;
-  margin: 0 0 6px 0;
+  margin: 0;
 }
 
 .posting-details {
@@ -226,6 +303,12 @@ body{font-family:Inter,Segoe UI,Roboto,Arial; margin:0; background:linear-gradie
   margin-top: 8px;
   padding-top: 8px;
   border-top: 1px solid #e2e8f0;
+}
+
+.posting-status {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
 }
 
 .posting-actions {
@@ -328,7 +411,7 @@ body{font-family:Inter,Segoe UI,Roboto,Arial; margin:0; background:linear-gradie
   color: white;
   text-decoration: none;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 1rem;
   transition: all 0.2s ease;
   border-left: 4px solid transparent;
 }
@@ -376,114 +459,62 @@ body{font-family:Inter,Segoe UI,Roboto,Arial; margin:0; background:linear-gradie
   margin-top: 10px !important;
 }
 
-/* Posting Actions Styles */
-.posting-actions {
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 10000;
   display: flex;
-  gap: 8px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #e5e7eb;
-  flex-wrap: wrap;
-  max-width: 100%;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.posting-actions .btn {
-  padding: 6px 12px;
-  font-size: 14px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.posting-actions .edit-posting {
-  background-color: #3b82f6;
+.toast {
+  background: #10b981;
   color: white;
-  border: none;
-}
-
-.posting-actions .edit-posting:hover {
-  background-color: #2563eb;
-  transform: translateY(-1px);
-}
-
-.posting-actions .delete-posting {
-  background-color: #ef4444;
-  color: white;
-  border: none;
-}
-
-.posting-actions .delete-posting:hover {
-  background-color: #dc2626;
-  transform: translateY(-1px);
-}
-
-/* App Notifications */
-.app-notification {
-  position: fixed !important;
-  top: 20px !important;
-  right: 20px !important;
-  z-index: 9999 !important;
-  max-width: 400px;
+  padding: 12px 20px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  animation: slideInRight 0.3s ease-out;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-.app-notification-success {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  border: 1px solid #059669;
-}
-
-.app-notification-error {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
-  border: 1px solid #dc2626;
-}
-
-.app-notification-info {
-  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
-  color: white;
-  border: 1px solid #1e40af;
-}
-
-.notification-content {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  gap: 12px;
-}
-
-.notification-message {
-  font-weight: 500;
+  gap: 10px;
+  min-width: 200px;
+  max-width: 300px;
+  animation: slideInRight 0.3s ease-out;
   font-size: 14px;
-  flex: 1;
+  font-weight: 500;
 }
 
-.notification-close {
+.toast.error {
+  background: #ef4444;
+}
+
+.toast.warning {
+  background: #f59e0b;
+}
+
+.toast.info {
+  background: #3b82f6;
+}
+
+.toast-icon {
+  font-size: 16px;
+}
+
+.toast-close {
   background: none;
   border: none;
   color: white;
-  font-size: 18px;
-  font-weight: bold;
   cursor: pointer;
-  padding: 0;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background-color 0.2s;
+  font-size: 18px;
+  margin-left: auto;
+  opacity: 0.8;
+  transition: opacity 0.2s;
 }
 
-.notification-close:hover {
-  background: rgba(255, 255, 255, 0.2);
+.toast-close:hover {
+  opacity: 1;
 }
 
 @keyframes slideInRight {
@@ -497,130 +528,37 @@ body{font-family:Inter,Segoe UI,Roboto,Arial; margin:0; background:linear-gradie
   }
 }
 
-/* Ensure notification is always visible */
-.app-notification {
-  position: fixed !important;
-  top: 20px !important;
-  right: 20px !important;
-  z-index: 99999 !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
 }
 
-/* Edit Job Posting Modal */
-.modal#editModal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 2000;
-  display: none;
-  align-items: center;
-  justify-content: center;
+.toast.slide-out {
+  animation: slideOutRight 0.3s ease-in forwards;
 }
 
-#editModal .modal-content {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border-radius: 12px;
-  box-shadow: 0 4px 15px var(--shadow);
-  max-width: 500px;
-  width: 90%;
-  max-height: 90vh;
-  overflow-y: auto;
-  border: 1px solid #e2e8f0;
+/* Dark theme support for toasts */
+.dark-theme .toast {
+  background: #059669;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-#editModal .modal-header {
-  padding: 20px;
-  border-bottom: 1px solid #e2e8f0;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border-radius: 12px 12px 0 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  z-index: 5;
-}
-
-#editModal .modal-header h2 {
-  margin: 0;
-  color: #1e293b;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-#editModal .modal-close {
-  background: #ff0000 !important;
-  border: 2px solid #000000 !important;
-  color: white !important;
-  cursor: pointer !important;
-  padding: 15px 20px !important;
-  border-radius: 6px;
-  font-size: 18px !important;
-  position: relative !important;
-  z-index: 9999 !important;
-  width: 60px !important;
-  height: 60px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex-shrink: 0 !important;
-  user-select: none !important;
-  margin: 0 !important;
-}
-
-#editModal .modal-close:hover {
+.dark-theme .toast.error {
   background: #dc2626;
 }
 
-#editModal .modal-close:active {
-  transform: scale(0.95);
+.dark-theme .toast.warning {
+  background: #d97706;
 }
 
-#editModal .modal-close:focus {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-#editModal .modal-body {
-  padding: 15px 20px;
-}
-
-#editModal .modal-body .form-vertical {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-#editModal .modal-body .form-vertical input,
-#editModal .modal-body .form-vertical textarea,
-#editModal .modal-body .form-vertical select {
-  padding: 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 14px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-#editModal .modal-body .form-vertical input:focus,
-#editModal .modal-body .form-vertical textarea:focus,
-#editModal .modal-body .form-vertical select:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-#editModal .modal-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid #e2e8f0;
+.dark-theme .toast.info {
+  background: #2563eb;
 }
 
 

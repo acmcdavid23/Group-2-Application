@@ -1,0 +1,850 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title data-translate="settings.pageTitle">Settings - Internship Application Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet" />
+    <style>
+      .settings-container { max-width: 960px; margin: 32px auto; padding: 16px; }
+      .settings-grid { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items:start; }
+      .settings-card { background: #fff; border-radius: 12px; padding: 18px; box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06); }
+      .settings-card h3 { margin-top: 0; }
+      .setting-row { margin-bottom: 14px; }
+      .small-note { color: #6b7280; font-size: 13px; }
+      .sidebar-help { font-size: 14px; color:#374151; }
+      .btn-group { display:flex; gap:8px; }
+      .reset-quiet { background:none; border: none; color:#6b7280; text-decoration:underline; cursor:pointer; padding:0; }
+      /* make dark-theme work on this page too */
+      .dark-theme .settings-card { background:#374151; color:#f9fafb; }
+      /* Toast (non-blocking) */
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-rect glisten">
+        <div class="header-inner">
+          <div class="brand" data-translate="settings.brand">Internship Application Manager</div>
+          <div class="subtitle" data-translate="settings.subtitle">Settings</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hamburger Menu -->
+    <div class="hamburger-menu">
+      <button id="hamburgerBtn" class="hamburger-btn" aria-label="Open Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu">
+      <!-- menu items are injected by each page or by hamburger-menu.js -->
+    </div>
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay"></div>
+
+    <main class="settings-container">
+      <div class="settings-grid">
+        <div class="settings-card">
+          <h3 data-translate="settings.title">Appearance</h3>
+          <div class="setting-row">
+            <label for="themeSelect" data-translate="settings.theme">Appearance</label>
+            <select id="themeSelect" class="form-control">
+              <option value="light" data-translate="settings.theme.light">Light</option>
+              <option value="dark" data-translate="settings.theme.dark">Dark</option>
+              <option value="auto" data-translate="settings.theme.auto">Auto (System)</option>
+            </select>
+            <div class="small-note" data-translate="settings.themeNote">Choose your preferred color theme. "Auto" follows the operating system preference.</div>
+          </div>
+
+          <div class="setting-row">
+            <label for="fontSizeSelect" data-translate="settings.fontSize">Base font size</label>
+            <select id="fontSizeSelect" class="form-control">
+              <option value="14" data-translate="settings.fontSize.small">Small</option>
+              <option value="16" data-translate="settings.fontSize.default">Default</option>
+              <option value="18" data-translate="settings.fontSize.large">Large</option>
+              <option value="20" data-translate="settings.fontSize.larger">Larger</option>
+            </select>
+            <div class="small-note" data-translate="settings.fontSizeNote">Adjust the base font size for better readability.</div>
+          </div>
+
+          <div class="setting-row">
+            <label for="highContrast" data-translate="settings.highContrast">High contrast</label>
+            <div class="btn-group" style="margin-top:6px;">
+              <button id="highContrastOn" class="btn btn-sm high-contrast-toggle" data-translate="settings.highContrast.enable">Enable</button>
+              <button id="highContrastOff" class="btn btn-sm high-contrast-toggle" data-translate="settings.highContrast.disable">Disable</button>
+            </div>
+            <div class="small-note" data-translate="settings.highContrastNote">Turn on larger contrast for better legibility.</div>
+          </div>
+
+          <div class="setting-row">
+            <label for="languageSelect" data-translate="settings.language">Language</label>
+            <select id="languageSelect" class="form-control">
+              <option value="en">English</option>
+              <option value="es">Español</option>
+              <option value="fr">Français</option>
+              <option value="de">Deutsch</option>
+            </select>
+            <div class="small-note" data-translate="settings.languageNote">Choose your preferred language for the entire application.</div>
+          </div>
+
+          <div class="setting-row">
+            <label for="timezoneSelect" data-translate="settings.timezone">Timezone</label>
+            <select id="timezoneSelect" class="form-control"></select>
+            <div class="small-note" data-translate="settings.timezoneNote">Used for reminders and calendar displays.</div>
+          </div>
+
+          <h3 style="margin-top:18px;" data-translate="settings.remindersTitle">Reminders & Notifications</h3>
+          <div class="setting-row">
+            <label for="reminderDays" data-translate="settings.reminderDays">Reminder Days (before deadline)</label>
+            <select id="reminderDays" class="form-control">
+              <option value="1" data-translate="settings.reminderDays.1day">1 day</option>
+              <option value="2" data-translate="settings.reminderDays.2days">2 days</option>
+              <option value="3" data-translate="settings.reminderDays.3days">3 days</option>
+              <option value="5" data-translate="settings.reminderDays.5days">5 days</option>
+              <option value="7" selected data-translate="settings.reminderDays.1week">1 week</option>
+              <option value="14" data-translate="settings.reminderDays.2weeks">2 weeks</option>
+              <option value="21" data-translate="settings.reminderDays.3weeks">3 weeks</option>
+              <option value="30" data-translate="settings.reminderDays.1month">1 month</option>
+            </select>
+          </div>
+          
+          <div class="setting-row">
+            <label><input type="checkbox" id="emailReminders" /> 📧 <span data-translate="settings.enableEmail">Enable email reminders</span></label>
+            <div class="small-note" data-translate="settings.enableEmailNote">Send email notifications before job posting due dates</div>
+          </div>
+          
+          <div class="setting-row" id="emailSettings" style="display: none;">
+            <label for="userEmail" data-translate="settings.yourEmail">Your Email Address</label>
+            <input id="userEmail" type="email" class="form-control" placeholder="your.email@example.com" data-translate="settings.yourEmailPlaceholder" />
+            <div class="small-note" data-translate="settings.yourEmailNote">Email address to receive reminder notifications</div>
+          </div>
+          
+          <div class="setting-row" id="emailSettings" style="display: none;">
+            <label for="reminderTime" data-translate="settings.reminderTime">Reminder Time</label>
+            <select id="reminderTime" class="form-control">
+              <option value="09:00" data-translate="settings.reminderTime.9am">9:00 AM</option>
+              <option value="12:00" data-translate="settings.reminderTime.12pm">12:00 PM</option>
+              <option value="15:00" data-translate="settings.reminderTime.3pm">3:00 PM</option>
+              <option value="18:00" data-translate="settings.reminderTime.6pm">6:00 PM</option>
+            </select>
+            <div class="small-note" data-translate="settings.reminderTimeNote">Time of day to send reminder emails</div>
+          </div>
+          
+          <div class="setting-row">
+            <label><input type="checkbox" id="autoSave" /> <span data-translate="settings.autoSave">Auto-save changes</span></label>
+          </div>
+
+          <h3 style="margin-top:18px;" data-translate="settings.accessibilityTitle">Accessibility & Text</h3>
+
+          <div style="margin-top:20px; display:flex; gap:10px;">
+            <button id="saveSettingsBtn" class="btn primary" data-translate="settings.saveSettings">Save Settings</button>
+            <button id="testEmailBtn" class="btn" style="background: #3b82f6; color: white;" data-translate="settings.testEmail">📧 Test Email</button>
+            <button id="resetDefaultsBtn" class="btn" data-translate="settings.resetDefaults">Reset to Defaults</button>
+          </div>
+        </div>
+
+        <aside class="settings-card sidebar-help">
+          <h4 data-translate="settings.tips.title">Tips</h4>
+          <ul>
+            <li data-translate="settings.tips.darkMode">Use Dark mode to reduce eye strain in low light.</li>
+            <li data-translate="settings.tips.autoSave">Enable Auto-save to avoid losing changes while editing postings.</li>
+            <li data-translate="settings.tips.timezone">Set your timezone so deadline reminders match your locale.</li>
+            <li data-translate="settings.tips.translations">If you need translations across the app, the backend must serve localized strings.</li>
+          </ul>
+          <div style="margin-top:12px;">
+            <button id="clearAllBtn" class="btn btn-sm" style="background:#fee2e2;color:#991b1b;" data-translate="settings.tips.clearAll">Clear all saved settings</button>
+            <button id="learnMore" class="reset-quiet" data-translate="settings.tips.learnMore">Learn more about settings</button>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="js/translations.js"></script>
+  <script src="email-service.js"></script>
+  <script src="toast-notifications.js"></script>
+  <script src="hamburger-menu.js"></script>
+  <script>
+    // Initialize EmailJS
+    (function() {
+      emailjs.init("X80istNGO-VJ1Q9zZ");
+    })();
+  </script>
+  <script>
+      // Basic settings persistence and UI wiring. Uses localStorage first, then attempts /api/settings.
+      const defaults = {
+        theme: 'light',
+        language: 'en',
+        reminderDays: 7,
+        autoSave: true,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+        fontSize: 16,
+        highContrast: false,
+        emailReminders: false,
+        userEmail: '',
+        reminderTime: '09:00'
+      };
+
+      function loadLocal() {
+        try { return JSON.parse(localStorage.getItem('appSettings')) || {}; } catch { return {}; }
+      }
+
+      function saveLocal(settings) {
+        localStorage.setItem('appSettings', JSON.stringify(settings));
+      }
+
+      function applySettings(s) {
+        const theme = s.theme || defaults.theme;
+        if (theme === 'dark') {
+          document.body.classList.add('dark-theme');
+          try { document.documentElement.classList.add('dark-theme'); } catch(_) {}
+        } else {
+          document.body.classList.remove('dark-theme');
+          try { document.documentElement.classList.remove('dark-theme'); } catch(_) {}
+        }
+        if (s.fontSize) {
+          document.documentElement.style.fontSize = (s.fontSize || defaults.fontSize) + 'px';
+          document.body.style.fontSize = (s.fontSize || defaults.fontSize) + 'px';
+        }
+        if (s.highContrast) {
+          document.body.classList.add('high-contrast');
+          try { document.documentElement.classList.add('high-contrast'); } catch(_) {}
+        } else {
+          document.body.classList.remove('high-contrast');
+          try { document.documentElement.classList.remove('high-contrast'); } catch(_) {}
+        }
+      }
+
+
+      function setFormValues(s) {
+        document.getElementById('themeSelect').value = s.theme || defaults.theme;
+        const langEl = document.getElementById('languageSelect');
+        if (langEl) langEl.value = s.language || defaults.language;
+        document.getElementById('reminderDays').value = s.reminderDays || defaults.reminderDays;
+        document.getElementById('autoSave').checked = typeof s.autoSave === 'boolean' ? s.autoSave : defaults.autoSave;
+        document.getElementById('timezoneSelect').value = s.timezone || defaults.timezone;
+        document.getElementById('fontSizeSelect').value = s.fontSize || defaults.fontSize;
+        
+        // Email settings
+        document.getElementById('emailReminders').checked = s.emailReminders || defaults.emailReminders;
+        document.getElementById('userEmail').value = s.userEmail || defaults.userEmail;
+        document.getElementById('reminderTime').value = s.reminderTime || defaults.reminderTime;
+        
+        // Show/hide email settings based on checkbox
+        toggleEmailSettings(s.emailReminders);
+        
+        // Ensure test email button follows the email reminders setting
+        const testEmailBtn = document.getElementById('testEmailBtn');
+        if (testEmailBtn) {
+          testEmailBtn.style.display = s.emailReminders ? 'block' : 'none';
+        }
+        
+        // Update high contrast toggle visual state
+        updateHighContrastToggleState(s.highContrast);
+      }
+
+      function getFormValues() {
+        const stored = loadLocal();
+        const langEl2 = document.getElementById('languageSelect');
+        return {
+          theme: document.getElementById('themeSelect').value,
+          language: langEl2 ? langEl2.value : (stored && stored.language ? stored.language : undefined),
+          reminderDays: parseInt(document.getElementById('reminderDays').value) || defaults.reminderDays,
+          autoSave: document.getElementById('autoSave').checked,
+          timezone: document.getElementById('timezoneSelect').value,
+          fontSize: parseInt(document.getElementById('fontSizeSelect').value) || defaults.fontSize,
+          highContrast: document.body.classList.contains('high-contrast'),
+          emailReminders: document.getElementById('emailReminders').checked,
+          userEmail: document.getElementById('userEmail').value,
+          reminderTime: document.getElementById('reminderTime').value
+        };
+      }
+
+      function populateTimezones() {
+        const tz = document.getElementById('timezoneSelect');
+        const zones = ['UTC', 'America/New_York','America/Chicago','America/Denver','America/Los_Angeles','Europe/London','Europe/Paris','Asia/Tokyo','Asia/Shanghai'];
+        zones.forEach(z => { const o = document.createElement('option'); o.value = z; o.textContent = z; tz.appendChild(o); });
+        tz.value = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+      }
+
+      function updateHighContrastToggleState(isEnabled) {
+        const onBtn = document.getElementById('highContrastOn');
+        const offBtn = document.getElementById('highContrastOff');
+        
+        if (isEnabled) {
+          onBtn.classList.add('active');
+          offBtn.classList.remove('active');
+        } else {
+          onBtn.classList.remove('active');
+          offBtn.classList.add('active');
+        }
+      }
+
+      function toggleEmailSettings(enabled) {
+        const emailSettings = document.querySelectorAll('#emailSettings');
+        emailSettings.forEach(setting => {
+          setting.style.display = enabled ? 'block' : 'none';
+        });
+        
+        // Also show/hide the test email button
+        const testEmailBtn = document.getElementById('testEmailBtn');
+        if (testEmailBtn) {
+          testEmailBtn.style.display = enabled ? 'block' : 'none';
+        }
+      }
+
+      // Track original settings for revert functionality
+      let originalSettings = null;
+      let hasUnsavedChanges = false;
+      let isShowingDialog = false; // Prevent multiple dialogs
+
+      function saveSettingsImmediately() {
+        const settings = getFormValues();
+        saveLocal(settings);
+        applySettings(settings);
+        originalSettings = JSON.parse(JSON.stringify(settings)); // Deep copy
+        hasUnsavedChanges = false;
+        
+        // Try to save remotely but don't block if API isn't available
+        fetch('/api/settings', { 
+          method:'POST', 
+          headers:{'Content-Type':'application/json'}, 
+          body: JSON.stringify(settings) 
+        }).catch(() => { /* ignore */ });
+      }
+
+      // Manual save function for the Save Settings button
+      function saveSettings() {
+        const settings = getFormValues();
+        saveLocal(settings);
+        applySettings(settings);
+        originalSettings = JSON.parse(JSON.stringify(settings)); // Deep copy
+        hasUnsavedChanges = false;
+        
+        // Try to save remotely but don't block if API isn't available
+        fetch('/api/settings', { 
+          method:'POST', 
+          headers:{'Content-Type':'application/json'}, 
+          body: JSON.stringify(settings) 
+        }).catch(() => { /* ignore */ });
+        
+        if (window.toast) {
+          window.toast.success('Settings saved successfully!');
+        }
+      }
+
+      // Check for unsaved changes
+      function checkForUnsavedChanges() {
+        const currentSettings = getFormValues();
+        const savedSettings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+        
+        // Compare current form values with saved settings
+        const hasChanges = JSON.stringify(currentSettings) !== JSON.stringify(savedSettings);
+        hasUnsavedChanges = hasChanges;
+        
+        return hasChanges;
+      }
+
+      // Show change notification (called only when form changes)
+      function showChangeNotification() {
+        if (window.toast) {
+          window.toast.info('Settings have been modified. Remember to save your changes!', 3000);
+        }
+      }
+
+      // Revert to original settings
+      function revertToOriginal() {
+        if (originalSettings) {
+          setFormValues(originalSettings);
+          applySettings(originalSettings);
+          hasUnsavedChanges = false;
+          if (window.toast) {
+            window.toast.info('Settings reverted to last saved state');
+          }
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        console.log('Settings page loaded, checking translator...');
+        console.log('Translator available:', !!window.translator);
+        if (window.translator) {
+          console.log('Current language:', window.translator.getCurrentLanguage());
+          // Force apply language to see if it works
+          setTimeout(() => {
+            console.log('Forcing language application...');
+            window.translator.applyLanguage();
+          }, 500);
+        }
+        
+        populateTimezones();
+    const local = loadLocal();
+        const merged = Object.assign({}, defaults, local);
+        setFormValues(merged);
+        applySettings(merged);
+
+        document.getElementById('highContrastOn').addEventListener('click', () => {
+          document.body.classList.add('high-contrast');
+          try { document.documentElement.classList.add('high-contrast'); } catch(_) {}
+          updateHighContrastToggleState(true);
+          checkForUnsavedChanges();
+        });
+        document.getElementById('highContrastOff').addEventListener('click', () => {
+          document.body.classList.remove('high-contrast');
+          try { document.documentElement.classList.remove('high-contrast'); } catch(_) {}
+          updateHighContrastToggleState(false);
+          checkForUnsavedChanges();
+        });
+
+        // Add change tracking for settings (without auto-saving)
+        document.getElementById('themeSelect').addEventListener('change', () => {
+          applySettings(getFormValues()); // Apply changes immediately for preview
+          showChangeNotification();
+        });
+        document.getElementById('reminderDays').addEventListener('change', () => {
+          showChangeNotification();
+        });
+        document.getElementById('autoSave').addEventListener('change', () => {
+          showChangeNotification();
+        });
+        document.getElementById('timezoneSelect').addEventListener('change', () => {
+          showChangeNotification();
+        });
+        document.getElementById('fontSizeSelect').addEventListener('change', () => {
+          applySettings(getFormValues()); // Apply changes immediately for preview
+          showChangeNotification();
+        });
+        document.getElementById('languageSelect').addEventListener('change', () => {
+          const newLanguage = document.getElementById('languageSelect').value;
+          console.log('Language changed to:', newLanguage);
+          if (window.translator) {
+            console.log('Translator found, setting language...');
+            window.translator.setLanguage(newLanguage);
+          } else {
+            console.log('Translator not found!');
+          }
+          showChangeNotification();
+        });
+        
+        // Email settings
+        document.getElementById('emailReminders').addEventListener('change', (e) => {
+          toggleEmailSettings(e.target.checked);
+          showChangeNotification();
+        });
+        document.getElementById('userEmail').addEventListener('change', () => {
+          showChangeNotification();
+        });
+        document.getElementById('reminderTime').addEventListener('change', () => {
+          showChangeNotification();
+        });
+
+        document.getElementById('saveSettingsBtn').addEventListener('click', async (e) => {
+          // Prevent click from bubbling (some focus/keyboard interactions were opening the hamburger menu)
+          if (e && typeof e.preventDefault === 'function') e.preventDefault();
+          if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+
+          saveSettings();
+
+          // Clear focus to avoid accidental activation of focused controls (e.g., hamburger button)
+          try { if (document.activeElement && typeof document.activeElement.blur === 'function') document.activeElement.blur(); } catch(_) {}
+
+        });
+
+        document.getElementById('resetDefaultsBtn').addEventListener('click', () => {
+          // Immediately reset to defaults without confirmation
+          saveLocal(defaults);
+          setFormValues(defaults);
+          applySettings(defaults);
+        });
+
+        document.getElementById('testEmailBtn').addEventListener('click', async () => {
+          const userEmail = document.getElementById('userEmail').value;
+          if (!userEmail) {
+            alert('Please enter your email address first');
+            return;
+          }
+          
+          if (!document.getElementById('emailReminders').checked) {
+            alert('Please enable email reminders first');
+            return;
+          }
+          
+          try {
+            const testBtn = document.getElementById('testEmailBtn');
+            testBtn.textContent = 'Sending...';
+            testBtn.disabled = true;
+            
+            // Wait for email service to be ready
+            if (!window.emailService) {
+              alert('Email service not loaded yet. Please wait a moment and try again.');
+              return;
+            }
+            
+            // Wait for initialization
+            let attempts = 0;
+            while (!window.emailService.isInitialized && attempts < 50) {
+              await new Promise(resolve => setTimeout(resolve, 100));
+              attempts++;
+            }
+            
+            if (!window.emailService.isInitialized) {
+              alert('Email service failed to initialize. Please refresh the page and try again.');
+              return;
+            }
+            
+            const success = await window.emailService.sendTestEmail(userEmail);
+            if (success) {
+              window.toast.success('Email sent successfully! Check your inbox.');
+            } else {
+              window.toast.error('Failed to send test email. Please check your EmailJS configuration.');
+            }
+          } catch (error) {
+            window.toast.error('Error sending test email: ' + error.message);
+          } finally {
+            const testBtn = document.getElementById('testEmailBtn');
+            testBtn.textContent = '📧 Test Email';
+            testBtn.disabled = false;
+          }
+        });
+
+        // Language selector removed; no handler required
+
+        // Export/Import removed — simpler settings UI
+
+        document.getElementById('clearAllBtn').addEventListener('click', () => {
+          if (!confirm('Clear all saved settings from this browser?')) return;
+          localStorage.removeItem('appSettings');
+          setFormValues(defaults); applySettings(defaults);
+        });
+
+        // Initialize original settings
+        originalSettings = JSON.parse(JSON.stringify(merged));
+        
+        // We'll handle navigation warnings through custom dialogs only
+
+        // Override the hamburger menu's navigation function
+        const originalWindowLocationHref = window.location.href;
+        let originalLocationSetter = null;
+        
+        // Try to override window.location.href setter
+        try {
+          const locationDescriptor = Object.getOwnPropertyDescriptor(Location.prototype, 'href');
+          if (locationDescriptor && locationDescriptor.set) {
+            originalLocationSetter = locationDescriptor.set;
+            Object.defineProperty(Location.prototype, 'href', {
+              get: locationDescriptor.get,
+              set: function(url) {
+                // Check if we're on settings page and have unsaved changes
+        if (window.location.pathname.includes('settings.html') && 
+            hasUnsavedChanges && 
+            !isShowingDialog && 
+            !url.includes('settings.html')) {
+                  
+                  isShowingDialog = true;
+                  
+                  // Show custom toast notification immediately
+                  if (window.toast) {
+                    window.toast.warning('You have unsaved changes. Please save your settings before leaving.', 8000);
+                  }
+                  
+                  // Show custom confirmation dialog immediately
+                  showCustomConfirmDialog(
+                    'You have unsaved changes. Would you like to save them before leaving?',
+                    () => {
+                      // Save and navigate
+                      isShowingDialog = false;
+                      saveSettings();
+                      originalLocationSetter.call(this, url);
+                    },
+                    () => {
+                      // Show revert option
+                      showCustomConfirmDialog(
+                        'Would you like to revert your changes?',
+                        () => {
+                          isShowingDialog = false;
+                          revertToOriginal();
+                        },
+                        () => {
+                          // Do nothing - stay on settings page
+                          isShowingDialog = false;
+                        }
+                      );
+                    }
+                  );
+                } else {
+                  // No unsaved changes or not on settings page, proceed normally
+                  originalLocationSetter.call(this, url);
+                }
+              }
+            });
+          }
+        } catch (e) {
+          console.log('Could not override location.href, using fallback method');
+        }
+
+        // Intercept hamburger menu navigation after a delay to ensure it's loaded
+        setTimeout(() => {
+          const originalSetTimeout = window.setTimeout;
+          window.setTimeout = function(callback, delay) {
+            if (typeof callback === 'function' && delay === 300) {
+              // This is likely the hamburger menu's navigation timeout
+              return originalSetTimeout(function() {
+                // Only check for unsaved changes if we're actually trying to navigate away
+                if (window.location.pathname.includes('settings.html') && 
+                    hasUnsavedChanges && 
+                    !isShowingDialog) {
+                  
+                  isShowingDialog = true;
+                  
+                  // Show custom toast notification immediately
+                  if (window.toast) {
+                    window.toast.warning('You have unsaved changes. Please save your settings before leaving.', 8000);
+                  }
+                  
+                  // Show custom confirmation dialog immediately
+                  showCustomConfirmDialog(
+                    'You have unsaved changes. Would you like to save them before leaving?',
+                    () => {
+                      // Save and navigate
+                      isShowingDialog = false;
+                      saveSettings();
+                      callback();
+                    },
+                    () => {
+                      // Show revert option
+                      showCustomConfirmDialog(
+                        'Would you like to revert your changes?',
+                        () => {
+                          isShowingDialog = false;
+                          revertToOriginal();
+                        },
+                        () => {
+                          // Do nothing - stay on settings page
+                          isShowingDialog = false;
+                        }
+                      );
+                    }
+                  );
+                } else {
+                  // No unsaved changes, proceed normally
+                  callback();
+                }
+              }, delay);
+            }
+            return originalSetTimeout(callback, delay);
+          };
+        }, 100); // Reduced from 500ms to 100ms for faster response
+
+        // Add specific click event for hamburger menu items - optimized for speed
+        document.addEventListener('click', (e) => {
+          // Quick check for hamburger menu items
+          const isHamburgerMenuItem = e.target.matches('.mobile-menu-item') || 
+                                     e.target.closest('.mobile-menu-item') ||
+                                     e.target.matches('[data-page]') ||
+                                     e.target.closest('[data-page]');
+          
+          if (isHamburgerMenuItem && hasUnsavedChanges && !isShowingDialog) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            isShowingDialog = true;
+            
+            const targetPage = e.target.getAttribute('data-page') || 
+                             e.target.closest('[data-page]')?.getAttribute('data-page');
+            
+            // Show dialog immediately without delay
+            showCustomConfirmDialog(
+              'You have unsaved changes. Would you like to save them before leaving?',
+              () => {
+                isShowingDialog = false;
+                saveSettings();
+                if (targetPage) {
+                  window.location.href = targetPage;
+                }
+              },
+              () => {
+                showCustomConfirmDialog(
+                  'Would you like to revert your changes?',
+                  () => {
+                    isShowingDialog = false;
+                    revertToOriginal();
+                  },
+                  () => {
+                    isShowingDialog = false;
+                  }
+                );
+              }
+            );
+          }
+        });
+
+        // Custom confirmation dialog function
+        function showCustomConfirmDialog(message, onConfirm, onCancel) {
+          // Remove any existing dialogs first
+          const existingOverlays = document.querySelectorAll('.custom-dialog-overlay');
+          existingOverlays.forEach(overlay => overlay.remove());
+
+          // Disable all page interactions
+          document.body.style.pointerEvents = 'none';
+          document.body.style.overflow = 'hidden';
+
+          // Create modal overlay
+          const overlay = document.createElement('div');
+          overlay.className = 'custom-dialog-overlay';
+          overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+          `;
+
+          // Create dialog box
+          const dialog = document.createElement('div');
+          dialog.style.cssText = `
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            max-width: 450px;
+            text-align: center;
+            position: relative;
+            border: 2px solid #e5e7eb;
+            pointer-events: auto;
+            animation: dialogAppear 0.2s ease-out;
+          `;
+
+          // Add animation keyframes
+          if (!document.getElementById('dialog-animations')) {
+            const style = document.createElement('style');
+            style.id = 'dialog-animations';
+            style.textContent = `
+              @keyframes dialogAppear {
+                from {
+                  opacity: 0;
+                  transform: scale(0.9) translateY(-20px);
+                }
+                to {
+                  opacity: 1;
+                  transform: scale(1) translateY(0);
+                }
+              }
+            `;
+            document.head.appendChild(style);
+          }
+
+          dialog.innerHTML = `
+            <div style="margin-bottom: 20px;">
+              <div style="font-size: 24px; margin-bottom: 10px;">⚠️</div>
+              <p style="margin: 0; font-size: 18px; font-weight: 600; color: #1f2937;">${message}</p>
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+              <button id="confirmBtn" style="
+                background: #3b82f6;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: 600;
+                min-width: 80px;
+                transition: background-color 0.2s;
+              " onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">Yes</button>
+              <button id="cancelBtn" style="
+                background: #6b7280;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: 600;
+                min-width: 80px;
+                transition: background-color 0.2s;
+              " onmouseover="this.style.background='#4b5563'" onmouseout="this.style.background='#6b7280'">No</button>
+            </div>
+          `;
+
+          overlay.appendChild(dialog);
+          document.body.appendChild(overlay);
+
+          // Add event listeners with proper cleanup
+          const confirmBtn = dialog.querySelector('#confirmBtn');
+          const cancelBtn = dialog.querySelector('#cancelBtn');
+
+          const cleanup = () => {
+            if (document.body.contains(overlay)) {
+              document.body.removeChild(overlay);
+            }
+            // Re-enable page interactions
+            document.body.style.pointerEvents = '';
+            document.body.style.overflow = '';
+            isShowingDialog = false;
+          };
+
+          confirmBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            cleanup();
+            onConfirm();
+          });
+
+          cancelBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            cleanup();
+            onCancel();
+          });
+
+          // Prevent overlay clicks from closing (make it truly modal)
+          overlay.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // Don't close on overlay click - force user to choose
+          });
+
+          // Prevent dialog clicks from closing
+          dialog.addEventListener('click', (e) => {
+            e.stopPropagation();
+          });
+
+          // Focus the first button for keyboard navigation immediately
+          confirmBtn.focus();
+
+          // Prevent keyboard navigation away from dialog
+          const preventTab = (e) => {
+            if (e.key === 'Tab') {
+              e.preventDefault();
+              if (document.activeElement === confirmBtn) {
+                cancelBtn.focus();
+              } else {
+                confirmBtn.focus();
+              }
+            }
+          };
+
+          document.addEventListener('keydown', preventTab);
+          
+          // Clean up keyboard listener when dialog closes
+          const originalCleanup = cleanup;
+          cleanup = () => {
+            document.removeEventListener('keydown', preventTab);
+            originalCleanup();
+          };
+        }
+      });
+      
+    </script>
+  </body>
+</html>

@@ -3,248 +3,463 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Internship Application Manager</title>
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
+    <title data-translate="home.title">Job Postings</title>
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link href="styles.css" rel="stylesheet" />
-  <style>
-    html {
-      overflow-y: scroll !important;
-    }
-    body {
-      overflow-y: auto !important;
+  <link href="styles.css" rel="stylesheet" />
+    <style>
+    /* Status Dropdown Styles */
+    .status-dropdown {
+      padding: 12px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 16px;
+      transition: all 0.2s;
+      background: white;
+      backdrop-filter: blur(10px);
+      font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+      width: 100%;
+      box-sizing: border-box;
     }
     
-    /* Body scroll lock for modals */
-    body.scroll-locked {
-      overflow: hidden !important;
-      position: fixed !important;
-      width: 100% !important;
-      height: 100% !important;
+    .status-dropdown:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
-  </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script>
-      // Initialize EmailJS
-      (function() {
-        emailjs.init("X80istNGO-VJ1Q9zZ");
-      })();
-    </script>
-    <style>
-      /* Help Modal Styles */
-      .help-modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.5);
-        animation: fadeIn 0.3s ease-out;
-      }
-      
-      .help-content {
-        background-color: #fff;
-        margin: 5% auto;
-        padding: 20px;
-        border-radius: 12px;
-        width: 80%;
-        max-width: 600px;
-        max-height: 80vh;
-        overflow-y: auto;
-        position: relative;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      }
-      
-      .help-close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-        position: absolute;
-        top: 10px;
-        right: 15px;
-      }
-      
-      .help-close:hover {
-        color: #000;
-      }
-      
-      .help-section {
-        margin-bottom: 20px;
-      }
-      
-      .help-section h3 {
-        color: #1e293b;
-        margin-bottom: 10px;
-        font-size: 16px;
-      }
-      
-      .help-section p {
-        color: #475569;
-        line-height: 1.6;
-        margin-bottom: 10px;
-      }
-      
-      .help-section ul {
-        color: #475569;
-        line-height: 1.6;
-        padding-left: 20px;
-      }
-      
-      .help-section li {
-        margin-bottom: 8px;
-      }
-      
-      .status-badge {
-        display: inline-block;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: 500;
-        margin-right: 8px;
-      }
-      
-      .status-interested { background: #fef3c7; color: #92400e; }
-      .status-applied { background: #dbeafe; color: #1e40af; }
-      .status-phone_screen { background: #e0e7ff; color: #3730a3; }
-      .status-interview { background: #f3e8ff; color: #7c3aed; }
-      .status-offer { background: #d1fae5; color: #065f46; }
-      .status-rejected { background: #fee2e2; color: #991b1b; }
-      
-      @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-      }
-      
-      /* Help Button Styles */
-      .help-btn {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        border: 2px solid #3b82f6;
-        background: #3b82f6;
-        color: white;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
+    
+    /* Status Badge Styles */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .status-interested { background: #f3f4f6; color: #374151; }
+    .status-applied { background: #dbeafe; color: #1e40af; }
+    .status-phone_screen { background: #fef3c7; color: #92400e; }
+    .status-interview { background: #fce7f3; color: #be185d; }
+    .status-offer { background: #d1fae5; color: #065f46; }
+    .status-rejected { background: #fee2e2; color: #991b1b; }
+    
+    /* Settings Modal Styles */
+    .settings-modal .modal-content {
+      border-radius: 12px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    .settings-modal .form-label {
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+    
+    .settings-modal .form-select,
+    .settings-modal .form-control {
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px 16px;
+      transition: all 0.2s;
+    }
+    
+    .settings-modal .form-select:focus,
+    .settings-modal .form-control:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .settings-modal .form-check-input:checked {
+      background-color: #3b82f6;
+      border-color: #3b82f6;
+    }
+    
+    /* Dark Theme Support */
+    .dark-theme {
+      background-color: #1f2937;
+      color: #f9fafb;
+    }
+    
+    .dark-theme .modal-content {
+      background-color: #374151;
+      color: #f9fafb;
+    }
+    
+    .dark-theme .form-label {
+      color: #f9fafb;
+    }
+    
+    .dark-theme .form-select,
+    .dark-theme .form-control {
+      background-color: #4b5563;
+      border-color: #6b7280;
+      color: #f9fafb;
+    }
+    
+    .dark-theme .form-select:focus,
+    .dark-theme .form-control:focus {
+      background-color: #4b5563;
+      border-color: #3b82f6;
+      color: #f9fafb;
+    }
+    
+    .dark-theme .card {
+      background-color: #4b5563;
+      border-color: #6b7280;
+    }
+    
+    .dark-theme .btn-outline-primary {
+      color: #60a5fa;
+      border-color: #60a5fa;
+    }
+    
+    .dark-theme .btn-outline-primary:hover {
+      background-color: #60a5fa;
+      border-color: #60a5fa;
+      color: #1f2937;
+    }
+
+    /* Posting Header Layout */
+    .posting-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    
+    .posting-status {
+      flex-shrink: 0;
+      margin-left: 12px;
+    }
+    
+    /* Search and Filter Styles */
+    .postings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    
+    .search-filter-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: nowrap;
+    }
+    
+    .search-input {
+      padding: 0 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 14px;
+      width: 200px;
+      height: 40px;
+      transition: all 0.2s;
+      box-sizing: border-box;
+      margin: 0;
+      display: inline-block;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .status-filter {
+      padding: 0 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 14px;
+      background: white;
+      width: 160px;
+      height: 40px;
+      transition: all 0.2s;
+      box-sizing: border-box;
+      margin: 0;
+      display: inline-block;
+      line-height: 36px;
+    }
+    
+    .status-filter:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      color: #6b7280;
+      font-style: italic;
+    }
+    
+    /* Analytics Dashboard Styles */
+    .analytics-dashboard {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 16px;
+      border: 1px solid #e2e8f0;
+    }
+    
+    .analytics-dashboard h4 {
+      margin: 0 0 12px 0;
+      color: #1e293b;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .analytics-stats {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-        position: absolute;
-        top: 20px;
-        left: 20px;
-        z-index: 1001;
-      }
-      
-      .help-btn:hover {
-        background: #2563eb;
-        border-color: #2563eb;
-        transform: scale(1.1);
-      }
+        flex-direction: column;
+      gap: 8px;
+    }
+    
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+    }
+    
+    .stat-label {
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 500;
+    }
+    
+    .stat-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e293b;
+      background: #e2e8f0;
+      padding: 2px 8px;
+      border-radius: 12px;
+      min-width: 30px;
+      text-align: center;
+    }
+    
+    /* Help System Styles */
+    .site-header {
+      position: relative;
+    }
+    
+    .header-rect {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .help-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid #3b82f6;
+      background: #3b82f6;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+    }
+    
+    .help-btn:hover {
+      background: #2563eb;
+      border-color: #2563eb;
+      transform: scale(1.1);
+    }
+    
+    .help-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+        left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .help-modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      margin: 20px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .help-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .help-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0;
+    }
+    
+    .help-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #64748b;
+      padding: 4px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    
+    .help-close:hover {
+      background: #f1f5f9;
+      color: #1e293b;
+    }
+    
+    .help-section {
+      margin-bottom: 20px;
+    }
+    
+    .help-section h4 {
+      color: #3b82f6;
+      font-size: 16px;
+      margin: 0 0 8px 0;
+      font-weight: 600;
+    }
+    
+    .help-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    
+    .help-section li {
+      margin-bottom: 4px;
+      color: #475569;
+      line-height: 1.5;
+    }
+    
+    .help-tip {
+      background: #f0f9ff;
+      border-left: 4px solid #3b82f6;
+      padding: 12px;
+      margin: 12px 0;
+      border-radius: 0 6px 6px 0;
+    }
+    
+    .help-tip strong {
+      color: #1e40af;
+    }
     </style>
   </head>
   <body>
-    <!-- Redirect to login if not authenticated -->
-    <script>
-      // Check if user is logged in (in a real app, this would check localStorage or cookies)
-      if (!localStorage.getItem('userLoggedIn')) {
-        window.location.href = 'login.html';
-      }
-    </script>
-    
-    <!-- Header -->
-    <div class="header-rect">
-      <div class="header-inner" style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
-        <div>
-          <div class="brand" onclick="window.location.href='index.html'" style="cursor: pointer;">Internship Application Manager</div>
-          <div class="subtitle">Track your internship applications and manage your career journey</div>
-        </div>
-        <div class="auth-buttons">
-          <button class="btn btn-sm" onclick="logout()" style="position: absolute; top: 20px; right: 20px; z-index: 1001;">Logout</button>
+    <header class="site-header">
+      <div class="header-rect glisten">
+        <div class="header-inner">
+          <div class="brand" data-translate="home.brand">Internship Application Manager</div>
+          <div class="subtitle" data-translate="home.subtitle">Keep resumes, postings, and due dates in one place</div>
         </div>
       </div>
-    </div>
+    </header>
 
-    <!-- Navigation -->
-    <div class="nav-banner-rect">
-      <div class="nav-banner-inner">
-        <button class="nav-btn active" onclick="window.location.href='index.html'">📊 Dashboard</button>
-        <button class="nav-btn" onclick="window.location.href='resumes.html'">📄 Resumes</button>
-        <button class="nav-btn" onclick="window.location.href='calendar.html'">📅 Calendar</button>
-        <button class="nav-btn" onclick="window.location.href='ai.html'">🤖 AI Assistant</button>
-      </div>
-    </div>
+    <!-- Hamburger Menu -->
+    <div class="hamburger-menu">
+      <button id="hamburgerBtn" class="hamburger-btn">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+            </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu">
+      <a href="index.html" class="mobile-menu-item active" data-page="index.html">
+        📋 <span data-translate="nav.home">Job Postings</span>
+      </a>
+      <a href="resumes.html" class="mobile-menu-item" data-page="resumes.html">
+        📄 <span data-translate="nav.resumes">Resumes</span>
+      </a>
+      <a href="calendar.html" class="mobile-menu-item" data-page="calendar.html">
+        📅 <span data-translate="nav.calendar">Calendar</span>
+      </a>
+      <a href="ai.html" class="mobile-menu-item" data-page="ai.html">
+        🤖 <span data-translate="nav.ai">AI Assistant</span>
+      </a>
+      <a href="settings.html" class="mobile-menu-item" data-page="settings.html">
+        ⚙️ <span data-translate="nav.settings">Settings</span>
+      </a>
+                  </div>
 
     <main class="container">
       <div class="panel full-width" style="margin-top: 20px; display: flex; gap: 20px;">
         
-        <div class="card" style="flex: 0 0 300px; max-height: fit-content; height: fit-content;">
-          <!-- Add Job Posting Section -->
-          <div class="form-section" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
-            <h3 style="margin-top: 0; color: #1e293b; font-size: 18px; font-weight: 600;">Add Job Posting</h3>
-            <form id="postingForm" class="form-vertical">
-              <!-- Add spacing above job title -->
-              <div style="margin-top: 70px;">
-                <input name="title" placeholder="Job Title" required />
-                <input name="company" placeholder="Company Name" />
-                <textarea name="description" placeholder="Job description" rows="4" style="resize: none;"></textarea>
-                <input name="due_date" type="date" />
-                <select name="status">
-                  <option value="interested">Interested</option>
-                  <option value="applied">Applied</option>
-                  <option value="phone_screen">Phone Screen</option>
-                  <option value="interview">Interview</option>
-                  <option value="offer">Offer</option>
-                  <option value="rejected">Rejected</option>
-                </select>
-              </div>
-              
-            <!-- Email Notification Settings -->
-            <div style="border-top: 1px solid #e2e8f0; padding-top: 3px; margin-top: 3px;">
-              <h4 style="margin: 0 0 10px 0; color: #1e293b; font-size: 14px; font-weight: 600;">📧 Email Notifications</h4>
-              <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 13px; cursor: pointer;">
-                <input type="checkbox" name="emailNotifications" id="emailNotifications" onchange="toggleEmailFields()" style="width: 16px; height: 16px; accent-color: #3b82f6; margin: 0; vertical-align: middle;">
-                <span style="line-height: 16px; vertical-align: middle;">Send email reminders for this posting</span>
-              </label>
-              <div id="emailFields" style="height: 120px; opacity: 0; transition: opacity 0.3s ease;">
-                <input type="email" name="notificationEmail" id="notificationEmail" placeholder="Email for notifications" style="font-size: 13px; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 10px;">
-                <select name="notificationTiming" id="notificationTiming" style="font-size: 13px; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; width: 100%;">
-                  <option value="1_day">1 day before due date</option>
-                  <option value="3_days">3 days before due date</option>
-                  <option value="1_week">1 week before due date</option>
-                  <option value="2_weeks">2 weeks before due date</option>
-                  <option value="on_due_date">On due date</option>
-                </select>
-              </div>
-            </div>
-              
-              <button class="btn primary">Add Posting</button>
-            </form>
-          </div>
+        <div class="card" style="flex: 0 0 300px;">
+          <h3 data-translate="form.addPosting">Add Job Posting</h3>
+          <form id="postingForm" class="form-vertical">
+            <input name="title" placeholder="Job Title" required data-translate="form.title" />
+            <input name="company" placeholder="Company Name" data-translate="form.company" />
+            <textarea name="description" placeholder="Job description" rows="4" style="resize: none;" data-translate="form.description"></textarea>
+            <input name="due_date" type="date" data-translate="form.dueDate" />
+            <select name="status" class="status-dropdown">
+              <option value="interested" data-translate="home.status.interested">Interested</option>
+              <option value="applied" data-translate="home.status.applied">Applied</option>
+              <option value="phone_screen" data-translate="home.status.phone_screen">Phone Screen</option>
+              <option value="interview" data-translate="home.status.interview">Interview</option>
+              <option value="offer" data-translate="home.status.offer">Offer</option>
+              <option value="rejected" data-translate="home.status.rejected">Rejected</option>
+            </select>
+            <button type="button" id="sendReminderBtn" class="btn btn-sm" style="margin: 12px 0; background: #e5e7eb; color: #374151; border: 1px solid #d1d5db;" data-translate="form.sendReminder">
+              📧 Send email reminder before due date
+            </button>
+            <input type="hidden" id="sendReminder" name="sendReminder" value="false" />
+            <button class="btn primary" data-translate="form.save">Add Posting</button>
+          </form>
           
-          <!-- Analytics Dashboard Section -->
-          <div class="analytics-section" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0;">
-            <h3 style="margin-top: 0; color: #1e293b; font-size: 18px; font-weight: 600;">📊 Application Analytics</h3>
-            <div style="display: flex; flex-direction: column; gap: 20px;">
-              <!-- Status Distribution Chart -->
-              <div style="height: 200px;">
-                <canvas id="statusChart"></canvas>
-              </div>
-              <!-- Quick Stats -->
-              <div id="quickStats" class="analytics-stats">
-                <div class="stat-item">
-                  <span class="stat-label">Total Applications:</span>
-                  <span class="stat-value" id="totalApplications">0</span>
+          <!-- Analytics Dashboard -->
+          <div class="analytics-dashboard" style="margin-top: 20px;">
+            <h4 data-translate="home.analytics.title">📊 Application Stats</h4>
+            <div id="analyticsStats" class="analytics-stats">
+              <div class="stat-item">
+                <span class="stat-label" data-translate="home.analytics.total">Total Applications:</span>
+                <span class="stat-value" id="totalApplications">0</span>
                 </div>
-                <div class="stat-item">
-                  <span class="stat-label">Success Rate:</span>
-                  <span class="stat-value" id="successRate">0%</span>
+              <div class="stat-item">
+                <span class="stat-label" data-translate="home.analytics.applied">Applied:</span>
+                <span class="stat-value" id="appliedCount">0</span>
+                  </div>
+              <div class="stat-item">
+                <span class="stat-label" data-translate="home.analytics.interviews">Interviews:</span>
+                <span class="stat-value" id="interviewCount">0</span>
                 </div>
+              <div class="stat-item">
+                <span class="stat-label" data-translate="home.analytics.offers">Offers:</span>
+                <span class="stat-value" id="offerCount">0</span>
+                  </div>
+              <div class="stat-item">
+                <span class="stat-label" data-translate="home.analytics.success">Success Rate:</span>
+                <span class="stat-value" id="successRate">0%</span>
               </div>
             </div>
           </div>
@@ -253,19 +468,18 @@
 
         <div class="card" style="flex: 1;">
           <div class="postings-header">
-            <h3>Job Postings</h3>
+            <h3 data-translate="home.title">Job Postings</h3>
             <div class="search-filter-controls">
-              <input type="text" id="searchInput" placeholder="Search postings..." class="search-input" />
-              <select id="statusFilter">
-                <option value="">All Statuses</option>
-                <option value="interested">Interested</option>
-                <option value="applied">Applied</option>
-                <option value="phone_screen">Phone Screen</option>
-                <option value="interview">Interview</option>
-                <option value="offer">Offer</option>
-                <option value="rejected">Rejected</option>
+              <input type="text" id="searchInput" placeholder="Search postings..." class="search-input" data-translate="home.searchPlaceholder" />
+              <select id="statusFilter" class="status-filter">
+                <option value="" data-translate="home.status.all">All Statuses</option>
+                <option value="interested" data-translate="home.status.interested">Interested</option>
+                <option value="applied" data-translate="home.status.applied">Applied</option>
+                <option value="phone_screen" data-translate="home.status.phone_screen">Phone Screen</option>
+                <option value="interview" data-translate="home.status.interview">Interview</option>
+                <option value="offer" data-translate="home.status.offer">Offer</option>
+                <option value="rejected" data-translate="home.status.rejected">Rejected</option>
               </select>
-              <button id="exportPostings" class="btn btn-sm">📊 Export</button>
             </div>
           </div>
           <div id="postings" class="list"></div>
@@ -273,149 +487,132 @@
       </div>
     </main>
 
-
-    <!-- Help Button -->
-    <button id="helpBtn" class="help-btn" title="Help & Tips">?</button>
-
-    <!-- Edit Job Posting Modal -->
-    <div id="editModal" class="modal" style="display: none;">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Edit Job Posting</h2>
-          <button id="closeEditModal" onclick="closeEditModal()" style="
-            background: #ef4444 !important;
-            border: none !important;
-            color: white !important;
-            cursor: pointer !important;
-            padding: 8px 12px !important;
-            border-radius: 6px;
-            font-size: 16px !important;
-            position: relative !important;
-            z-index: 9999 !important;
-            min-width: 32px !important;
-            min-height: 32px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            flex-shrink: 0 !important;
-            user-select: none !important;
-            margin: 0 !important;
-          ">&times;</button>
-        </div>
-        <div class="modal-body">
-          <form id="editForm" class="form-vertical">
-            <input type="hidden" id="editPostingId" name="id">
-            
-             <!-- Add spacing above job title -->
-             <div style="margin-top: 70px;">
-               <input id="editTitle" name="title" placeholder="Job Title" required />
-              <input id="editCompany" name="company" placeholder="Company Name" />
-              <textarea id="editDescription" name="description" placeholder="Job description" rows="4" style="resize: none;"></textarea>
-              <input id="editDueDate" name="due_date" type="date" />
-              <select id="editStatus" name="status">
-                <option value="interested">Interested</option>
-                <option value="applied">Applied</option>
-                <option value="phone_screen">Phone Screen</option>
-                <option value="interview">Interview</option>
-                <option value="offer">Offer</option>
-                <option value="rejected">Rejected</option>
-              </select>
-            </div>
-            
-            <!-- Email Notification Settings -->
-            <div style="border-top: 1px solid #e2e8f0; padding-top: 3px; margin-top: 3px;">
-              <h4 style="margin: 0 0 10px 0; color: #1e293b; font-size: 14px; font-weight: 600;">📧 Email Notifications</h4>
-              <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 13px; cursor: pointer;">
-                <input type="checkbox" id="editEmailNotifications" name="emailNotifications" onchange="toggleEditEmailFields()" style="width: 16px; height: 16px; accent-color: #3b82f6; margin: 0; vertical-align: middle;">
-                <span style="line-height: 16px; vertical-align: middle;">Send email reminders for this posting</span>
-              </label>
-              <div id="editEmailFields" style="height: 120px; opacity: 0; transition: opacity 0.3s ease;">
-                <input type="email" id="editNotificationEmail" name="notificationEmail" placeholder="Email for notifications" style="font-size: 13px; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 10px;">
-                <select id="editNotificationTiming" name="notificationTiming" style="font-size: 13px; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; width: 100%;">
-                  <option value="1_day">1 day before due date</option>
-                  <option value="3_days">3 days before due date</option>
-                  <option value="1_week">1 week before due date</option>
-                  <option value="2_weeks">2 weeks before due date</option>
-                  <option value="on_due_date">On due date</option>
-                </select>
-              </div>
-            </div>
-            
-            <div class="modal-actions">
-              <button type="button" id="cancelEdit" class="btn">Cancel</button>
-              <button type="submit" class="btn primary">Update Posting</button>
-            </div>
-          </form>
-        </div>
+  <!-- Edit Posting Modal -->
+  <div id="editModal" class="modal" style="display: none;">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3>Edit Job Posting</h3>
+        <button id="closeEditModal" class="btn-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm" class="form-vertical">
+          <input name="title" placeholder="Job Title" required data-translate="form.title" />
+          <input name="company" placeholder="Company Name" data-translate="form.company" />
+          <textarea name="description" placeholder="Job description" rows="4" style="resize: none;" data-translate="form.description"></textarea>
+          <input name="due_date" type="date" data-translate="form.dueDate" />
+          <select name="status" class="status-dropdown">
+            <option value="interested" data-translate="home.status.interested">Interested</option>
+            <option value="applied" data-translate="home.status.applied">Applied</option>
+            <option value="phone_screen" data-translate="home.status.phone_screen">Phone Screen</option>
+            <option value="interview" data-translate="home.status.interview">Interview</option>
+            <option value="offer" data-translate="home.status.offer">Offer</option>
+            <option value="rejected" data-translate="home.status.rejected">Rejected</option>
+          </select>
+          <button type="button" id="editSendReminderBtn" class="btn btn-sm" style="margin: 12px 0; background: #e5e7eb; color: #374151; border: 1px solid #d1d5db;" data-translate="form.sendReminder">
+            📧 Send email reminder before due date
+          </button>
+          <input type="hidden" id="editSendReminder" name="sendReminder" value="false" />
+          <input type="hidden" name="id" />
+        </form>
+      </div>
+      <div class="modal-actions">
+        <button id="cancelEdit" class="btn" data-translate="form.cancel">Cancel</button>
+        <button id="saveEdit" class="btn primary" data-translate="form.save">Save Changes</button>
       </div>
     </div>
 
-    <!-- Help Modal -->
-    <div id="helpModal" class="help-modal" style="display: none;">
-      <div class="help-content">
-        <span id="closeHelpModal" class="help-close">&times;</span>
-        <h2>Welcome to Internship Application Manager!</h2>
-        <div class="help-section">
-          <h3>🎯 About This Platform</h3>
-          <p>Internship Application Manager is your all-in-one solution for tracking internship applications, managing your career journey, and staying organized throughout the application process. Whether you're applying to your first internship or managing multiple opportunities, this platform helps you stay on top of deadlines, track your progress, and make data-driven decisions about your career.</p>
-        </div>
-        <div class="help-section">
-          <h3>📋 Getting Started</h3>
-          <p>This tool helps you track your internship applications. Here's how to use it:</p>
-          <ul>
-            <li><strong>Add Job Postings:</strong> Use the form on the left to add new internship opportunities</li>
-            <li><strong>Track Status:</strong> Update the status of your applications as you progress</li>
-            <li><strong>View Analytics:</strong> See charts showing your application progress</li>
-            <li><strong>Search & Filter:</strong> Use the search bar and status filter to find specific applications</li>
-          </ul>
-        </div>
-        <div class="help-section">
-          <h3>📊 Application Statuses</h3>
-          <ul>
-            <li><span class="status-badge status-interested">Interested</span> - You're considering applying</li>
-            <li><span class="status-badge status-applied">Applied</span> - Application submitted</li>
-            <li><span class="status-badge status-phone_screen">Phone Screen</span> - Initial screening call</li>
-            <li><span class="status-badge status-interview">Interview</span> - Formal interview scheduled</li>
-            <li><span class="status-badge status-offer">Offer</span> - Job offer received</li>
-            <li><span class="status-badge status-rejected">Rejected</span> - Application not successful</li>
-          </ul>
-        </div>
-        <div class="help-section">
-          <h3>💡 Tips for Success</h3>
-          <ul>
-            <li>Keep your applications organized by updating statuses regularly</li>
-            <li>Use the calendar to track important dates and deadlines</li>
-            <li>Upload your resumes to keep them organized and easily accessible</li>
-            <li>Use the AI assistant for help with applications and interview prep</li>
-          </ul>
-        </div>
+  <!-- Help Modal -->
+  <div id="helpModal" class="help-modal">
+    <div class="help-modal-content">
+      <div class="help-header">
+        <h3 class="help-title" data-translate="help.title">📋 Job Postings Help</h3>
+        <button id="closeHelpModal" class="help-close">&times;</button>
+      </div>
+      
+      <div class="help-section">
+        <h4 data-translate="help.statusPipeline">🎯 Application Status Pipeline</h4>
+        <ul>
+          <li><strong data-translate="help.status.interested">Interested:</strong> <span data-translate="help.status.interested.desc">Jobs you're considering applying to</span></li>
+          <li><strong data-translate="help.status.applied">Applied:</strong> <span data-translate="help.status.applied.desc">Applications you've submitted</span></li>
+          <li><strong data-translate="help.status.phone_screen">Phone Screen:</strong> <span data-translate="help.status.phone_screen.desc">Initial phone/video interviews</span></li>
+          <li><strong data-translate="help.status.interview">Interview:</strong> <span data-translate="help.status.interview.desc">In-person or final interviews</span></li>
+          <li><strong data-translate="help.status.offer">Offer:</strong> <span data-translate="help.status.offer.desc">Job offers received</span></li>
+          <li><strong data-translate="help.status.rejected">Rejected:</strong> <span data-translate="help.status.rejected.desc">Applications that didn't work out</span></li>
+        </ul>
+      </div>
+      
+      <div class="help-section">
+        <h4 data-translate="help.searchFilter">🔍 Search & Filter</h4>
+        <ul>
+          <li data-translate="help.search.desc">Search by job title, company name, or description</li>
+          <li data-translate="help.filter.desc">Filter by application status to see your progress</li>
+          <li data-translate="help.search.bar">Use the search bar for quick finding of specific applications</li>
+        </ul>
+      </div>
+      
+      <div class="help-section">
+        <h4 data-translate="help.analytics">📊 Analytics Dashboard</h4>
+        <ul>
+          <li><strong data-translate="help.analytics.total">Total Applications:</strong> <span data-translate="help.analytics.total.desc">All job postings in your system</span></li>
+          <li><strong data-translate="help.analytics.applied">Applied:</strong> <span data-translate="help.analytics.applied.desc">Applications you've actually submitted</span></li>
+          <li><strong data-translate="help.analytics.interviews">Interviews:</strong> <span data-translate="help.analytics.interviews.desc">Applications that reached interview stage</span></li>
+          <li><strong data-translate="help.analytics.offers">Offers:</strong> <span data-translate="help.analytics.offers.desc">Job offers you've received</span></li>
+          <li><strong data-translate="help.analytics.success">Success Rate:</strong> <span data-translate="help.analytics.success.desc">Percentage of applications that led to offers</span></li>
+        </ul>
+      </div>
+      
+      <div class="help-section">
+        <h4 data-translate="help.dataManagement">💾 Data Management</h4>
+        <ul>
+          <li data-translate="help.data.autoSave">All your data is automatically saved in your browser</li>
+          <li data-translate="help.data.preserved">Application details, statuses, and dates are preserved</li>
+          <li data-translate="help.data.persist">Data persists between browser sessions</li>
+        </ul>
+      </div>
+      
+      <div class="help-tip">
+        <strong data-translate="help.proTip">💡 Pro Tip:</strong> <span data-translate="help.proTip.desc">Update your application status regularly to get accurate analytics and track your job search progress effectively!</span>
       </div>
     </div>
 
-    <!-- Hidden Pages -->
-    <div id="resumesPage" class="page" style="display: none;">
-      <iframe src="resumes.html" width="100%" height="800px" frameborder="0"></iframe>
-    </div>
-
-    <div id="calendarPage" class="page" style="display: none;">
-      <iframe src="calendar.html" width="100%" height="800px" frameborder="0"></iframe>
-    </div>
-
-    <div id="aiPage" class="page" style="display: none;">
-      <iframe src="ai.html" width="100%" height="800px" frameborder="0"></iframe>
-    </div>
-
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
-    <script src="main.js?v=35"></script>
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="toast-notifications.js"></script>
+  <script>
+    // Check authentication on page load
+    function isAuthenticated() {
+      return localStorage.getItem('authToken') && localStorage.getItem('currentUser');
+    }
     
-    <!-- Help Modal JavaScript -->
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const helpBtn = document.getElementById('helpBtn');
-        const helpModal = document.getElementById('helpModal');
-        const closeHelpModal = document.getElementById('closeHelpModal');
-        
-        if (helpBtn && helpModal && closeHelpModal) {
+    if (!isAuthenticated()) {
+      window.location.href = 'login.html';
+    }
+    
+    // Initialize EmailJS
+    (function() {
+      emailjs.init("X80istNGO-VJ1Q9zZ");
+    })();
+  </script>
+  <script src="js/translations.js"></script>
+  <script src="hamburger-menu.js"></script>
+  <script src="main.js?v=3"></script>
+  
+  <!-- Help Modal JavaScript -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+      console.log('Help modal script loading...');
+      
+      const helpBtn = document.getElementById('helpBtn');
+      const helpModal = document.getElementById('helpModal');
+      const closeHelpModal = document.getElementById('closeHelpModal');
+      
+      console.log('Help button found:', helpBtn);
+      console.log('Help modal found:', helpModal);
+      console.log('Close button found:', closeHelpModal);
+      
+      if (helpBtn && helpModal && closeHelpModal) {
+          console.log('Setting up help modal event listeners');
+          
           helpBtn.addEventListener('click', function() {
             helpModal.style.display = 'block';
           });
@@ -440,6 +637,220 @@
         localStorage.removeItem('userLoggedIn');
         window.location.href = 'login.html';
       }
-    </script>
+  });
+
+  // Settings functionality
+  let currentSettingsId = null;
+
+  // Load settings when page loads
+  document.addEventListener('DOMContentLoaded', async function() {
+      await loadSettings();
+  });
+
+  // Load settings from API
+  async function loadSettings() {
+      try {
+          const response = await fetch('/api/settings');
+          if (response.ok) {
+              const settings = await response.json();
+              if (settings.length > 0) {
+                  const setting = settings[0]; // Use first setting
+                  currentSettingsId = setting.id;
+                  showCurrentSettings(setting);
+              } else {
+                  showNewSettingsForm();
+              }
+          }
+      } catch (error) {
+          console.error('Failed to load settings:', error);
+          showNewSettingsForm();
+      }
+  }
+
+  function showCurrentSettings(setting) {
+      document.getElementById('settingsForm').style.display = 'none';
+      document.getElementById('currentSettings').style.display = 'block';
+      
+      document.getElementById('displayTheme').textContent = setting.theme.charAt(0).toUpperCase() + setting.theme.slice(1);
+      document.getElementById('displayLanguage').textContent = setting.language || 'English';
+      document.getElementById('displayReminderDays').textContent = setting.reminderDays + ' days';
+      document.getElementById('displayAutoSave').textContent = setting.autoSave ? 'Enabled' : 'Disabled';
+      document.getElementById('displayNotifications').textContent = setting.showNotifications ? 'Enabled' : 'Disabled';
+  }
+
+  function showNewSettingsForm() {
+      document.getElementById('settingsForm').style.display = 'block';
+      document.getElementById('currentSettings').style.display = 'none';
+      currentSettingsId = null;
+  }
+
+  function editSettings() {
+      showNewSettingsForm();
+      // Load current settings data into form
+      loadSettings().then(() => {
+          if (currentSettingsId) {
+              fetch(`/api/settings/${currentSettingsId}`)
+                  .then(r => r.json())
+                  .then(setting => {
+                      document.getElementById('themeSelect').value = setting.theme;
+                      document.getElementById('languageSelect').value = setting.language || 'en';
+                      document.getElementById('reminderDays').value = setting.reminderDays;
+                      document.getElementById('autoSave').checked = setting.autoSave;
+                  });
+          }
+      });
+  }
+
+  async function saveSettings() {
+      const theme = document.getElementById('themeSelect').value;
+      const language = document.getElementById('languageSelect').value;
+      const reminderDays = parseInt(document.getElementById('reminderDays').value);
+      const autoSave = document.getElementById('autoSave').checked;
+
+      if (!theme || reminderDays < 1) {
+          console.warn('Please fill in all required fields');
+          return;
+      }
+
+      try {
+          const settingsData = {
+              theme,
+              language,
+              reminderDays,
+              autoSave,
+          };
+
+          let response;
+          if (currentSettingsId) {
+              response = await fetch(`/api/settings/${currentSettingsId}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(settingsData)
+              });
+          } else {
+              response = await fetch('/api/settings', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(settingsData)
+              });
+          }
+
+          if (response.ok) {
+              const setting = await response.json();
+              currentSettingsId = setting.id;
+              showCurrentSettings(setting);
+              console.log('Settings saved successfully!');
+              
+              // Apply theme if changed
+              if (theme === 'dark') {
+                  document.body.classList.add('dark-theme');
+              } else if (theme === 'light') {
+                  document.body.classList.remove('dark-theme');
+              }
+          } else {
+              const error = await response.json();
+              console.error('Error: ' + (error.error || 'Failed to save settings'));
+          }
+      } catch (error) {
+          console.error('Error saving settings:', error);
+          console.error('Failed to save settings');
+      }
+  }
+
+  function resetSettings() {
+      if (confirm('Are you sure you want to reset all settings to default?')) {
+          // Reset form to defaults
+          document.getElementById('themeSelect').value = 'light';
+          document.getElementById('languageSelect').value = 'en';
+          document.getElementById('reminderDays').value = '7';
+          document.getElementById('autoSave').checked = true;
+          document.getElementById('showNotifications').checked = true;
+          
+          // Save defaults
+          saveSettings();
+      }
+  }
+  </script>
+
+  <!-- Settings Modal -->
+  <div class="modal fade settings-modal" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="settingsModalLabel">⚙️ Settings</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="settingsForm">
+        <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="themeSelect" class="form-label">Theme</label>
+                <select class="form-select" id="themeSelect">
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                  <option value="auto">Auto (System)</option>
+                </select>
+                </div>
+              <div class="col-md-6 mb-3">
+                <label for="languageSelect" class="form-label">Language</label>
+                <select class="form-select" id="languageSelect">
+                  <option value="en">English</option>
+                  <option value="es">Español</option>
+                  <option value="fr">Français</option>
+                  <option value="de">Deutsch</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="reminderDays" class="form-label">Reminder Days (before deadline)</label>
+                <input type="number" class="form-control" id="reminderDays" min="1" max="30" value="7">
+                <div class="form-text">How many days before a deadline to send reminders</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Preferences</label>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="autoSave" checked>
+                  <label class="form-check-label" for="autoSave">
+                    Auto-save changes
+                  </label>
+          </div>
+              </div>
+            </div>
+          </form>
+          
+          <!-- Current Settings Display -->
+          <div id="currentSettings" class="mt-4" style="display: none;">
+            <h6>Current Settings:</h6>
+            <div class="card">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <strong>Theme:</strong> <span id="displayTheme"></span><br>
+                    <strong>Language:</strong> <span id="displayLanguage"></span>
+                  </div>
+                  <div class="col-md-6">
+                    <strong>Reminder Days:</strong> <span id="displayReminderDays"></span><br>
+                    <strong>Auto-save:</strong> <span id="displayAutoSave"></span><br>
+                    <strong>Notifications:</strong> <span id="displayNotifications"></span>
+            </div>
+          </div>
+                <div class="mt-3">
+                  <button type="button" class="btn btn-outline-primary btn-sm" onclick="editSettings()">Edit Settings</button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm" onclick="resetSettings()">Reset to Default</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   </body>
 </html>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Resumes - Internship Application Manager</title>
+    <title data-translate="resumes.title">Resumes - Internship Application Manager</title>
   <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link href="styles.css" rel="stylesheet" />
@@ -53,10 +53,10 @@
       justify-content: center;
       transition: all 0.2s;
       flex-shrink: 0;
-        position: absolute;
-        top: 20px;
-        left: 20px;
-        z-index: 1001;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
     }
     
     .help-btn:hover {
@@ -177,14 +177,20 @@
       </div>
     </div>
 
-    <!-- Navigation -->
-    <div class="nav-banner-rect">
-      <div class="nav-banner-inner">
-        <button class="nav-btn" onclick="window.location.href='index.html'">📊 Dashboard</button>
-        <button class="nav-btn active" onclick="window.location.href='resumes.html'">📄 Resumes</button>
-        <button class="nav-btn" onclick="window.location.href='calendar.html'">📅 Calendar</button>
-        <button class="nav-btn" onclick="window.location.href='ai.html'">🤖 AI Assistant</button>
-      </div>
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu">
+      <a href="index.html" class="mobile-menu-item" data-page="index.html">
+        📋 Job Postings
+      </a>
+      <a href="resumes.html" class="mobile-menu-item active" data-page="resumes.html">
+        📄 <span data-translate="nav.resumes">Resumes</span>
+      </a>
+      <a href="calendar.html" class="mobile-menu-item" data-page="calendar.html">
+        📅 Calendar
+      </a>
+      <a href="ai.html" class="mobile-menu-item" data-page="ai.html">
+        🤖 AI Assistant
+      </a>
     </div>
 
     <main class="container">
@@ -198,7 +204,7 @@
         </div>
 
         <div class="card">
-          <h3>Saved Resumes</h3>
+          <h3 data-translate="resumes.savedResumes">Saved Resumes</h3>
           <div id="resumes" class="list"></div>
         </div>
       </div>
@@ -228,57 +234,61 @@
     <div id="helpModal" class="help-modal">
       <div class="help-modal-content">
         <div class="help-header">
-          <h3 class="help-title">📄 Resumes Help</h3>
+          <h3 class="help-title" data-translate="resumes.help.title">📄 Resumes Help</h3>
           <button id="closeHelpModal" class="help-close">&times;</button>
         </div>
         
         <div class="help-section">
-          <h4>📤 Uploading Resumes</h4>
+          <h4 data-translate="resumes.help.uploading">📤 Uploading Resumes</h4>
           <ul>
-            <li>Click "Choose File" to select your resume (PDF, DOC, DOCX)</li>
-            <li>Click "Upload" to save your resume to the system</li>
-            <li>Give your resume a descriptive name for easy identification</li>
-            <li>Upload multiple versions for different job types</li>
+            <li data-translate="resumes.help.chooseFile">Click "Choose File" to select your resume (PDF, DOC, DOCX)</li>
+            <li data-translate="resumes.help.upload">Click "Upload" to save your resume to the system</li>
+            <li data-translate="resumes.help.descriptiveName">Give your resume a descriptive name for easy identification</li>
+            <li data-translate="resumes.help.multipleVersions">Upload multiple versions for different job types</li>
           </ul>
         </div>
         
         <div class="help-section">
-          <h4>👁️ Preview & Management</h4>
+          <h4 data-translate="resumes.help.previewManagement">👁️ Preview & Management</h4>
           <ul>
-            <li>Click "Preview" to see your resume content</li>
-            <li>Click "Download" to get a copy of your resume</li>
-            <li>Click "Delete" to remove resumes you no longer need</li>
-            <li>Use descriptive names like "Software Engineer Resume - Fall 2025"</li>
+            <li data-translate="resumes.help.preview">Click "Preview" to see your resume content</li>
+            <li data-translate="resumes.help.download">Click "Download" to get a copy of your resume</li>
+            <li data-translate="resumes.help.delete">Click "Delete" to remove resumes you no longer need</li>
+            <li data-translate="resumes.help.descriptiveNames">Use descriptive names like "Software Engineer Resume - Fall 2025"</li>
           </ul>
         </div>
         
         <div class="help-section">
-          <h4>🎯 Resume Tailoring</h4>
+          <h4 data-translate="resumes.help.tailoring">🎯 Resume Tailoring</h4>
           <ul>
-            <li>Go to Job Postings page and click "Tailor Resume"</li>
-            <li>The system will analyze the job description</li>
-            <li>Get suggestions for keywords and skills to highlight</li>
-            <li>Create customized versions for different job types</li>
+            <li data-translate="resumes.help.goToJobPostings">Go to Job Postings page and click "Tailor Resume"</li>
+            <li data-translate="resumes.help.analyzeDescription">The system will analyze the job description</li>
+            <li data-translate="resumes.help.getSuggestions">Get suggestions for keywords and skills to highlight</li>
+            <li data-translate="resumes.help.createVersions">Create customized versions for different job types</li>
           </ul>
         </div>
         
         <div class="help-section">
-          <h4>💡 Best Practices</h4>
+          <h4 data-translate="resumes.help.bestPractices">💡 Best Practices</h4>
           <ul>
-            <li>Keep multiple versions for different industries</li>
-            <li>Update your resume regularly with new skills</li>
-            <li>Use clear, descriptive names for easy organization</li>
-            <li>Always preview before downloading to ensure quality</li>
+            <li data-translate="resumes.help.multipleVersions">Keep multiple versions for different industries</li>
+            <li data-translate="resumes.help.updateRegularly">Update your resume regularly with new skills</li>
+            <li data-translate="resumes.help.clearNames">Use clear, descriptive names for easy organization</li>
+            <li data-translate="resumes.help.previewFirst">Always preview before downloading to ensure quality</li>
           </ul>
         </div>
         
         <div class="help-tip">
-          <strong>💡 Pro Tip:</strong> Upload different versions of your resume for different job types (technical, business, creative) and use the tailoring feature to customize them for specific applications!
+          <strong data-translate="resumes.help.proTip">💡 Pro Tip:</strong> <span data-translate="resumes.help.proTip.desc">Upload different versions of your resume for different job types (technical, business, creative) and use the tailoring feature to customize them for specific applications!</span>
         </div>
       </div>
     </div>
 
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="toast-notifications.js"></script>
+  <script src="js/translations.js"></script>
+  <script src="hamburger-menu.js"></script>
   <script src="resumes.js"></script>
   
   <!-- Logout Function -->

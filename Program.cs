@@ -1,12 +1,22 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Text.Json.Serialization;
-using InternApp.Services;
+using Microsoft.EntityFrameworkCore;
+using InternApp.Data;
 using InternApp.Models;
-using InternApp.Models.DTOs;
+using InternApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options => options.AddDefaultPolicy(p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
+
+// Add Entity Framework with SQLite
+var connectionString = "Data Source=app.db";
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlite(connectionString));
+
+// Add authentication service
+builder.Services.AddScoped<AuthService>();
+
 var app = builder.Build();
 app.UseCors();
 
@@ -15,59 +25,161 @@ if (!Directory.Exists(webRoot)) Directory.CreateDirectory(webRoot);
 var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
 if (!Directory.Exists(uploadDir)) Directory.CreateDirectory(uploadDir);
 
-// Initialize database service
-var dbService = new DatabaseService();
-var migrationService = new MigrationService(dbService);
+// Ensure database is created and migrate existing data
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    context.Database.EnsureCreated();
+    
+    // Migrate existing JSON data if it exists
+    var jsonDataFile = Path.Combine(AppContext.BaseDirectory, "data.json");
+    if (File.Exists(jsonDataFile))
+    {
+        await MigrationHelper.MigrateFromJsonAsync(context, jsonDataFile);
+    }
+}
 
-// Simple in-memory storage for resumes (temporary solution)
-var resumes = new List<object>();
+// Helper function to get user ID from request
+string GetUserId(HttpRequest req)
+{
+    // Try to get from Authorization header (Bearer token)
+    var authHeader = req.Headers["Authorization"].FirstOrDefault();
+    if (authHeader != null && authHeader.StartsWith("Bearer "))
+    {
+        var token = authHeader.Substring("Bearer ".Length);
+        using var scope = app.Services.CreateScope();
+        var authService = scope.ServiceProvider.GetRequiredService<AuthService>();
+        var userId = authService.GetUserIdFromToken(token);
+        if (userId.HasValue)
+        {
+            return userId.Value.ToString();
+        }
+    }
+    
+    // Try to get from X-User-ID header (legacy support)
+    if (req.Headers.TryGetValue("X-User-ID", out var headerUserId))
+        return headerUserId.ToString();
+    
+    // Fallback to query parameter
+    if (req.Query.TryGetValue("userId", out var queryUserId))
+        return queryUserId.ToString();
+    
+    // Generate a default user ID if none provided
+    return "default_user";
+}
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-// Resume endpoints (updated for SQLite)
+// Authentication Endpoints
+app.MapPost("/api/auth/login", async (LoginRequest request, ApplicationDbContext context, AuthService authService) =>
+{
+    var user = await authService.AuthenticateAsync(request.Email, request.Password);
+    if (user == null)
+    {
+        return Results.Json(new { message = "Invalid email or password" }, statusCode: 401);
+    }
+
+    var token = authService.GenerateToken(user);
+    return Results.Json(new { 
+        token, 
+        user = new { id = user.Id, name = user.Name, email = user.Email } 
+    });
+});
+
+app.MapPost("/api/auth/signup", async (SignupRequest request, ApplicationDbContext context, AuthService authService) =>
+{
+    var user = await authService.RegisterAsync(request.Name, request.Email, request.Password);
+    if (user == null)
+    {
+        return Results.Json(new { message = "Email already exists" }, statusCode: 400);
+    }
+
+    var token = authService.GenerateToken(user);
+    return Results.Json(new { 
+        token, 
+        user = new { id = user.Id, name = user.Name, email = user.Email } 
+    });
+});
+
+app.MapGet("/api/auth/me", async (HttpRequest req, ApplicationDbContext context, AuthService authService) =>
+{
+    var authHeader = req.Headers["Authorization"].FirstOrDefault();
+    if (authHeader == null || !authHeader.StartsWith("Bearer "))
+    {
+        return Results.Json(new { message = "No token provided" }, statusCode: 401);
+    }
+
+    var token = authHeader.Substring("Bearer ".Length);
+    var userId = authService.GetUserIdFromToken(token);
+    if (userId == null)
+    {
+        return Results.Json(new { message = "Invalid token" }, statusCode: 401);
+    }
+
+    var user = await authService.GetUserByIdAsync(userId.Value);
+    if (user == null)
+    {
+        return Results.Json(new { message = "User not found" }, statusCode: 404);
+    }
+
+    return Results.Json(new { id = user.Id, name = user.Name, email = user.Email });
+});
+
 app.MapPost("/api/resumes", async (HttpRequest req) => {
     if (!req.HasFormContentType) return Results.BadRequest(new { error = "form required" });
+    var userId = GetUserId(req);
     var form = await req.ReadFormAsync();
     var file = form.Files.GetFile("resume");
     var name = form["name"].ToString();
     if (file == null) return Results.BadRequest(new { error = "file missing" });
     
-    // Save file to uploads directory
     var filename = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + "-" + Path.GetFileName(file.FileName);
     var dest = Path.Combine(uploadDir, filename);
     using var fs = File.Create(dest);
     await file.CopyToAsync(fs);
     
-    // Create record and add to in-memory storage
-    var record = new { 
-        Id = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), 
-        FileName = filename, 
-        OriginalName = file.FileName, 
-        DisplayName = string.IsNullOrWhiteSpace(name) ? file.FileName : name, 
-        Url = "/uploads/" + filename, 
-        CreatedAt = DateTime.UtcNow 
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    
+    var resume = new Resume
+    {
+        UserId = userId,
+        FileName = filename,
+        OriginalName = file.FileName,
+        DisplayName = string.IsNullOrWhiteSpace(name) ? null : name,
+        CreatedAt = DateTime.UtcNow
     };
     
-    resumes.Add(record);
-    return Results.Ok(record);
+    context.Resumes.Add(resume);
+    await context.SaveChangesAsync();
+    
+    return Results.Ok(new { resume.Id, resume.FileName, resume.OriginalName, DisplayName = resume.DisplayName, resume.CreatedAt });
 });
 
-app.MapGet("/api/resumes", () => {
+app.MapGet("/api/resumes", async (HttpRequest req) => {
+    var userId = GetUserId(req);
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    
+    var resumes = await context.Resumes
+        .Where(r => r.UserId == userId)
+        .OrderByDescending(r => r.CreatedAt)
+        .Select(r => new { r.Id, r.FileName, r.OriginalName, DisplayName = r.DisplayName, Url = "/uploads/" + r.FileName, r.CreatedAt })
+        .ToListAsync();
+    
     return Results.Ok(resumes);
 });
 
 // Get resume content
-app.MapGet("/api/resumes/{id:int}/content", (int id) => {
-    return Results.Ok(new { content = "Resume content extraction not implemented yet." });
-});
-
-// Delete a resume
-app.MapDelete("/api/resumes/{id:int}", (int id) => {
-    var resume = resumes.FirstOrDefault(r => {
-        var idProperty = r.GetType().GetProperty("Id");
-        return idProperty != null && Convert.ToInt64(idProperty.GetValue(r)) == id;
-    });
+app.MapGet("/api/resumes/{id:int}/content", async (int id, HttpRequest req) => {
+    var userId = GetUserId(req);
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    
+    var resume = await context.Resumes
+        .FirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
+    if (resume == null) return Results.NotFound();
     
     if (resume != null)
     {
@@ -102,115 +214,47 @@ app.MapPost("/api/auth/register", async (UserRequest request) => {
     }
 });
 
-app.MapPost("/api/auth/login", async (LoginRequest request) => {
-    try
-    {
-        var user = await dbService.GetUserByEmailAsync(request.Email);
-        if (user == null || user.Password != request.Password)
-        {
-            return Results.BadRequest(new { error = "Invalid email or password" });
-        }
-        
-        return Results.Ok(new { 
-            id = user.Id, 
-            email = user.Email, 
-            isDemo = user.IsDemo,
-            message = "Login successful" 
-        });
-    }
-    catch (Exception ex)
-    {
-        return Results.BadRequest(new { error = ex.Message });
-    }
+// Delete a resume (remove metadata and delete uploaded file)
+app.MapDelete("/api/resumes/{id:int}", async (int id, HttpRequest req) => {
+    var userId = GetUserId(req);
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    
+    var resume = await context.Resumes
+        .FirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
+    if (resume == null) return Results.NotFound();
+    
+    context.Resumes.Remove(resume);
+    await context.SaveChangesAsync();
+    
+    var path = Path.Combine(uploadDir, resume.FileName);
+    try{
+        if (File.Exists(path)) File.Delete(path);
+    }catch{}
+    return Results.Ok(new { success = true });
 });
 
-// Job posting endpoints
-app.MapGet("/api/job-postings/{userId:int}", async (int userId) => {
-    try
-    {
-        var postings = await dbService.GetJobPostingsByUserIdAsync(userId);
-        return Results.Ok(postings);
-    }
-    catch (Exception ex)
-    {
-        return Results.BadRequest(new { error = ex.Message });
-    }
-});
-
-app.MapPost("/api/job-postings", async (JobPostingRequest request) => {
-    try
-    {
-        var posting = await dbService.CreateJobPostingAsync(request);
-        return Results.Ok(posting);
-    }
-    catch (Exception ex)
-    {
-        return Results.BadRequest(new { error = ex.Message });
-    }
-});
-
-app.MapPut("/api/job-postings/{id:int}", async (int id, JobPostingRequest request) => {
-    try
-    {
-        var posting = await dbService.UpdateJobPostingAsync(id, request);
-        if (posting == null)
-        {
-            return Results.NotFound(new { error = "Job posting not found" });
-        }
-        return Results.Ok(posting);
-    }
-    catch (Exception ex)
-    {
-        return Results.BadRequest(new { error = ex.Message });
-    }
-});
-
-app.MapDelete("/api/job-postings/{id:int}", async (int id) => {
-    try
-    {
-        var success = await dbService.DeleteJobPostingAsync(id);
-        if (!success)
-        {
-            return Results.NotFound(new { error = "Job posting not found" });
-        }
-        return Results.Ok(new { success = true });
-    }
-    catch (Exception ex)
-    {
-        return Results.BadRequest(new { error = ex.Message });
-    }
-});
-
-// Calendar events endpoints
-app.MapGet("/api/calendar-events/{userId:int}", async (int userId) => {
-    try
-    {
-        var events = await dbService.GetCalendarEventsByUserIdAsync(userId);
-        return Results.Ok(events);
-    }
-    catch (Exception ex)
-    {
-        return Results.BadRequest(new { error = ex.Message });
-    }
-});
-
-app.MapPost("/api/calendar-events", async (CalendarEventRequest request) => {
-    try
-    {
-        var calendarEvent = await dbService.CreateCalendarEventAsync(request);
-        return Results.Ok(calendarEvent);
-    }
-    catch (Exception ex)
-    {
-        return Results.BadRequest(new { error = ex.Message });
-    }
-});
-
-// Legacy endpoints for backward compatibility
-app.MapPost("/api/postings", (Posting p) =>
+app.MapPost("/api/postings", async (Posting p, HttpRequest req) =>
 {
-    var rec = new { Id = 1, Title = p.Title, Company = p.Company, Description = p.Description, DueDate = p.DueDate, Status = p.Status, CreatedAt = DateTime.UtcNow };
-    return Results.Ok(rec);
+    var userId = GetUserId(req);
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    
+    var posting = new Posting
+    {
+        UserId = userId,
+        Title = p.Title,
+        Company = p.Company,
+        Description = p.Description,
+        DueDate = p.DueDate,
+        Status = p.Status,
+        CreatedAt = DateTime.UtcNow
+    };
+    
+    context.Postings.Add(posting);
+    await context.SaveChangesAsync();
+    
+    return Results.Ok(new { posting.Id, posting.Title, posting.Company, posting.Description, posting.DueDate, posting.Status, posting.CreatedAt });
 });
 
 app.MapGet("/api/postings", () => Results.Ok(new List<object>()));
@@ -247,6 +291,54 @@ app.MapPost("/api/ollama", async (HttpRequest req) => {
     } catch (Exception ex) {
         return Results.BadRequest(new { error = ex.Message });
     }
+});
+
+app.MapGet("/api/postings", async (HttpRequest req) => {
+    var userId = GetUserId(req);
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    
+    var postings = await context.Postings
+        .Where(p => p.UserId == userId)
+        .OrderByDescending(p => p.CreatedAt)
+        .ToListAsync();
+    
+    return Results.Ok(postings);
+});
+
+// Update a posting
+app.MapPut("/api/postings/{id:int}", async (int id, Posting p, HttpRequest req) => {
+    var userId = GetUserId(req);
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    
+    var posting = await context.Postings
+        .FirstOrDefaultAsync(po => po.Id == id && po.UserId == userId);
+    if (posting == null) return Results.NotFound();
+    
+    posting.Title = p.Title;
+    posting.Company = p.Company;
+    posting.Description = p.Description;
+    posting.DueDate = p.DueDate;
+    posting.Status = p.Status;
+    
+    await context.SaveChangesAsync();
+    return Results.Ok(new { posting.Id, posting.Title, posting.Company, posting.Description, posting.DueDate, posting.Status, posting.CreatedAt });
+});
+
+// Delete a posting
+app.MapDelete("/api/postings/{id:int}", async (int id, HttpRequest req) => {
+    var userId = GetUserId(req);
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    
+    var posting = await context.Postings
+        .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);
+    if (posting == null) return Results.NotFound();
+    
+    context.Postings.Remove(posting);
+    await context.SaveChangesAsync();
+    return Results.Ok(new { success = true });
 });
 
 app.MapPost("/api/tailor", (TailorRequest req) => {
@@ -294,22 +386,8 @@ app.MapGet("/uploads/{file}", (string file) => {
 
 app.Run();
 
-// Legacy records for backward compatibility
-record Resume(int Id, string FileName, string OriginalName, string? DisplayName, DateTime CreatedAt);
-record Posting(int Id, string Title, string Company, string Description, string? DueDate, string Status, DateTime CreatedAt);
 record TailorRequest(string PostingUrl, int ResumeId);
 record OllamaRequest([property: JsonPropertyName("prompt")] string Prompt);
-record EmailRequest(string To, string Subject, string Body);
+record LoginRequest(string Email, string Password);
+record SignupRequest(string Name, string Email, string Password);
 
-// Email service implementation
-class EmailService
-{
-    public async Task SendEmailAsync(string to, string subject, string body)
-    {
-        Console.WriteLine($"EMAIL SENT TO: {to}");
-        Console.WriteLine($"SUBJECT: {subject}");
-        Console.WriteLine($"BODY: {body}");
-        Console.WriteLine("---");
-        await Task.Delay(100);
-    }
-}

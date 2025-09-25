@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Calendar - Internship Application Manager</title>
+    <title data-translate="calendar.title">Calendar - Internship Application Manager</title>
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="styles.css" rel="stylesheet" />
@@ -853,14 +853,20 @@
       </div>
     </div>
 
-    <!-- Navigation -->
-    <div class="nav-banner-rect">
-      <div class="nav-banner-inner">
-        <button class="nav-btn" onclick="window.location.href='index.html'">📊 Dashboard</button>
-        <button class="nav-btn" onclick="window.location.href='resumes.html'">📄 Resumes</button>
-        <button class="nav-btn active" onclick="window.location.href='calendar.html'">📅 Calendar</button>
-        <button class="nav-btn" onclick="window.location.href='ai.html'">🤖 AI Assistant</button>
-      </div>
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu">
+      <a href="index.html" class="mobile-menu-item" data-page="index.html">
+        📋 <span data-translate="nav.home">Job Postings</span>
+      </a>
+      <a href="resumes.html" class="mobile-menu-item" data-page="resumes.html">
+        📄 <span data-translate="nav.resumes">Resumes</span>
+      </a>
+      <a href="calendar.html" class="mobile-menu-item active" data-page="calendar.html">
+        📅 <span data-translate="nav.calendar">Calendar</span>
+      </a>
+      <a href="ai.html" class="mobile-menu-item" data-page="ai.html">
+        🤖 <span data-translate="nav.ai">AI Assistant</span>
+      </a>
     </div>
 
     <main class="container">
@@ -1005,76 +1011,72 @@
     <div id="helpModal" class="help-modal">
       <div class="help-modal-content">
         <div class="help-header">
-          <h3 class="help-title">📅 Calendar Help</h3>
+          <h3 class="help-title" data-translate="calendar.help.title">📅 Calendar Help</h3>
           <button id="closeHelpModal" class="help-close">&times;</button>
         </div>
         
         <div class="help-section">
-          <h4>📅 Calendar Views</h4>
+          <h4 data-translate="calendar.help.views">📅 Calendar Views</h4>
           <ul>
-            <li><strong>Month View:</strong> See the full month with all events</li>
-            <li><strong>Week View:</strong> Focus on a single week's schedule</li>
-            <li><strong>Day View:</strong> Detailed view of a single day with time slots</li>
+            <li><strong data-translate="calendar.help.monthView">Month View:</strong> <span data-translate="calendar.help.monthView.desc">See the full month with all events</span></li>
+            <li><strong data-translate="calendar.help.weekView">Week View:</strong> <span data-translate="calendar.help.weekView.desc">Focus on a single week's schedule</span></li>
+            <li><strong data-translate="calendar.help.dayView">Day View:</strong> <span data-translate="calendar.help.dayView.desc">Detailed view of a single day with time slots</span></li>
           </ul>
         </div>
         
         <div class="help-section">
-          <h4>➕ Adding Events</h4>
+          <h4 data-translate="calendar.help.addingEvents">➕ Adding Events</h4>
           <ul>
-            <li>Click "Add Event" button or click on any day</li>
-            <li>Fill in event title, date, and optional time</li>
-            <li>Choose event category (Interview, Deadline, etc.)</li>
-            <li>Add description for more details</li>
+            <li data-translate="calendar.help.addEvent.click">Click "Add Event" button or click on any day</li>
+            <li data-translate="calendar.help.addEvent.fill">Fill in event title, date, and optional time</li>
+            <li data-translate="calendar.help.addEvent.category">Choose event category (Interview, Deadline, etc.)</li>
+            <li data-translate="calendar.help.addEvent.description">Add description for more details</li>
           </ul>
         </div>
         
         <div class="help-section">
-          <h4>🔄 Recurring Events</h4>
+          <h4 data-translate="calendar.help.recurringEvents">🔄 Recurring Events</h4>
           <ul>
-            <li>Check "Make this a recurring event" for regular events</li>
-            <li>Choose frequency: Daily, Weekly, or Monthly</li>
-            <li>Set an end date to limit how long events repeat</li>
-            <li>Perfect for weekly deadlines or regular meetings</li>
+            <li data-translate="calendar.help.recurring.check">Check "Make this a recurring event" for regular events</li>
+            <li data-translate="calendar.help.recurring.frequency">Choose frequency: Daily, Weekly, or Monthly</li>
+            <li data-translate="calendar.help.recurring.endDate">Set an end date to limit how long events repeat</li>
+            <li data-translate="calendar.help.recurring.perfect">Perfect for weekly deadlines or regular meetings</li>
           </ul>
         </div>
         
         <div class="help-section">
-          <h4>📊 Event Categories</h4>
+          <h4 data-translate="calendar.help.eventCategories">📊 Event Categories</h4>
           <ul>
-            <li><strong>Interview:</strong> Job interviews and assessments</li>
-            <li><strong>Deadline:</strong> Application deadlines and important dates</li>
-            <li><strong>Follow-up:</strong> Reminders to follow up on applications</li>
-            <li><strong>Networking:</strong> Career fairs, meetups, and networking events</li>
-            <li><strong>Meeting:</strong> General meetings and appointments</li>
-            <li><strong>Other:</strong> Any other calendar events</li>
+            <li><strong data-translate="calendar.help.category.interview">Interview:</strong> <span data-translate="calendar.help.category.interview.desc">Job interviews and assessments</span></li>
+            <li><strong data-translate="calendar.help.category.deadline">Deadline:</strong> <span data-translate="calendar.help.category.deadline.desc">Application deadlines and important dates</span></li>
+            <li><strong data-translate="calendar.help.category.followup">Follow-up:</strong> <span data-translate="calendar.help.category.followup.desc">Reminders to follow up on applications</span></li>
+            <li><strong data-translate="calendar.help.category.networking">Networking:</strong> <span data-translate="calendar.help.category.networking.desc">Career fairs, meetups, and networking events</span></li>
+            <li><strong data-translate="calendar.help.category.meeting">Meeting:</strong> <span data-translate="calendar.help.category.meeting.desc">General meetings and appointments</span></li>
+            <li><strong data-translate="calendar.help.category.other">Other:</strong> <span data-translate="calendar.help.category.other.desc">Any other calendar events</span></li>
           </ul>
         </div>
         
         <div class="help-section">
-          <h4>💾 Export & Navigation</h4>
+          <h4 data-translate="calendar.help.navigation">📅 Navigation</h4>
           <ul>
-            <li>Use arrow buttons to navigate between months/weeks/days</li>
-            <li>Click "Today" to jump to the current date</li>
-            <li>Export your calendar events as CSV for backup</li>
-            <li>Click on events to edit or delete them</li>
+            <li data-translate="calendar.help.nav.arrows">Use arrow buttons to navigate between months/weeks/days</li>
+            <li data-translate="calendar.help.nav.today">Click "Today" to jump to the current date</li>
+            <li data-translate="calendar.help.nav.events">Click on events to edit or delete them</li>
           </ul>
         </div>
         
         <div class="help-tip">
-          <strong>💡 Pro Tip:</strong> Use recurring events for weekly application deadlines and set up interview reminders to stay organized during your job search!
+          <strong data-translate="calendar.help.proTip">💡 Pro Tip:</strong> <span data-translate="calendar.help.proTip.desc">Use recurring events for weekly application deadlines and set up interview reminders to stay organized during your job search!</span>
         </div>
       </div>
     </div>
 
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
-    <!-- Logout Function -->
-    <script>
-      function logout() {
-        localStorage.removeItem('userLoggedIn');
-        window.location.href = 'login.html';
-      }
-    </script>
-    <script src="calendar.js?v=48"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="js/translations.js"></script>
+  <script src="toast-notifications.js"></script>
+  <script src="hamburger-menu.js"></script>
+  <script src="calendar.js"></script>
     
     <!-- Help Modal JavaScript -->
     <script>

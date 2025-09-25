@@ -1,0 +1,65 @@
+{
+  "Files": [
+    {
+      "Id": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/ai.html",
+      "PackagePath": "staticwebassets/ai.html"
+    },
+    {
+      "Id": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/calendar.html",
+      "PackagePath": "staticwebassets/calendar.html"
+    },
+    {
+      "Id": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/calendar.js",
+      "PackagePath": "staticwebassets/calendar.js"
+    },
+    {
+      "Id": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/hamburger-menu.js",
+      "PackagePath": "staticwebassets/hamburger-menu.js"
+    },
+    {
+      "Id": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/i18n.js",
+      "PackagePath": "staticwebassets/i18n.js"
+    },
+    {
+      "Id": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/index.html",
+      "PackagePath": "staticwebassets/index.html"
+    },
+    {
+      "Id": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/main.js",
+      "PackagePath": "staticwebassets/main.js"
+    },
+    {
+      "Id": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/resumes.html",
+      "PackagePath": "staticwebassets/resumes.html"
+    },
+    {
+      "Id": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/resumes.js",
+      "PackagePath": "staticwebassets/resumes.js"
+    },
+    {
+      "Id": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/settings.html",
+      "PackagePath": "staticwebassets/settings.html"
+    },
+    {
+      "Id": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/wwwroot/styles.css",
+      "PackagePath": "staticwebassets/styles.css"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.InternApp.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.InternApp.props",
+      "PackagePath": "build\\InternApp.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.InternApp.props",
+      "PackagePath": "buildMultiTargeting\\InternApp.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.InternApp.props",
+      "PackagePath": "buildTransitive\\InternApp.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

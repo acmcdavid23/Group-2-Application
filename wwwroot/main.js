@@ -1,11 +1,118 @@
-// Global variables
+console.log('Main.js is loading...');
+
+// Check authentication on page load
+if (!isAuthenticated()) {
+  redirectToLogin();
+}
+
+// Load email service
+const emailScript = document.createElement('script');
+emailScript.src = 'email-service.js';
+emailScript.onload = () => {
+  console.log('Email service script loaded');
+};
+document.head.appendChild(emailScript);
+
+const api = (path, opts) => fetch(path, opts).then(r=>{ if(!r.ok) return r.json().then(e=>{throw e}); return r.json(); });
+
+// Resume functionality moved to resumes.js
+
+// Navigation is now handled by hamburger-menu.js
+
+// Status label helper function
+function getStatusLabel(status) {
+  if (window.translator) {
+    return window.translator.translate(`home.status.${status}`, status);
+  }
+  const labels = {
+    'interested': 'Interested',
+    'applied': 'Applied',
+    'phone_screen': 'Phone Screen',
+    'interview': 'Interview',
+    'offer': 'Offer',
+    'rejected': 'Rejected'
+  };
+  return labels[status] || 'Interested';
+}
+
+// Global variables for search and filter
 let allPostings = [];
 let filteredPostings = [];
 let statusChart = null;
 
-// Body scroll lock functions
-function lockBodyScroll() {
-  document.body.classList.add('scroll-locked');
+// Authentication management
+function getAuthToken() {
+  return localStorage.getItem('authToken');
+}
+
+function getCurrentUser() {
+  const userStr = localStorage.getItem('currentUser');
+  return userStr ? JSON.parse(userStr) : null;
+}
+
+function isAuthenticated() {
+  return getAuthToken() && getCurrentUser();
+}
+
+function redirectToLogin() {
+  window.location.href = 'login.html';
+}
+
+// API helper with authentication
+async function apiWithAuth(url, options = {}) {
+  const token = getAuthToken();
+  if (!token) {
+    redirectToLogin();
+    return;
+  }
+  
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+    ...options.headers
+  };
+  
+  const response = await fetch(url, {
+    ...options,
+    headers
+  });
+  
+  // If unauthorized, redirect to login
+  if (response.status === 401) {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('currentUser');
+    redirectToLogin();
+    return;
+  }
+  
+  return response;
+}
+
+// Search and filter functionality
+function setupSearchAndFilter() {
+  const searchInput = document.getElementById('searchInput');
+  const statusFilter = document.getElementById('statusFilter');
+  
+  function filterPostings() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const statusFilterValue = statusFilter.value;
+    
+    filteredPostings = allPostings.filter(posting => {
+      const matchesSearch = !searchTerm || 
+        posting.title.toLowerCase().includes(searchTerm) ||
+        posting.company.toLowerCase().includes(searchTerm) ||
+        posting.description.toLowerCase().includes(searchTerm);
+      
+      const matchesStatus = !statusFilterValue || posting.status === statusFilterValue;
+      
+      return matchesSearch && matchesStatus;
+    });
+    
+    renderFilteredPostings();
+  }
+  
+  searchInput.addEventListener('input', filterPostings);
+  statusFilter.addEventListener('change', filterPostings);
 }
 
 function unlockBodyScroll() {
@@ -159,50 +266,29 @@ function setupEditModal() {
     return;
   }
   
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-        const userPostings = JSON.parse(localStorage.getItem(`user_${currentUser.id}_postings`) || '[]');
-        
-        console.log('Updating existing posting:', id);
-        
-        // Update existing posting
-        const postingIndex = userPostings.findIndex(p => p.id == id);
-        if (postingIndex !== -1) {
-          userPostings[postingIndex] = {
-            ...userPostings[postingIndex],
-            title,
-            company,
-            description,
-            dueDate,
-            status,
-            notifications: {
-              email: emailNotifications,
-              emailAddress: notificationEmail,
-              timing: notificationTiming
-            }
-          };
-          
-          localStorage.setItem(`user_${currentUser.id}_postings`, JSON.stringify(userPostings));
-          
-          // Reload data from localStorage to ensure consistency
-          allPostings = userPostings;
-          filteredPostings = [...allPostings];
-          
-          // Update calendar event
-          if (dueDate) {
-            addJobPostingToCalendar(userPostings[postingIndex]);
-            if (typeof window.refreshCalendar === 'function') {
-              window.refreshCalendar();
-            }
-          }
-          
-          console.log('Posting updated successfully!');
-          
-          // Close modal
-          document.getElementById('editModal').style.display = 'none';
-          unlockBodyScroll();
-          
-          // Render updated list and update analytics
-          renderUserPostings();
+  filteredPostings.forEach(p => {
+    const el = document.createElement('div'); 
+    el.className='posting';
+    el.innerHTML = `
+      <div class="posting-content">
+        <div class="posting-title">${p.title}</div>
+        ${p.company ? `<div class="posting-company">@ ${p.company}</div>` : ''}
+        ${p.description ? `<div class="posting-description">${p.description}</div>` : ''}
+        ${p.dueDate ? `<div class="posting-due-date">Due: ${p.dueDate}</div>` : ''}
+        <div class="posting-status">
+          <span class="status-badge status-${p.status || 'interested'}">${getStatusLabel(p.status || 'interested')}</span>
+        </div>
+      </div>
+      <div class="posting-actions">
+        <button class="btn btn-sm" onclick="editPosting(${p.id})">Edit</button>
+        <button class="btn btn-sm danger" onclick="deletePosting(${p.id})">Delete</button>
+        <button class="btn btn-sm primary" onclick="tailorResume(${JSON.stringify(p).replace(/"/g, '&quot;')})">Tailor Resume</button>
+      </div>
+    `;
+    container.appendChild(el);
+  });
+  
+  // Update analytics
   updateAnalytics();
 }
 
@@ -386,18 +472,154 @@ function scheduleReminders() {
     }
   });
   
-  // Send reminders for postings with notifications enabled
-  const lastReminder = localStorage.getItem(`user_${currentUser.id}_last_reminder`) || '';
-  const todayStr = today.toDateString();
+  // Save edit
+  saveEdit.addEventListener('click', async function() {
+    try {
+      const formData = new FormData(editForm);
+      const body = {
+        title: formData.get('title'),
+        company: formData.get('company'),
+        description: formData.get('description'),
+        dueDate: formData.get('due_date'),
+        status: formData.get('status'),
+        sendReminder: formData.get('sendReminder') === 'true'
+      };
+      
+      const response = await apiWithAuth(`/api/postings/${formData.get('id')}`, {
+        method: 'PUT',
+        body: JSON.stringify(body)
+      });
+      
+      if (response.ok) {
+        // Check if reminder should be sent
+        if (body.sendReminder && body.dueDate) {
+          const userSettings = getUserEmailSettings();
+          if (shouldSendReminder(body, userSettings)) {
+            // Send immediate reminder if within reminder window
+            setTimeout(async () => {
+              try {
+                if (window.emailService && window.emailService.isInitialized) {
+                  const success = await window.emailService.sendReminderEmail(body, userSettings.userEmail, 'due_date');
+                  if (success) {
+                    const message = window.translator ? window.translator.translate('settings.emailReminderSent') : 'Reminder email sent for updated posting!';
+                    window.toast.success(message);
+                  } else {
+                    const message = window.translator ? window.translator.translate('settings.emailError') : 'Failed to send reminder email';
+                    window.toast.warning(message);
+                  }
+                } else {
+                  console.log('Email service not ready, skipping reminder');
+                }
+              } catch (error) {
+                console.error('Failed to send reminder email:', error);
+              }
+            }, 1000); // Small delay to ensure posting is saved
+          }
+        }
+        
+        closeModal();
+        await loadPostings();
+      } else {
+        console.error('Failed to update posting: ' + response.statusText);
+      }
+    } catch (error) {
+      console.error('Error updating posting: ' + error.message);
+    }
+  });
+});
+
+// Email reminder button toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+  // Add posting form reminder button
+  const sendReminderBtn = document.getElementById('sendReminderBtn');
+  const sendReminderInput = document.getElementById('sendReminder');
   
-  if (lastReminder !== todayStr) {
-    upcomingDeadlines.forEach(posting => {
-      if (posting.notifications?.email && posting.notifications?.emailAddress) {
-        sendAutomatedEmailReminder(posting, posting.notifications.emailAddress);
+  if (sendReminderBtn && sendReminderInput) {
+    sendReminderBtn.addEventListener('click', function() {
+      const isActive = sendReminderInput.value === 'true';
+      sendReminderInput.value = isActive ? 'false' : 'true';
+      
+      if (isActive) {
+        sendReminderBtn.style.background = '#e5e7eb';
+        sendReminderBtn.style.color = '#374151';
+        sendReminderBtn.style.border = '1px solid #d1d5db';
+      } else {
+        sendReminderBtn.style.background = '#3b82f6';
+        sendReminderBtn.style.color = 'white';
+        sendReminderBtn.style.border = '1px solid #3b82f6';
       }
     });
-    
-    localStorage.setItem(`user_${currentUser.id}_last_reminder`, todayStr);
+  }
+  
+  // Edit posting form reminder button
+  const editSendReminderBtn = document.getElementById('editSendReminderBtn');
+  const editSendReminderInput = document.getElementById('editSendReminder');
+  
+  if (editSendReminderBtn && editSendReminderInput) {
+    editSendReminderBtn.addEventListener('click', function() {
+      const isActive = editSendReminderInput.value === 'true';
+      editSendReminderInput.value = isActive ? 'false' : 'true';
+      
+      if (isActive) {
+        editSendReminderBtn.style.background = '#e5e7eb';
+        editSendReminderBtn.style.color = '#374151';
+        editSendReminderBtn.style.border = '1px solid #d1d5db';
+      } else {
+        editSendReminderBtn.style.background = '#3b82f6';
+        editSendReminderBtn.style.color = 'white';
+        editSendReminderBtn.style.border = '1px solid #3b82f6';
+      }
+    });
+  }
+});
+
+// Resume functionality moved to resumes.js
+
+document.getElementById('postingForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const body = { 
+    title: e.target.title.value, 
+    company: e.target.company.value, 
+    description: e.target.description.value, 
+    dueDate: e.target.due_date.value,
+    sendReminder: e.target.sendReminder ? e.target.sendReminder.value === 'true' : false
+  };
+  try {
+    const response = await apiWithAuth('/api/postings', { method:'POST', body: JSON.stringify(body) });
+    if (response.ok) {
+      // Check if reminder should be sent
+      if (body.sendReminder && body.dueDate) {
+        const userSettings = getUserEmailSettings();
+        if (shouldSendReminder(body, userSettings)) {
+          // Send immediate reminder if within reminder window
+          setTimeout(async () => {
+            try {
+              if (window.emailService && window.emailService.isInitialized) {
+                const success = await window.emailService.sendReminderEmail(body, userSettings.userEmail, 'due_date');
+                if (success) {
+                  const message = window.translator ? window.translator.translate('settings.emailReminderSent') : 'Reminder email sent for new posting!';
+                  window.toast.success(message);
+                } else {
+                  const message = window.translator ? window.translator.translate('settings.emailError') : 'Failed to send reminder email';
+                  window.toast.warning(message);
+                }
+              } else {
+                console.log('Email service not ready, skipping reminder');
+              }
+            } catch (error) {
+              console.error('Failed to send reminder email:', error);
+            }
+          }, 1000); // Small delay to ensure posting is saved
+        }
+      }
+      
+      e.target.reset();
+      await loadPostings(); // This will update both postings list and calendar preview
+    } else {
+      console.error('Failed to add posting: ' + response.statusText);
+    }
+  } catch (error) {
+    console.error('Error adding posting: ' + error.message);
   }
 }
 
@@ -406,38 +628,11 @@ async function sendAutomatedEmailReminder(posting, userEmail) {
   const body = `Don't forget about your application for ${posting.title} at ${posting.company}. Due date: ${posting.dueDate}`;
   
   try {
-    // Check if EmailJS is loaded
-    if (typeof emailjs === 'undefined') {
-      console.log('EmailJS not available for automated email');
-      return;
-    }
-
-    const templateParams = {
-      to_email: userEmail,
-      to_name: 'User',
-      from_name: 'Internship Application Manager',
-      subject: subject,
-      message: body,
-      job_title: posting.title,
-      company_name: posting.company,
-      due_date: posting.dueDate
-    };
-
-    // EmailJS credentials
-    const serviceId = 'service_lk4nt0v';
-    const templateId = 'template_a3kh9cp';
-    const publicKey = 'X80istNGO-VJ1Q9zZ';
-
-    await emailjs.send(serviceId, templateId, templateParams, publicKey);
-    console.log('Automated email sent successfully!');
-  } catch (error) {
-    console.error('Error sending automated email:', error);
-  }
-}
-
-
-// Render user-specific postings
-function renderUserPostings() {
+    const response = await apiWithAuth('/api/postings');
+    const posts = await response.json();
+    allPostings = posts;
+    filteredPostings = [...posts];
+    
     const container = document.getElementById('postings'); 
     
   if (container) {
@@ -676,211 +871,134 @@ function setupForm() {
       return;
     }
     
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-        const userPostings = JSON.parse(localStorage.getItem(`user_${currentUser.id}_postings`) || '[]');
-        
-        console.log('Adding new posting');
-        
-        const newPosting = {
-          id: Date.now(),
-          title,
-          company,
-          description,
-          dueDate,
-          status,
-          createdAt: new Date().toISOString(),
-          notifications: {
-            email: emailNotifications,
-            emailAddress: notificationEmail,
-            timing: notificationTiming
-          }
-        };
-        
-        userPostings.push(newPosting);
-        localStorage.setItem(`user_${currentUser.id}_postings`, JSON.stringify(userPostings));
-        
-        // Reload data from localStorage to ensure consistency
-        allPostings = userPostings;
-        filteredPostings = [...allPostings];
-        
-        // Add to calendar if due date is provided
-        if (dueDate) {
-          addJobPostingToCalendar(newPosting);
-          if (typeof window.refreshCalendar === 'function') {
-            window.refreshCalendar();
-          }
-        }
-        
-        // Reset form
-        form.reset();
-        
-        console.log('Posting added successfully!');
-        
-        // Render updated list and update analytics
-        renderUserPostings();
-        updateAnalytics();
-        
-  } catch (error) {
-        console.error('Error with posting:', error);
-        alert('Error: ' + error.message);
-      }
-    };
-    
-    form.addEventListener('submit', form._submitHandler);
-  }
-}
-
-// Setup search and filter
-function setupSearchAndFilter() {
-  const searchInput = document.getElementById('searchInput');
-  const statusFilter = document.getElementById('statusFilter');
-  
-  function filterPostings() {
-    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-    const statusFilterValue = statusFilter ? statusFilter.value : '';
-    
-    const postings = document.querySelectorAll('.posting');
-    let visibleCount = 0;
-    
-    postings.forEach(posting => {
-      const title = posting.querySelector('h3').textContent.toLowerCase();
-      const company = posting.querySelector('p').textContent.toLowerCase();
-      const status = posting.querySelectorAll('p')[1].textContent.toLowerCase();
-      
-      const matchesSearch = !searchTerm || 
-        title.includes(searchTerm) ||
-        company.includes(searchTerm);
-      
-      const matchesStatus = !statusFilterValue || 
-        status.includes(statusFilterValue);
-      
-      if (matchesSearch && matchesStatus) {
-        posting.style.display = 'block';
-        visibleCount++;
-      } else {
-        posting.style.display = 'none';
-      }
-    });
-    
-    // Show "no results" message if no postings are visible
-    const container = document.getElementById('postings');
-    let noResultsDiv = container.querySelector('.no-content-message');
-    
-    if (visibleCount === 0 && postings.length > 0) {
-      if (!noResultsDiv) {
-        noResultsDiv = document.createElement('div');
-        noResultsDiv.className = 'no-content-message';
-        noResultsDiv.innerHTML = `
-          <div style="text-align: center; padding: 40px; color: #6b7280;">
-            <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
-            <h3 style="margin: 0 0 8px 0; color: #374151;">No results found</h3>
-            <p style="margin: 0; font-size: 14px;">Try adjusting your search terms or status filter to find more job postings.</p>
-          </div>
-        `;
-        container.appendChild(noResultsDiv);
-      }
-    } else if (noResultsDiv) {
-      noResultsDiv.remove();
-    }
-  }
-  
-  if (searchInput) {
-    searchInput.addEventListener('input', filterPostings);
-  }
-  
-  if (statusFilter) {
-    statusFilter.addEventListener('change', filterPostings);
-  }
-}
-
-// Load postings from API
-async function loadPostings() {
-  try {
-    console.log('Loading postings from API...');
-    const posts = await api('/api/postings');
-    console.log('Loaded postings:', posts);
-    
-    const container = document.getElementById('postings');
-    if (container) {
-      container.innerHTML = '';
-      
-      if (posts && Array.isArray(posts) && posts.length > 0) {
-        // Update with real data
-        posts.forEach((posting, index) => {
-          const postingDiv = document.createElement('div');
-          postingDiv.className = 'posting';
-          postingDiv.setAttribute('data-id', posting.id || (index + 1));
-          postingDiv.innerHTML = `
-            <div class="posting-header">
-              <h3 class="posting-title">${posting.title}</h3>
-              <span class="posting-status status-${posting.status}">${posting.status}</span>
-            </div>
-            <div class="posting-company">${posting.company}</div>
-            <div class="posting-description">${posting.description}</div>
-            <div class="posting-due-date">Due: ${new Date(posting.dueDate).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' })}</div>
-            <div class="posting-actions">
-              <button class="btn btn-sm edit-posting" onclick="editPosting(${posting.id || (index + 1)})">✏️ Edit</button>
-              <button class="btn btn-sm danger delete-posting" onclick="deletePosting(${posting.id || (index + 1)})">🗑️ Delete</button>
-            </div>
-          `;
-          container.appendChild(postingDiv);
-        });
-        console.log('Real data loaded successfully!');
-    } else {
-        // Show no postings message
-        const noPostingsDiv = document.createElement('div');
-        noPostingsDiv.className = 'no-postings';
-        noPostingsDiv.style.cssText = `
-          text-align: center;
-          padding: 40px 20px;
-          color: #64748b;
-          background: #f8fafc;
-          border-radius: 12px;
-          border: 2px dashed #cbd5e1;
-        `;
-        noPostingsDiv.innerHTML = `
-          <div style="font-size: 48px; margin-bottom: 16px;">📋</div>
-          <h3 style="margin: 0 0 8px 0; color: #475569; font-size: 18px;">No Job Postings Yet</h3>
-          <p style="margin: 0; font-size: 14px; line-height: 1.5;">
-            Start tracking your internship applications by adding your first job posting using the form on the left.
-          </p>
-        `;
-        container.appendChild(noPostingsDiv);
-        console.log('No postings found, showing empty state');
-      }
-    }
+    renderFilteredPostings();
+    // renderCalendarPreview(posts); // Function removed
   } catch (error) {
     console.error('Error loading postings:', error);
     // Keep the hardcoded content if API fails
   }
 }
 
-// Manual chart creation for debugging
-window.createChartsManually = function() {
-  console.log('Manually creating charts...');
-  createCharts();
-};
+async function tailorResume(post){
+  console.log('TAILOR FUNCTION CALLED - NEW VERSION'); // Debug log
+  const resumes = await apiWithAuth('/api/resumes');
+  if(!resumes.length) {
+    const message = window.translator ? window.translator.translate('common.uploadResumeFirst') : 'Please upload a resume first before using the Tailor Resume feature.';
+    if (window.toast) {
+      window.toast.warning(message);
+    } else {
+      alert(message);
+    }
+    return;
+  }
+  
+  // Get the first resume
+  const resume = resumes[0];
+  const resumeName = resume.DisplayName || resume.OriginalName || resume.originalName || 'Resume';
+  
+  // Fetch resume content
+  let resumeContent = '';
+  try {
+    const resumeId = resume.Id || resume.id; // Handle both cases
+    const contentResponse = await apiWithAuth(`/api/resumes/${resumeId}/content`);
+    resumeContent = contentResponse.content || 'Unable to extract resume content';
+  } catch (error) {
+    resumeContent = 'Unable to fetch resume content';
+  }
+  
+  // Create the tailored prompt for the AI assistant
+  const tailoredPrompt = `I need help tailoring my resume for this specific internship opportunity:
 
-// Force create charts with simple data
-window.forceCreateCharts = function() {
-  console.log('Force creating charts with simple data...');
-  createCharts();
-};
+**Job Details:**
+- Job Title: ${post.title || 'Not specified'}
+- Company: ${post.company || 'Not specified'}
+- Job Description: ${post.description || 'Not provided'}
 
-// Test chart creation immediately
-window.testCharts = function() {
-  console.log('Testing chart creation...');
-  console.log('Chart.js available:', typeof Chart);
-  console.log('Status canvas:', document.getElementById('statusChart'));
-  createCharts();
-};
+**My Current Resume:**
+${resumeContent}
 
-// Edit and Delete Functions
-function editPosting(id) {
-  console.log('Edit posting:', id);
-  const postingElement = document.querySelector(`[data-id="${id}"]`);
-  if (!postingElement) {
-    console.log('Posting not found');
+Please provide specific tips and suggestions on how to adjust my resume to better match this internship posting. Focus on:
+1. Keywords to emphasize from the job description
+2. Skills to highlight that match the requirements
+3. Experience to rephrase or reorder
+4. Any gaps to address or strengths to emphasize
+5. Formatting suggestions to make it more relevant
+
+Please be specific and actionable in your recommendations.`;
+
+  // Store the prompt in localStorage for the AI page to use
+  localStorage.setItem('tailoredResumePrompt', tailoredPrompt);
+  localStorage.setItem('tailoredResumeJobTitle', post.title || 'Not specified');
+  localStorage.setItem('tailoredResumeCompany', post.company || 'Not specified');
+  
+  // Navigate to the AI assistant page
+  window.location.href = 'ai.html';
+}
+
+let currentEditingPosting = null;
+
+async function editPosting(id) {
+  try {
+    const response = await apiWithAuth('/api/postings');
+    const postings = await response.json();
+    const posting = postings.find(p => p.id === id);
+    if (!posting) {
+      console.error('Posting not found');
+      return;
+    }
+    
+    currentEditingPosting = posting;
+    
+    // Populate the edit form
+    const editForm = document.getElementById('editForm');
+    editForm.title.value = posting.title || '';
+    editForm.company.value = posting.company || '';
+    editForm.description.value = posting.description || '';
+    editForm.due_date.value = posting.dueDate || '';
+    editForm.status.value = posting.status || 'interested';
+    editForm.id.value = posting.id;
+    
+    // Set reminder button state (default to false for existing postings)
+    const editSendReminderBtn = document.getElementById('editSendReminderBtn');
+    const editSendReminderInput = document.getElementById('editSendReminder');
+    if (editSendReminderBtn && editSendReminderInput) {
+      editSendReminderInput.value = 'false';
+      editSendReminderBtn.style.background = '#e5e7eb';
+      editSendReminderBtn.style.color = '#374151';
+      editSendReminderBtn.style.border = '1px solid #d1d5db';
+    }
+    
+    // Show the modal
+    document.getElementById('editModal').style.display = 'flex';
+  } catch (error) {
+    console.error('Error loading posting: ' + error.message);
+  }
+}
+
+async function deletePosting(id) {
+  try {
+    const response = await apiWithAuth('/api/postings/' + id, { method: 'DELETE' });
+    if (response.ok) {
+      await loadPostings(); // Reload the postings list
+    } else {
+      console.error('Delete failed: ' + response.statusText);
+    }
+  } catch (error) {
+    console.error('Delete failed: ' + error.message);
+  }
+}
+
+// Calendar preview functionality removed - now handled on calendar page
+
+loadPostings();
+setupSearchAndFilter();
+
+// Export functionality
+function exportPostings() {
+  const dataToExport = filteredPostings.length > 0 ? filteredPostings : allPostings;
+  
+  if (dataToExport.length === 0) {
+    console.warn('No postings to export');
     return;
   }
   
@@ -912,12 +1030,24 @@ function editPosting(id) {
   lockBodyScroll();
 }
 
-function deletePosting(id) {
-  console.log('Delete posting:', id);
-  const postingElement = document.querySelector(`[data-id="${id}"]`);
-  if (postingElement) {
-    postingElement.remove();
-    console.log('Posting deleted from UI');
+// Initialize application
+document.addEventListener('DOMContentLoaded', function() {
+  
+  // Help modal functionality
+  const helpBtn = document.getElementById('helpBtn');
+  const helpModal = document.getElementById('helpModal');
+  const closeHelpModal = document.getElementById('closeHelpModal');
+  
+  console.log('Help button found:', helpBtn);
+  console.log('Help modal found:', helpModal);
+  console.log('Close button found:', closeHelpModal);
+  
+  if (helpBtn && helpModal && closeHelpModal) {
+    console.log('Setting up help modal event listeners');
+    helpBtn.addEventListener('click', function() {
+      console.log('Help button clicked');
+      helpModal.style.display = 'flex';
+    });
     
     // Remove from localStorage
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');

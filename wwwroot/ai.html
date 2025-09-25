@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AI Assistant - Internship Application Manager</title>
+    <title data-translate="ai.title">AI Assistant - Internship Application Manager</title>
     <link
       href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css"
       rel="stylesheet"
@@ -279,14 +279,24 @@
       </div>
     </div>
 
-    <!-- Navigation -->
-    <div class="nav-banner-rect">
-      <div class="nav-banner-inner">
-        <button class="nav-btn" onclick="window.location.href='index.html'">📊 Dashboard</button>
-        <button class="nav-btn" onclick="window.location.href='resumes.html'">📄 Resumes</button>
-        <button class="nav-btn" onclick="window.location.href='calendar.html'">📅 Calendar</button>
-        <button class="nav-btn active" onclick="window.location.href='ai.html'">🤖 AI Assistant</button>
-      </div>
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu">
+      <a href="index.html" class="mobile-menu-item" data-page="index.html">
+        📋 Job Postings
+      </a>
+      <a href="resumes.html" class="mobile-menu-item" data-page="resumes.html">
+        📄 Resumes
+      </a>
+      <a
+        href="calendar.html"
+        class="mobile-menu-item"
+        data-page="calendar.html"
+      >
+        📅 Calendar
+      </a>
+      <a href="ai.html" class="mobile-menu-item active" data-page="ai.html">
+        🤖 <span data-translate="nav.ai">AI Assistant</span>
+      </a>
     </div>
 
     <!-- Help Modal -->
@@ -299,7 +309,7 @@
     >
       <div class="help-modal-content">
         <div class="help-header">
-          <h3 class="help-title">🤖 AI Assistant Help</h3>
+          <h3 class="help-title" data-translate="ai.help.title">🤖 AI Assistant Help</h3>
           <button
             id="closeHelpModal"
             class="help-close"
@@ -309,49 +319,48 @@
           </button>
         </div>
         <div class="help-section">
-          <h4>💬 Using the AI Chat</h4>
+          <h4 data-translate="ai.help.usingChat">💬 Using the AI Chat</h4>
           <ul>
-            <li>
+            <li data-translate="ai.help.typeQuestion">
               Type your question or prompt in the text box and click
               <b>Send</b> or press <b>Ctrl+Enter</b>.
             </li>
-            <li>
+            <li data-translate="ai.help.conversationSaved">
               Each conversation is saved in the Chat History on the right.
             </li>
-            <li>
+            <li data-translate="ai.help.clickPrevious">
               Click any previous chat to reload it for editing or follow-up.
             </li>
-            <li>
+            <li data-translate="ai.help.historySaved">
               Chat history is saved until you close or refresh the browser tab.
             </li>
           </ul>
         </div>
         <div class="help-section">
-          <h4>📄 Downloading & Exporting</h4>
+          <h4 data-translate="ai.help.downloading">📄 Downloading & Exporting</h4>
           <ul>
-            <li>Copy and paste any AI response for your records.</li>
-            <li>
+            <li data-translate="ai.help.copyPaste">Copy and paste any AI response for your records.</li>
+            <li data-translate="ai.help.downloadHistory">
               Download your chat history as a <b>.txt</b> file for backup.
             </li>
-            <li>
+            <li data-translate="ai.help.clearHistory">
               Clear all chat history with the <b>Clear History</b> button.
             </li>
           </ul>
         </div>
         <div class="help-section">
-          <h4>💡 Tips for Best Results</h4>
+          <h4 data-translate="ai.help.tips">💡 Tips for Best Results</h4>
           <ul>
-            <li>Be specific with your questions for more accurate answers.</li>
-            <li>
+            <li data-translate="ai.help.beSpecific">Be specific with your questions for more accurate answers.</li>
+            <li data-translate="ai.help.useHistory">
               Use the chat history to compare different prompts and responses.
             </li>
-            <li>Try rephrasing or following up for more details.</li>
-            <li>Keep prompts under 1000 characters for best performance.</li>
+            <li data-translate="ai.help.rephrase">Try rephrasing or following up for more details.</li>
+            <li data-translate="ai.help.characterLimit">Keep prompts under 1000 characters for best performance.</li>
           </ul>
         </div>
         <div class="help-tip">
-          <strong>💡 Pro Tip:</strong> Use the AI to draft emails, summarize job
-          descriptions, or brainstorm interview answers!
+          <strong data-translate="ai.help.proTip">💡 Pro Tip:</strong> <span data-translate="ai.help.proTip.desc">Use the AI to draft emails, summarize job descriptions, or brainstorm interview answers!</span>
         </div>
       </div>
     </div>
@@ -360,13 +369,13 @@
       <div class="panel full-width" style="margin-top: 20px">
         <div class="ai-flex-row">
           <div class="ai-card">
-            <h3 style="text-align: center">Local AI Assistant</h3>
+            <h3 style="text-align: center" data-translate="ai.mainTitle">Local AI Assistant</h3>
             <form id="aiForm" autocomplete="off">
               <textarea
                 id="aiPrompt"
                 rows="5"
                 maxlength="1000"
-                placeholder="Ask the AI anything..."
+                placeholder="Ask the AI anything..." data-translate="ai.promptPlaceholder"
                 aria-label="AI Prompt"
               ></textarea
               ><br />
@@ -375,42 +384,28 @@
                 class="btn primary"
                 aria-label="Send Message"
               >
-                Send
+                <span data-translate="ai.send">Send</span>
               </button>
             </form>
             <div id="aiResponse" aria-live="polite"></div>
           </div>
           <div class="ai-history-card" id="aiHistoryCard">
-            <h4>Chat History</h4>
+            <h4 data-translate="ai.chatHistory">Chat History</h4>
             <div id="aiHistory"></div>
             <button id="downloadHistory" class="btn" style="margin-top: 10px">
-              Download History
+              <span data-translate="ai.downloadHistory">Download History</span>
             </button>
             <button id="clearHistory" class="btn" style="margin-top: 10px">
-              Clear History
+              <span data-translate="ai.clearHistory">Clear History</span>
             </button>
           </div>
         </div>
       </div>
     </main>
 
-    <!-- Help Button -->
-    <button
-      id="helpBtn"
-      class="help-btn"
-      title="Help & Tips"
-      aria-label="Open AI Help"
-    >
-      ?
-    </button>
-
-    <!-- Logout Function -->
-    <script>
-      function logout() {
-        localStorage.removeItem('userLoggedIn');
-        window.location.href = 'login.html';
-      }
-    </script>
+    <script src="js/translations.js"></script>
+    <script src="toast-notifications.js"></script>
+    <script src="hamburger-menu.js"></script>
     <script>
       // --- Escape HTML to prevent XSS ---
       function escapeHTML(str) {
@@ -427,17 +422,44 @@
         });
       }
 
+      // --- Authentication Management ---
+      function getAuthToken() {
+        return localStorage.getItem('authToken');
+      }
+
+      function getCurrentUser() {
+        const userStr = localStorage.getItem('currentUser');
+        return userStr ? JSON.parse(userStr) : null;
+      }
+
+      function isAuthenticated() {
+        return getAuthToken() && getCurrentUser();
+      }
+
+      function redirectToLogin() {
+        window.location.href = 'login.html';
+      }
+
+      // Check authentication on page load
+      if (!isAuthenticated()) {
+        redirectToLogin();
+      }
+
       // --- Chat History Persistence ---
       function saveHistory(history) {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-        const userKey = currentUser.isDemo ? 'demo_ai_chat_history' : `user_${currentUser.id}_ai_chat_history`;
-        localStorage.setItem(userKey, JSON.stringify(history));
+        const user = getCurrentUser();
+        if (user) {
+          localStorage.setItem(`aiChatHistory_${user.id}`, JSON.stringify(history));
+        }
       }
+      
       function loadHistory() {
         try {
-          const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-          const userKey = currentUser.isDemo ? 'demo_ai_chat_history' : `user_${currentUser.id}_ai_chat_history`;
-          return JSON.parse(localStorage.getItem(userKey)) || [];
+          const user = getCurrentUser();
+          if (user) {
+            return JSON.parse(localStorage.getItem(`aiChatHistory_${user.id}`)) || [];
+          }
+          return [];
         } catch {
           return [];
         }
@@ -498,9 +520,13 @@
         showSpinner();
 
         try {
+          const token = getAuthToken();
           const res = await fetch("/api/ollama", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
             body: JSON.stringify({ prompt }),
           });
 
@@ -589,6 +615,40 @@
           helpBtn.focus();
         }
       });
+
+      // --- Tailored Resume Functionality ---
+      // Check if we have a tailored resume prompt to load
+      function loadTailoredResumePrompt() {
+        const tailoredPrompt = localStorage.getItem('tailoredResumePrompt');
+        const jobTitle = localStorage.getItem('tailoredResumeJobTitle');
+        const company = localStorage.getItem('tailoredResumeCompany');
+        
+        if (tailoredPrompt) {
+          // Pre-fill the AI prompt with the tailored resume request
+          aiPrompt.value = tailoredPrompt;
+          
+          // Update the page title to show we're in tailored resume mode
+          if (jobTitle && company) {
+            document.title = `Tailor Resume for ${jobTitle} at ${company} - AI Assistant`;
+          }
+          
+          // Clear the stored data so it doesn't persist on page refresh
+          localStorage.removeItem('tailoredResumePrompt');
+          localStorage.removeItem('tailoredResumeJobTitle');
+          localStorage.removeItem('tailoredResumeCompany');
+          
+          // Focus the prompt input
+          aiPrompt.focus();
+          
+          // Show a toast notification if available
+          if (window.toast) {
+            window.toast.info('Tailored resume prompt loaded! Click "Ask AI" to get personalized resume tips.');
+          }
+        }
+      }
+
+      // Load tailored resume prompt on page load
+      loadTailoredResumePrompt();
     </script>
   </body>
 </html>
