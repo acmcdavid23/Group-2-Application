@@ -1,4 +1,22 @@
 // Hamburger Menu Functionality
+
+// Logout function
+function logout() {
+    // Clear authentication data
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('currentUser');
+    
+    // Show logout confirmation
+    if (window.toast) {
+        window.toast.success('Logged out successfully!');
+    }
+    
+    // Redirect to login page after a short delay
+    setTimeout(() => {
+        window.location.href = 'login.html';
+    }, 1000);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const hamburgerBtn = document.getElementById('hamburgerBtn');
     const mobileMenu = document.getElementById('mobileMenu');
@@ -111,6 +129,28 @@ document.addEventListener('DOMContentLoaded', function() {
             // handler will be attached later via attachMenuItemHandlers
             mobileMenu.appendChild(a);
         });
+
+        // Add logout button
+        const logoutBtn = document.createElement('button');
+        logoutBtn.className = 'mobile-menu-item logout-btn';
+        logoutBtn.setAttribute('data-translate', 'nav.logout');
+        logoutBtn.textContent = '🚪 Logout';
+        logoutBtn.style.background = '#ef4444';
+        logoutBtn.style.color = 'white';
+        logoutBtn.style.border = 'none';
+        logoutBtn.style.padding = '12px 16px';
+        logoutBtn.style.margin = '8px 0';
+        logoutBtn.style.borderRadius = '8px';
+        logoutBtn.style.cursor = 'pointer';
+        logoutBtn.style.width = '100%';
+        logoutBtn.style.fontSize = '14px';
+        logoutBtn.style.fontWeight = '500';
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeMenu();
+            logout();
+        });
+        mobileMenu.appendChild(logoutBtn);
     }
 
     // Ensure menu integrity: if any standard items were removed, restore them
@@ -136,6 +176,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 mobileMenu.appendChild(a);
             }
         });
+        
+        // Ensure logout button exists
+        if (!mobileMenu.querySelector('.logout-btn')) {
+            const logoutBtn = document.createElement('button');
+            logoutBtn.className = 'mobile-menu-item logout-btn';
+            logoutBtn.setAttribute('data-translate', 'nav.logout');
+            logoutBtn.textContent = '🚪 Logout';
+            logoutBtn.style.background = '#ef4444';
+            logoutBtn.style.color = 'white';
+            logoutBtn.style.border = 'none';
+            logoutBtn.style.padding = '12px 16px';
+            logoutBtn.style.margin = '8px 0';
+            logoutBtn.style.borderRadius = '8px';
+            logoutBtn.style.cursor = 'pointer';
+            logoutBtn.style.width = '100%';
+            logoutBtn.style.fontSize = '14px';
+            logoutBtn.style.fontWeight = '500';
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeMenu();
+                logout();
+            });
+            mobileMenu.appendChild(logoutBtn);
+        }
+        
         // Re-attach handlers to any newly-added items
         attachMenuItemHandlers();
         // Update active state
@@ -176,7 +241,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.body.classList.remove('dark-theme');
                 try { document.documentElement.classList.remove('dark-theme'); } catch(_) {}
             }
-            if (s.fontSize) document.documentElement.style.fontSize = (s.fontSize || 16) + 'px';
+            if (s.fontSize) {
+                document.documentElement.style.fontSize = (s.fontSize || 16) + 'px';
+                document.body.style.fontSize = (s.fontSize || 16) + 'px';
+            }
             if (s.highContrast) {
                 document.body.classList.add('high-contrast');
                 try { document.documentElement.classList.add('high-contrast'); } catch(_) {}

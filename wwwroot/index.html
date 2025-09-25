@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Internship Application Manager</title>
+    <title data-translate="home.title">Job Postings</title>
   <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link href="styles.css" rel="stylesheet" />
@@ -150,15 +150,20 @@
       display: flex;
       gap: 12px;
       align-items: center;
+      flex-wrap: nowrap;
     }
     
     .search-input {
-      padding: 8px 12px;
+      padding: 0 12px;
       border: 2px solid #e2e8f0;
       border-radius: 6px;
       font-size: 14px;
-      min-width: 200px;
+      width: 200px;
+      height: 40px;
       transition: all 0.2s;
+      box-sizing: border-box;
+      margin: 0;
+      display: inline-block;
     }
     
     .search-input:focus {
@@ -168,13 +173,18 @@
     }
     
     .status-filter {
-      padding: 8px 12px;
+      padding: 0 12px;
       border: 2px solid #e2e8f0;
       border-radius: 6px;
       font-size: 14px;
       background: white;
-      min-width: 120px;
+      width: 160px;
+      height: 40px;
       transition: all 0.2s;
+      box-sizing: border-box;
+      margin: 0;
+      display: inline-block;
+      line-height: 36px;
     }
     
     .status-filter:focus {
@@ -261,7 +271,7 @@
       justify-content: center;
       transition: all 0.2s;
       flex-shrink: 0;
-      position: fixed;
+      position: absolute;
       top: 20px;
       left: 20px;
       z-index: 1001;
@@ -368,8 +378,8 @@
     <header class="site-header">
       <div class="header-rect glisten">
         <div class="header-inner">
-          <div class="brand">Internship Application Manager</div>
-          <div class="subtitle">Keep resumes, postings, and due dates in one place</div>
+          <div class="brand" data-translate="home.brand">Internship Application Manager</div>
+          <div class="subtitle" data-translate="home.subtitle">Keep resumes, postings, and due dates in one place</div>
         </div>
         <button id="helpBtn" class="help-btn" title="Help & Tips">?</button>
       </div>
@@ -387,19 +397,19 @@
     <!-- Mobile Menu -->
     <div id="mobileMenu" class="mobile-menu">
       <a href="index.html" class="mobile-menu-item active" data-page="index.html">
-        📋 Job Postings
+        📋 <span data-translate="nav.home">Job Postings</span>
       </a>
       <a href="resumes.html" class="mobile-menu-item" data-page="resumes.html">
-        📄 Resumes
+        📄 <span data-translate="nav.resumes">Resumes</span>
       </a>
       <a href="calendar.html" class="mobile-menu-item" data-page="calendar.html">
-        📅 Calendar
+        📅 <span data-translate="nav.calendar">Calendar</span>
       </a>
       <a href="ai.html" class="mobile-menu-item" data-page="ai.html">
-        🤖 AI Assistant
+        🤖 <span data-translate="nav.ai">AI Assistant</span>
       </a>
       <a href="settings.html" class="mobile-menu-item" data-page="settings.html">
-        ⚙️ Settings
+        ⚙️ <span data-translate="nav.settings">Settings</span>
       </a>
                   </div>
 
@@ -410,45 +420,49 @@
       <div class="panel full-width" style="margin-top: 20px; display: flex; gap: 20px;">
         
         <div class="card" style="flex: 0 0 300px;">
-          <h3>Add Job Posting</h3>
+          <h3 data-translate="form.addPosting">Add Job Posting</h3>
           <form id="postingForm" class="form-vertical">
-            <input name="title" placeholder="Job Title" required />
-            <input name="company" placeholder="Company Name" />
-            <textarea name="description" placeholder="Job description" rows="4" style="resize: none;"></textarea>
-            <input name="due_date" type="date" />
+            <input name="title" placeholder="Job Title" required data-translate="form.title" />
+            <input name="company" placeholder="Company Name" data-translate="form.company" />
+            <textarea name="description" placeholder="Job description" rows="4" style="resize: none;" data-translate="form.description"></textarea>
+            <input name="due_date" type="date" data-translate="form.dueDate" />
             <select name="status" class="status-dropdown">
-              <option value="interested">Interested</option>
-              <option value="applied">Applied</option>
-              <option value="phone_screen">Phone Screen</option>
-              <option value="interview">Interview</option>
-              <option value="offer">Offer</option>
-              <option value="rejected">Rejected</option>
+              <option value="interested" data-translate="home.status.interested">Interested</option>
+              <option value="applied" data-translate="home.status.applied">Applied</option>
+              <option value="phone_screen" data-translate="home.status.phone_screen">Phone Screen</option>
+              <option value="interview" data-translate="home.status.interview">Interview</option>
+              <option value="offer" data-translate="home.status.offer">Offer</option>
+              <option value="rejected" data-translate="home.status.rejected">Rejected</option>
             </select>
-            <button class="btn primary">Add Posting</button>
+            <button type="button" id="sendReminderBtn" class="btn btn-sm" style="margin: 12px 0; background: #e5e7eb; color: #374151; border: 1px solid #d1d5db;" data-translate="form.sendReminder">
+              📧 Send email reminder before due date
+            </button>
+            <input type="hidden" id="sendReminder" name="sendReminder" value="false" />
+            <button class="btn primary" data-translate="form.save">Add Posting</button>
           </form>
           
           <!-- Analytics Dashboard -->
           <div class="analytics-dashboard" style="margin-top: 20px;">
-            <h4>📊 Application Stats</h4>
+            <h4 data-translate="home.analytics.title">📊 Application Stats</h4>
             <div id="analyticsStats" class="analytics-stats">
               <div class="stat-item">
-                <span class="stat-label">Total Applications:</span>
+                <span class="stat-label" data-translate="home.analytics.total">Total Applications:</span>
                 <span class="stat-value" id="totalApplications">0</span>
                 </div>
               <div class="stat-item">
-                <span class="stat-label">Applied:</span>
+                <span class="stat-label" data-translate="home.analytics.applied">Applied:</span>
                 <span class="stat-value" id="appliedCount">0</span>
                   </div>
               <div class="stat-item">
-                <span class="stat-label">Interviews:</span>
+                <span class="stat-label" data-translate="home.analytics.interviews">Interviews:</span>
                 <span class="stat-value" id="interviewCount">0</span>
                 </div>
               <div class="stat-item">
-                <span class="stat-label">Offers:</span>
+                <span class="stat-label" data-translate="home.analytics.offers">Offers:</span>
                 <span class="stat-value" id="offerCount">0</span>
                   </div>
               <div class="stat-item">
-                <span class="stat-label">Success Rate:</span>
+                <span class="stat-label" data-translate="home.analytics.success">Success Rate:</span>
                 <span class="stat-value" id="successRate">0%</span>
               </div>
             </div>
@@ -457,19 +471,18 @@
 
         <div class="card" style="flex: 1;">
           <div class="postings-header">
-            <h3>Job Postings</h3>
+            <h3 data-translate="home.title">Job Postings</h3>
             <div class="search-filter-controls">
-              <input type="text" id="searchInput" placeholder="Search postings..." class="search-input" />
+              <input type="text" id="searchInput" placeholder="Search postings..." class="search-input" data-translate="home.searchPlaceholder" />
               <select id="statusFilter" class="status-filter">
-                <option value="">All Statuses</option>
-                <option value="interested">Interested</option>
-                <option value="applied">Applied</option>
-                <option value="phone_screen">Phone Screen</option>
-                <option value="interview">Interview</option>
-                <option value="offer">Offer</option>
-                <option value="rejected">Rejected</option>
+                <option value="" data-translate="home.status.all">All Statuses</option>
+                <option value="interested" data-translate="home.status.interested">Interested</option>
+                <option value="applied" data-translate="home.status.applied">Applied</option>
+                <option value="phone_screen" data-translate="home.status.phone_screen">Phone Screen</option>
+                <option value="interview" data-translate="home.status.interview">Interview</option>
+                <option value="offer" data-translate="home.status.offer">Offer</option>
+                <option value="rejected" data-translate="home.status.rejected">Rejected</option>
               </select>
-              <button id="exportPostings" class="btn btn-sm">📊 Export</button>
             </div>
           </div>
           <div id="postings" class="list"></div>
@@ -486,24 +499,28 @@
       </div>
       <div class="modal-body">
         <form id="editForm" class="form-vertical">
-          <input name="title" placeholder="Job Title" required />
-          <input name="company" placeholder="Company Name" />
-          <textarea name="description" placeholder="Job description" rows="4" style="resize: none;"></textarea>
-          <input name="due_date" type="date" />
+          <input name="title" placeholder="Job Title" required data-translate="form.title" />
+          <input name="company" placeholder="Company Name" data-translate="form.company" />
+          <textarea name="description" placeholder="Job description" rows="4" style="resize: none;" data-translate="form.description"></textarea>
+          <input name="due_date" type="date" data-translate="form.dueDate" />
           <select name="status" class="status-dropdown">
-            <option value="interested">Interested</option>
-            <option value="applied">Applied</option>
-            <option value="phone_screen">Phone Screen</option>
-            <option value="interview">Interview</option>
-            <option value="offer">Offer</option>
-            <option value="rejected">Rejected</option>
+            <option value="interested" data-translate="home.status.interested">Interested</option>
+            <option value="applied" data-translate="home.status.applied">Applied</option>
+            <option value="phone_screen" data-translate="home.status.phone_screen">Phone Screen</option>
+            <option value="interview" data-translate="home.status.interview">Interview</option>
+            <option value="offer" data-translate="home.status.offer">Offer</option>
+            <option value="rejected" data-translate="home.status.rejected">Rejected</option>
           </select>
+          <button type="button" id="editSendReminderBtn" class="btn btn-sm" style="margin: 12px 0; background: #e5e7eb; color: #374151; border: 1px solid #d1d5db;" data-translate="form.sendReminder">
+            📧 Send email reminder before due date
+          </button>
+          <input type="hidden" id="editSendReminder" name="sendReminder" value="false" />
           <input type="hidden" name="id" />
         </form>
       </div>
       <div class="modal-actions">
-        <button id="cancelEdit" class="btn">Cancel</button>
-        <button id="saveEdit" class="btn primary">Save Changes</button>
+        <button id="cancelEdit" class="btn" data-translate="form.cancel">Cancel</button>
+        <button id="saveEdit" class="btn primary" data-translate="form.save">Save Changes</button>
       </div>
     </div>
   </div>
@@ -512,58 +529,76 @@
   <div id="helpModal" class="help-modal">
     <div class="help-modal-content">
       <div class="help-header">
-        <h3 class="help-title">📋 Job Postings Help</h3>
+        <h3 class="help-title" data-translate="help.title">📋 Job Postings Help</h3>
         <button id="closeHelpModal" class="help-close">&times;</button>
       </div>
       
       <div class="help-section">
-        <h4>🎯 Application Status Pipeline</h4>
+        <h4 data-translate="help.statusPipeline">🎯 Application Status Pipeline</h4>
         <ul>
-          <li><strong>Interested:</strong> Jobs you're considering applying to</li>
-          <li><strong>Applied:</strong> Applications you've submitted</li>
-          <li><strong>Phone Screen:</strong> Initial phone/video interviews</li>
-          <li><strong>Interview:</strong> In-person or final interviews</li>
-          <li><strong>Offer:</strong> Job offers received</li>
-          <li><strong>Rejected:</strong> Applications that didn't work out</li>
+          <li><strong data-translate="help.status.interested">Interested:</strong> <span data-translate="help.status.interested.desc">Jobs you're considering applying to</span></li>
+          <li><strong data-translate="help.status.applied">Applied:</strong> <span data-translate="help.status.applied.desc">Applications you've submitted</span></li>
+          <li><strong data-translate="help.status.phone_screen">Phone Screen:</strong> <span data-translate="help.status.phone_screen.desc">Initial phone/video interviews</span></li>
+          <li><strong data-translate="help.status.interview">Interview:</strong> <span data-translate="help.status.interview.desc">In-person or final interviews</span></li>
+          <li><strong data-translate="help.status.offer">Offer:</strong> <span data-translate="help.status.offer.desc">Job offers received</span></li>
+          <li><strong data-translate="help.status.rejected">Rejected:</strong> <span data-translate="help.status.rejected.desc">Applications that didn't work out</span></li>
         </ul>
       </div>
       
       <div class="help-section">
-        <h4>🔍 Search & Filter</h4>
+        <h4 data-translate="help.searchFilter">🔍 Search & Filter</h4>
         <ul>
-          <li>Search by job title, company name, or description</li>
-          <li>Filter by application status to see your progress</li>
-          <li>Use the search bar for quick finding of specific applications</li>
+          <li data-translate="help.search.desc">Search by job title, company name, or description</li>
+          <li data-translate="help.filter.desc">Filter by application status to see your progress</li>
+          <li data-translate="help.search.bar">Use the search bar for quick finding of specific applications</li>
         </ul>
       </div>
       
       <div class="help-section">
-        <h4>📊 Analytics Dashboard</h4>
+        <h4 data-translate="help.analytics">📊 Analytics Dashboard</h4>
         <ul>
-          <li><strong>Total Applications:</strong> All job postings in your system</li>
-          <li><strong>Applied:</strong> Applications you've actually submitted</li>
-          <li><strong>Interviews:</strong> Applications that reached interview stage</li>
-          <li><strong>Offers:</strong> Job offers you've received</li>
-          <li><strong>Success Rate:</strong> Percentage of applications that led to offers</li>
+          <li><strong data-translate="help.analytics.total">Total Applications:</strong> <span data-translate="help.analytics.total.desc">All job postings in your system</span></li>
+          <li><strong data-translate="help.analytics.applied">Applied:</strong> <span data-translate="help.analytics.applied.desc">Applications you've actually submitted</span></li>
+          <li><strong data-translate="help.analytics.interviews">Interviews:</strong> <span data-translate="help.analytics.interviews.desc">Applications that reached interview stage</span></li>
+          <li><strong data-translate="help.analytics.offers">Offers:</strong> <span data-translate="help.analytics.offers.desc">Job offers you've received</span></li>
+          <li><strong data-translate="help.analytics.success">Success Rate:</strong> <span data-translate="help.analytics.success.desc">Percentage of applications that led to offers</span></li>
         </ul>
       </div>
       
       <div class="help-section">
-        <h4>💾 Export & Backup</h4>
+        <h4 data-translate="help.dataManagement">💾 Data Management</h4>
         <ul>
-          <li>Click the "📊 Export" button to download your data as CSV</li>
-          <li>Includes all application details, statuses, and dates</li>
-          <li>Perfect for backup or importing into other tools</li>
+          <li data-translate="help.data.autoSave">All your data is automatically saved in your browser</li>
+          <li data-translate="help.data.preserved">Application details, statuses, and dates are preserved</li>
+          <li data-translate="help.data.persist">Data persists between browser sessions</li>
         </ul>
       </div>
       
       <div class="help-tip">
-        <strong>💡 Pro Tip:</strong> Update your application status regularly to get accurate analytics and track your job search progress effectively!
+        <strong data-translate="help.proTip">💡 Pro Tip:</strong> <span data-translate="help.proTip.desc">Update your application status regularly to get accurate analytics and track your job search progress effectively!</span>
       </div>
     </div>
   </div>
 
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="toast-notifications.js"></script>
+  <script>
+    // Check authentication on page load
+    function isAuthenticated() {
+      return localStorage.getItem('authToken') && localStorage.getItem('currentUser');
+    }
+    
+    if (!isAuthenticated()) {
+      window.location.href = 'login.html';
+    }
+    
+    // Initialize EmailJS
+    (function() {
+      emailjs.init("X80istNGO-VJ1Q9zZ");
+    })();
+  </script>
+  <script src="js/translations.js"></script>
   <script src="hamburger-menu.js"></script>
   <script src="main.js?v=3"></script>
   
@@ -661,7 +696,6 @@
                       document.getElementById('languageSelect').value = setting.language || 'en';
                       document.getElementById('reminderDays').value = setting.reminderDays;
                       document.getElementById('autoSave').checked = setting.autoSave;
-                      document.getElementById('showNotifications').checked = setting.showNotifications;
                   });
           }
       });
@@ -672,10 +706,9 @@
       const language = document.getElementById('languageSelect').value;
       const reminderDays = parseInt(document.getElementById('reminderDays').value);
       const autoSave = document.getElementById('autoSave').checked;
-      const showNotifications = document.getElementById('showNotifications').checked;
 
       if (!theme || reminderDays < 1) {
-          alert('Please fill in all required fields');
+          console.warn('Please fill in all required fields');
           return;
       }
 
@@ -685,7 +718,6 @@
               language,
               reminderDays,
               autoSave,
-              showNotifications
           };
 
           let response;
@@ -707,7 +739,7 @@
               const setting = await response.json();
               currentSettingsId = setting.id;
               showCurrentSettings(setting);
-              alert('Settings saved successfully!');
+              console.log('Settings saved successfully!');
               
               // Apply theme if changed
               if (theme === 'dark') {
@@ -717,11 +749,11 @@
               }
           } else {
               const error = await response.json();
-              alert('Error: ' + (error.error || 'Failed to save settings'));
+              console.error('Error: ' + (error.error || 'Failed to save settings'));
           }
       } catch (error) {
           console.error('Error saving settings:', error);
-          alert('Failed to save settings');
+          console.error('Failed to save settings');
       }
   }
 
@@ -784,12 +816,6 @@
                     Auto-save changes
                   </label>
           </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="showNotifications" checked>
-                  <label class="form-check-label" for="showNotifications">
-                    Show browser notifications
-                  </label>
-                </div>
               </div>
             </div>
           </form>

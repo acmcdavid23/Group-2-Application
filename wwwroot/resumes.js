@@ -1,5 +1,59 @@
 console.log('Resumes.js is loading...');
-const api = (path, opts) => fetch(path, opts).then(r=>{ if(!r.ok) return r.json().then(e=>{throw e}); return r.json(); });
+
+// Check authentication on page load
+if (!isAuthenticated()) {
+  redirectToLogin();
+}
+
+// Authentication management (shared with main.js)
+function getAuthToken() {
+  return localStorage.getItem('authToken');
+}
+
+function getCurrentUser() {
+  const userStr = localStorage.getItem('currentUser');
+  return userStr ? JSON.parse(userStr) : null;
+}
+
+function isAuthenticated() {
+  return getAuthToken() && getCurrentUser();
+}
+
+function redirectToLogin() {
+  window.location.href = 'login.html';
+}
+
+// API helper with authentication
+async function apiWithAuth(url, options = {}) {
+  const token = getAuthToken();
+  if (!token) {
+    redirectToLogin();
+    return;
+  }
+  
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+    ...options.headers
+  };
+  
+  const response = await fetch(url, {
+    ...options,
+    headers
+  });
+  
+  // If unauthorized, redirect to login
+  if (response.status === 401) {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('currentUser');
+    redirectToLogin();
+    return;
+  }
+  
+  return response;
+}
+
+const api = (path, opts) => apiWithAuth(path, opts).then(r=>{ if(!r.ok) return r.json().then(e=>{throw e}); return r.json(); });
 
 const uploadForm = document.getElementById('uploadForm');
 const fileInput = uploadForm.elements['resume'];

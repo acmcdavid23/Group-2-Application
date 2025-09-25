@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/InternApp.csproj": {}
+    "C:\\Users\\acmcdavid\\MIS\\Group-2-Application\\InternApp.csproj": {}
   },
   "projects": {
-    "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/InternApp.csproj": {
+    "C:\\Users\\acmcdavid\\MIS\\Group-2-Application\\InternApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/InternApp.csproj",
+        "projectUniqueName": "C:\\Users\\acmcdavid\\MIS\\Group-2-Application\\InternApp.csproj",
         "projectName": "InternApp",
-        "projectPath": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/InternApp.csproj",
-        "packagesPath": "/Users/griffincarpenter/.nuget/packages/",
-        "outputPath": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/obj/",
+        "projectPath": "C:\\Users\\acmcdavid\\MIS\\Group-2-Application\\InternApp.csproj",
+        "packagesPath": "C:\\Users\\yooho\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\acmcdavid\\MIS\\Group-2-Application\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/Users/griffincarpenter/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\yooho\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -37,11 +43,26 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore.Design": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.EntityFrameworkCore.Sqlite": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -61,7 +82,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.405/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

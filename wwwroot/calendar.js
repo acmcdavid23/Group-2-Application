@@ -1,5 +1,64 @@
 console.log('Calendar.js is loading...');
+
+// Check authentication on page load
+if (!isAuthenticated()) {
+  redirectToLogin();
+}
+
 const api = (path, opts) => fetch(path, opts).then(r=>{ if(!r.ok) return r.json().then(e=>{throw e}); return r.json(); });
+
+// Authentication management
+function getAuthToken() {
+  return localStorage.getItem('authToken');
+}
+
+function getCurrentUser() {
+  const userStr = localStorage.getItem('currentUser');
+  return userStr ? JSON.parse(userStr) : null;
+}
+
+function isAuthenticated() {
+  return getAuthToken() && getCurrentUser();
+}
+
+function redirectToLogin() {
+  window.location.href = 'login.html';
+}
+
+// API helper with authentication
+async function apiWithAuth(url, options = {}) {
+  const token = getAuthToken();
+  if (!token) {
+    redirectToLogin();
+    return;
+  }
+  
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+    ...options.headers
+  };
+  
+  const response = await fetch(url, {
+    ...options,
+    headers
+  });
+  
+  // If unauthorized, redirect to login
+  if (response.status === 401) {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('currentUser');
+    redirectToLogin();
+    return;
+  }
+  
+  if (!response.ok) {
+    const error = await response.json();
+    throw error;
+  }
+  
+  return response.json();
+}
 
 // Calendar state
 let currentDate = new Date(2025, 8, 1); // September 2025
@@ -158,11 +217,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Export functionality
-    const exportEventsBtn = document.getElementById('exportEvents');
-    if (exportEventsBtn) {
-        exportEventsBtn.addEventListener('click', exportEvents);
-    }
     
     // Help modal functionality
     const helpBtn = document.getElementById('helpBtn');
@@ -813,19 +867,36 @@ function saveNotes() {
 // Load events from server
 async function loadEvents() {
     try {
-        const postings = await api('/api/postings');
+        const postings = await apiWithAuth('/api/postings');
+        console.log('Loaded postings:', postings);
+        
         events = postings
             .filter(p => p.dueDate)
-            .map(p => ({
-                id: `posting-${p.id}`,
-                title: `${p.title} - ${p.company}`,
-                start: p.dueDate,
-                extendedProps: {
-                    type: 'posting',
-                    posting: p
+            .map(p => {
+                console.log(`Processing posting: ${p.title}, dueDate: ${p.dueDate}`);
+                
+                // Ensure the date is in the correct format for the calendar
+                let formattedDate = p.dueDate;
+                
+                // If the date doesn't include time, add a default time
+                if (formattedDate && !formattedDate.includes('T')) {
+                    formattedDate = formattedDate + 'T00:00:00';
                 }
-            }));
+                
+                console.log(`Formatted date: ${formattedDate}`);
+                
+                return {
+                    id: `posting-${p.id}`,
+                    title: `${p.title} - ${p.company}`,
+                    start: formattedDate,
+                    extendedProps: {
+                        type: 'posting',
+                        posting: p
+                    }
+                };
+            });
         
+        console.log('Calendar events created:', events);
         renderCalendar(); // Re-render to show events
     } catch (error) {
         console.error('Failed to load events:', error);
@@ -1028,49 +1099,6 @@ async function deleteEventFromCalendar() {
     closeEventModal();
 }
 
-// Export events functionality
-function exportEvents() {
-    const allEvents = [...events, ...customEvents];
-    
-    if (allEvents.length === 0) {
-        alert('No events to export');
-        return;
-    }
-    
-    // Convert to CSV format
-    const headers = ['Title', 'Date', 'Time', 'Description', 'Type', 'Recurring'];
-    const csvContent = [
-        headers.join(','),
-        ...allEvents.map(event => {
-            const startDate = new Date(event.start);
-            const date = startDate.toISOString().split('T')[0];
-            const time = event.start.includes('T') ? event.start.split('T')[1] : '';
-            const description = event.extendedProps?.description || '';
-            const type = event.extendedProps?.type || 'api';
-            const recurring = event.extendedProps?.recurring ? 'Yes' : 'No';
-            
-            return [
-                `"${event.title || ''}"`,
-                `"${date}"`,
-                `"${time}"`,
-                `"${description.replace(/"/g, '""')}"`,
-                `"${type}"`,
-                `"${recurring}"`
-            ].join(',');
-        })
-    ].join('\n');
-    
-    // Create and download file
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `calendar-events-${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
 
 function showEventDetails(event) {
     const props = event.extendedProps;

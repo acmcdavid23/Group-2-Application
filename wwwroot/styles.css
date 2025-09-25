@@ -13,9 +13,9 @@ body{font-family:Inter,Segoe UI,Roboto,Arial; margin:0; background:linear-gradie
 .header-rect{margin-top:0}
 .header-rect{position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;width:100vw;background:linear-gradient(90deg,#022543 0%, #093a6b 60%);box-shadow:0 8px 36px rgba(2,10,30,0.45)}
 .header-inner{max-width:var(--max-width);margin:0 auto;padding:16px 22px}
-.brand{font-size:20px;font-weight:700}
+.brand{font-size:1.25rem;font-weight:700}
 .header-inner .brand{color:#ffffff}
-.header-inner .subtitle{color:rgba(255,255,255,0.85);font-size:13px;margin-top:4px}
+.header-inner .subtitle{color:rgba(255,255,255,0.85);font-size:0.8125rem;margin-top:4px}
 
 .glisten{display:block;position:relative;overflow:hidden;border-radius:0}
 
@@ -72,7 +72,7 @@ body{font-family:Inter,Segoe UI,Roboto,Arial; margin:0; background:linear-gradie
 .panel.full-width{grid-column:1/-1}
 .card{background:var(--card);padding:20px;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.1);margin-bottom:20px;border:1px solid rgba(255,255,255,0.2);backdrop-filter:blur(10px);transition:all 0.3s ease}
 .card:hover{transform:translateY(-2px);box-shadow:0 20px 60px rgba(0,0,0,0.15)}
-.card h3{margin:0 0 10px 0;font-size:15px}
+.card h3{margin:0 0 10px 0;font-size:0.9375rem}
 .form-inline{display:flex;gap:8px;align-items:center}
 
 /* Make overall page background match card color in dark theme for a cohesive look */
@@ -137,10 +137,36 @@ html.high-contrast, body.high-contrast, .high-contrast, html.high-contrast body,
 
 .high-contrast .posting-title, .high-contrast .posting-company { color: #ffffff !important; }
 
-/* Ensure toast remains readable in high-contrast */
-.high-contrast .toast, html.high-contrast .toast { background: #111111 !important; color: #ffffff !important; }
+
+/* High contrast toggle button active state - filled style */
+.high-contrast-toggle {
+  background: white !important;
+  color: #374151 !important;
+  border: 2px solid #d1d5db !important;
+  transition: all 0.2s ease !important;
+}
+
+.high-contrast-toggle.active {
+  background: #667eea !important;
+  color: white !important;
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3) !important;
+}
+
+.high-contrast .high-contrast-toggle {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+}
+
+.high-contrast .high-contrast-toggle.active {
+  background: #ffea00 !important;
+  color: #000000 !important;
+  border-color: #ffea00 !important;
+  box-shadow: 0 0 0 2px rgba(255, 234, 0, 0.3) !important;
+}
 .form-inline input[type=file]{flex:1}
-.form-vertical input, .form-vertical textarea{width:100%;padding:12px 16px;border:2px solid #e2e8f0;border-radius:12px;margin-bottom:12px;font-size:14px;transition:all 0.3s ease;background:rgba(255,255,255,0.8);backdrop-filter:blur(10px);font-family:inherit;resize:none}
+.form-vertical input, .form-vertical textarea{width:100%;padding:12px 16px;border:2px solid #e2e8f0;border-radius:12px;margin-bottom:12px;font-size:0.875rem;transition:all 0.3s ease;background:rgba(255,255,255,0.8);backdrop-filter:blur(10px);font-family:inherit;resize:none}
 .form-vertical input:focus, .form-vertical textarea:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102, 126, 234, 0.1);background:white}
 
 /* Make selects match inputs (used by settings.html and other pages) */
@@ -172,7 +198,7 @@ html.high-contrast, body.high-contrast, .high-contrast, html.high-contrast body,
 .list{display:flex;flex-direction:column;gap:8px}
 .resume, .posting{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;background:linear-gradient(180deg, rgba(2,6,23,0.02), rgba(2,6,23,0.01));}
 .resume a{color:var(--accent);font-weight:600;text-decoration:none}
-.posting small{color:var(--muted);font-size:12px}
+.posting small{color:var(--muted);font-size:0.75rem}
 
 /* Enhanced Posting styles */
 .posting {
@@ -193,11 +219,13 @@ html.high-contrast, body.high-contrast, .high-contrast, html.high-contrast body,
   border-color: #cbd5e1;
 }
 
-.posting-header {
+.posting-content {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 8px;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .posting-title {
@@ -210,7 +238,7 @@ html.high-contrast, body.high-contrast, .high-contrast, html.high-contrast body,
 .posting-company {
   color: #3b82f6;
   font-weight: 500;
-  margin-left: 8px;
+  margin: 0;
 }
 
 .posting-details {
@@ -233,6 +261,12 @@ html.high-contrast, body.high-contrast, .high-contrast, html.high-contrast body,
   color: #dc2626;
   font-weight: 500;
   font-size: 0.9em;
+}
+
+.posting-status {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
 }
 
 .posting-actions {
@@ -337,7 +371,7 @@ html.high-contrast, body.high-contrast, .high-contrast, html.high-contrast body,
   color: white;
   text-decoration: none;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 1rem;
   transition: all 0.2s ease;
   border-left: 4px solid transparent;
 }
@@ -384,4 +418,107 @@ html.high-contrast, body.high-contrast, .high-contrast, html.high-contrast body,
 .panel {
   margin-top: 10px !important;
 }
+
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  background: #10b981;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 200px;
+  max-width: 300px;
+  animation: slideInRight 0.3s ease-out;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.toast.error {
+  background: #ef4444;
+}
+
+.toast.warning {
+  background: #f59e0b;
+}
+
+.toast.info {
+  background: #3b82f6;
+}
+
+.toast-icon {
+  font-size: 16px;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+  margin-left: auto;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.toast-close:hover {
+  opacity: 1;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.toast.slide-out {
+  animation: slideOutRight 0.3s ease-in forwards;
+}
+
+/* Dark theme support for toasts */
+.dark-theme .toast {
+  background: #059669;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .toast.error {
+  background: #dc2626;
+}
+
+.dark-theme .toast.warning {
+  background: #d97706;
+}
+
+.dark-theme .toast.info {
+  background: #2563eb;
+}
+
 
