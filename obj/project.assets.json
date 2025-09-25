@@ -1,36 +1,36 @@
 {
   "version": 3,
   "targets": {
-    "net9.0": {}
+    "net8.0": {}
   },
   "libraries": {},
   "projectFileDependencyGroups": {
-    "net9.0": []
+    "net8.0": []
   },
   "packageFolders": {
-    "C:\\Users\\Gunba\\.nuget\\packages\\": {}
+    "/Users/griffincarpenter/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Gunba\\Documents\\Source\\expo.2025\\mis321\\Group-2-Application\\InternApp.csproj",
+      "projectUniqueName": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/InternApp.csproj",
       "projectName": "InternApp",
-      "projectPath": "C:\\Users\\Gunba\\Documents\\Source\\expo.2025\\mis321\\Group-2-Application\\InternApp.csproj",
-      "packagesPath": "C:\\Users\\Gunba\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Gunba\\Documents\\Source\\expo.2025\\mis321\\Group-2-Application\\obj\\",
+      "projectPath": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/InternApp.csproj",
+      "packagesPath": "/Users/griffincarpenter/.nuget/packages/",
+      "outputPath": "/Users/griffincarpenter/Documents/GitHub/Group-2-Application/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Gunba\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "/Users/griffincarpenter/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
-        "net9.0"
+        "net8.0"
       ],
       "sources": {
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net9.0": {
-          "targetAlias": "net9.0",
+        "net8.0": {
+          "targetAlias": "net8.0",
           "projectReferences": {}
         }
       },
@@ -43,12 +43,11 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      },
-      "SdkAnalysisLevel": "9.0.300"
+      }
     },
     "frameworks": {
-      "net9.0": {
-        "targetAlias": "net9.0",
+      "net8.0": {
+        "targetAlias": "net8.0",
         "imports": [
           "net461",
           "net462",
@@ -68,7 +67,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.405/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

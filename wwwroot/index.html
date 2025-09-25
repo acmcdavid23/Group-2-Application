@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Internship Application Manager</title>
   <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link href="styles.css" rel="stylesheet" />
-  <style>
+    <style>
     /* Status Dropdown Styles */
     .status-dropdown {
       padding: 12px 16px;
@@ -47,6 +47,82 @@
     .status-offer { background: #d1fae5; color: #065f46; }
     .status-rejected { background: #fee2e2; color: #991b1b; }
     
+    /* Settings Modal Styles */
+    .settings-modal .modal-content {
+      border-radius: 12px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    .settings-modal .form-label {
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+    
+    .settings-modal .form-select,
+    .settings-modal .form-control {
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px 16px;
+      transition: all 0.2s;
+    }
+    
+    .settings-modal .form-select:focus,
+    .settings-modal .form-control:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .settings-modal .form-check-input:checked {
+      background-color: #3b82f6;
+      border-color: #3b82f6;
+    }
+    
+    /* Dark Theme Support */
+    .dark-theme {
+      background-color: #1f2937;
+      color: #f9fafb;
+    }
+    
+    .dark-theme .modal-content {
+      background-color: #374151;
+      color: #f9fafb;
+    }
+    
+    .dark-theme .form-label {
+      color: #f9fafb;
+    }
+    
+    .dark-theme .form-select,
+    .dark-theme .form-control {
+      background-color: #4b5563;
+      border-color: #6b7280;
+      color: #f9fafb;
+    }
+    
+    .dark-theme .form-select:focus,
+    .dark-theme .form-control:focus {
+      background-color: #4b5563;
+      border-color: #3b82f6;
+      color: #f9fafb;
+    }
+    
+    .dark-theme .card {
+      background-color: #4b5563;
+      border-color: #6b7280;
+    }
+    
+    .dark-theme .btn-outline-primary {
+      color: #60a5fa;
+      border-color: #60a5fa;
+    }
+    
+    .dark-theme .btn-outline-primary:hover {
+      background-color: #60a5fa;
+      border-color: #60a5fa;
+      color: #1f2937;
+    }
+
     /* Posting Header Layout */
     .posting-header {
       display: flex;
@@ -130,8 +206,8 @@
     }
     
     .analytics-stats {
-      display: flex;
-      flex-direction: column;
+        display: flex;
+        flex-direction: column;
       gap: 8px;
     }
     
@@ -201,11 +277,11 @@
       display: none;
       position: fixed;
       top: 0;
-      left: 0;
+        left: 0;
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.5);
-      z-index: 1000;
+        z-index: 1000;
       align-items: center;
       justify-content: center;
     }
@@ -286,7 +362,7 @@
     .help-tip strong {
       color: #1e40af;
     }
-  </style>
+    </style>
   </head>
   <body>
     <header class="site-header">
@@ -306,7 +382,7 @@
         <span class="hamburger-line"></span>
         <span class="hamburger-line"></span>
       </button>
-    </div>
+            </div>
 
     <!-- Mobile Menu -->
     <div id="mobileMenu" class="mobile-menu">
@@ -322,7 +398,10 @@
       <a href="ai.html" class="mobile-menu-item" data-page="ai.html">
         🤖 AI Assistant
       </a>
-    </div>
+      <a href="#" class="mobile-menu-item" data-bs-toggle="modal" data-bs-target="#settingsModal">
+        ⚙️ Settings
+      </a>
+                  </div>
 
     <!-- Mobile Menu Overlay -->
     <div id="mobileMenuOverlay" class="mobile-menu-overlay"></div>
@@ -355,19 +434,19 @@
               <div class="stat-item">
                 <span class="stat-label">Total Applications:</span>
                 <span class="stat-value" id="totalApplications">0</span>
-              </div>
+                </div>
               <div class="stat-item">
                 <span class="stat-label">Applied:</span>
                 <span class="stat-value" id="appliedCount">0</span>
-              </div>
+                  </div>
               <div class="stat-item">
                 <span class="stat-label">Interviews:</span>
                 <span class="stat-value" id="interviewCount">0</span>
-              </div>
+                </div>
               <div class="stat-item">
                 <span class="stat-label">Offers:</span>
                 <span class="stat-value" id="offerCount">0</span>
-              </div>
+                  </div>
               <div class="stat-item">
                 <span class="stat-label">Success Rate:</span>
                 <span class="stat-value" id="successRate">0%</span>
@@ -524,6 +603,228 @@
           console.log('Help modal elements not found');
       }
   });
+
+  // Settings functionality
+  let currentSettingsId = null;
+
+  // Load settings when page loads
+  document.addEventListener('DOMContentLoaded', async function() {
+      await loadSettings();
+  });
+
+  // Load settings from API
+  async function loadSettings() {
+      try {
+          const response = await fetch('/api/settings');
+          if (response.ok) {
+              const settings = await response.json();
+              if (settings.length > 0) {
+                  const setting = settings[0]; // Use first setting
+                  currentSettingsId = setting.id;
+                  showCurrentSettings(setting);
+              } else {
+                  showNewSettingsForm();
+              }
+          }
+      } catch (error) {
+          console.error('Failed to load settings:', error);
+          showNewSettingsForm();
+      }
+  }
+
+  function showCurrentSettings(setting) {
+      document.getElementById('settingsForm').style.display = 'none';
+      document.getElementById('currentSettings').style.display = 'block';
+      
+      document.getElementById('displayTheme').textContent = setting.theme.charAt(0).toUpperCase() + setting.theme.slice(1);
+      document.getElementById('displayLanguage').textContent = setting.language || 'English';
+      document.getElementById('displayReminderDays').textContent = setting.reminderDays + ' days';
+      document.getElementById('displayAutoSave').textContent = setting.autoSave ? 'Enabled' : 'Disabled';
+      document.getElementById('displayNotifications').textContent = setting.showNotifications ? 'Enabled' : 'Disabled';
+  }
+
+  function showNewSettingsForm() {
+      document.getElementById('settingsForm').style.display = 'block';
+      document.getElementById('currentSettings').style.display = 'none';
+      currentSettingsId = null;
+  }
+
+  function editSettings() {
+      showNewSettingsForm();
+      // Load current settings data into form
+      loadSettings().then(() => {
+          if (currentSettingsId) {
+              fetch(`/api/settings/${currentSettingsId}`)
+                  .then(r => r.json())
+                  .then(setting => {
+                      document.getElementById('themeSelect').value = setting.theme;
+                      document.getElementById('languageSelect').value = setting.language || 'en';
+                      document.getElementById('reminderDays').value = setting.reminderDays;
+                      document.getElementById('autoSave').checked = setting.autoSave;
+                      document.getElementById('showNotifications').checked = setting.showNotifications;
+                  });
+          }
+      });
+  }
+
+  async function saveSettings() {
+      const theme = document.getElementById('themeSelect').value;
+      const language = document.getElementById('languageSelect').value;
+      const reminderDays = parseInt(document.getElementById('reminderDays').value);
+      const autoSave = document.getElementById('autoSave').checked;
+      const showNotifications = document.getElementById('showNotifications').checked;
+
+      if (!theme || reminderDays < 1) {
+          alert('Please fill in all required fields');
+          return;
+      }
+
+      try {
+          const settingsData = {
+              theme,
+              language,
+              reminderDays,
+              autoSave,
+              showNotifications
+          };
+
+          let response;
+          if (currentSettingsId) {
+              response = await fetch(`/api/settings/${currentSettingsId}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(settingsData)
+              });
+          } else {
+              response = await fetch('/api/settings', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(settingsData)
+              });
+          }
+
+          if (response.ok) {
+              const setting = await response.json();
+              currentSettingsId = setting.id;
+              showCurrentSettings(setting);
+              alert('Settings saved successfully!');
+              
+              // Apply theme if changed
+              if (theme === 'dark') {
+                  document.body.classList.add('dark-theme');
+              } else if (theme === 'light') {
+                  document.body.classList.remove('dark-theme');
+              }
+          } else {
+              const error = await response.json();
+              alert('Error: ' + (error.error || 'Failed to save settings'));
+          }
+      } catch (error) {
+          console.error('Error saving settings:', error);
+          alert('Failed to save settings');
+      }
+  }
+
+  function resetSettings() {
+      if (confirm('Are you sure you want to reset all settings to default?')) {
+          // Reset form to defaults
+          document.getElementById('themeSelect').value = 'light';
+          document.getElementById('languageSelect').value = 'en';
+          document.getElementById('reminderDays').value = '7';
+          document.getElementById('autoSave').checked = true;
+          document.getElementById('showNotifications').checked = true;
+          
+          // Save defaults
+          saveSettings();
+      }
+  }
   </script>
+
+  <!-- Settings Modal -->
+  <div class="modal fade settings-modal" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="settingsModalLabel">⚙️ Settings</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="settingsForm">
+        <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="themeSelect" class="form-label">Theme</label>
+                <select class="form-select" id="themeSelect">
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                  <option value="auto">Auto (System)</option>
+                </select>
+                </div>
+              <div class="col-md-6 mb-3">
+                <label for="languageSelect" class="form-label">Language</label>
+                <select class="form-select" id="languageSelect">
+                  <option value="en">English</option>
+                  <option value="es">Español</option>
+                  <option value="fr">Français</option>
+                  <option value="de">Deutsch</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="reminderDays" class="form-label">Reminder Days (before deadline)</label>
+                <input type="number" class="form-control" id="reminderDays" min="1" max="30" value="7">
+                <div class="form-text">How many days before a deadline to send reminders</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Preferences</label>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="autoSave" checked>
+                  <label class="form-check-label" for="autoSave">
+                    Auto-save changes
+                  </label>
+          </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="showNotifications" checked>
+                  <label class="form-check-label" for="showNotifications">
+                    Show browser notifications
+                  </label>
+                </div>
+              </div>
+            </div>
+          </form>
+          
+          <!-- Current Settings Display -->
+          <div id="currentSettings" class="mt-4" style="display: none;">
+            <h6>Current Settings:</h6>
+            <div class="card">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <strong>Theme:</strong> <span id="displayTheme"></span><br>
+                    <strong>Language:</strong> <span id="displayLanguage"></span>
+                  </div>
+                  <div class="col-md-6">
+                    <strong>Reminder Days:</strong> <span id="displayReminderDays"></span><br>
+                    <strong>Auto-save:</strong> <span id="displayAutoSave"></span><br>
+                    <strong>Notifications:</strong> <span id="displayNotifications"></span>
+            </div>
+          </div>
+                <div class="mt-3">
+                  <button type="button" class="btn btn-outline-primary btn-sm" onclick="editSettings()">Edit Settings</button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm" onclick="resetSettings()">Reset to Default</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   </body>
-  </html>
+</html>
