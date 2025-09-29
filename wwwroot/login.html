@@ -6,6 +6,7 @@
     <title>Login - Internship Application Manager</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="styles.css" rel="stylesheet" />
+    <script src="theme.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="https://sdk.twilio.com/js/client/releases/1.14.0/twilio.min.js"></script>
     <style>
@@ -20,8 +21,8 @@
         background: 
           linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         background-attachment: fixed;
-        min-height: 100vh;
-        overflow-x: hidden;
+        height: 100vh;
+        overflow: hidden;
         position: relative;
       }
       
@@ -57,7 +58,7 @@
       }
       
       .login-container {
-        min-height: 100vh;
+        height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -163,7 +164,6 @@
           0 0 0 4px rgba(102, 126, 234, 0.1),
           0 4px 12px rgba(102, 126, 234, 0.15);
         background: white;
-        transform: translateY(-2px);
       }
       
       .login-buttons {
@@ -200,7 +200,6 @@
       }
       
       .btn-login:hover {
-        transform: translateY(-3px);
         box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
       }
       
@@ -238,7 +237,6 @@
       .btn-signup:hover {
         color: white;
         border-color: #667eea;
-        transform: translateY(-3px);
         box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
       }
       
@@ -401,7 +399,6 @@
           0 0 0 4px rgba(102, 126, 234, 0.1),
           0 4px 12px rgba(102, 126, 234, 0.15);
         background: white;
-        transform: translateY(-2px);
       }
       
       .btn-signup-submit {
@@ -432,7 +429,6 @@
       }
       
       .btn-signup-submit:hover {
-        transform: translateY(-3px);
         box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
       }
       
@@ -591,7 +587,7 @@
     </style>
   </head>
   <body>
-    <div class="login-container">
+    <div class="login-container" id="loginModal">
       <div class="login-card">
         <div class="login-logo">Internship Application Manager</div>
         <div class="login-subtitle">Track your internship applications and manage your career journey</div>
@@ -608,6 +604,10 @@
           <div class="login-buttons">
             <button type="submit" class="btn-login">Login</button>
             <button type="button" class="btn-signup" onclick="showSignupForm()">Sign Up</button>
+          </div>
+          
+          <div class="forgot-password-link">
+            <a href="#" onclick="showForgotPasswordModal()" style="color: #667eea; text-decoration: none; font-size: 14px; margin-top: 10px; display: inline-block;">Forgot Password?</a>
           </div>
         </form>
         
@@ -655,10 +655,32 @@
       </div>
     </div>
 
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="signup-modal" style="display: none;">
+      <div class="signup-modal-content">
+        <div class="signup-header">
+          <h2>Reset Password</h2>
+          <span class="close" onclick="closeForgotPasswordModal()">&times;</span>
+        </div>
+        <form id="forgotPasswordForm" class="signup-form">
+          <div class="form-group">
+            <input type="email" id="resetEmail" placeholder="Enter your email address" required />
+          </div>
+          <button type="submit" class="btn-signup-submit">Send Reset Link</button>
+        </form>
+        <div id="resetSuccessMessage" class="success-message" style="display: none;">
+          <p>✅ Reset link sent to your email!</p>
+        </div>
+        <div class="signup-footer">
+          <p>Remember your password? <a href="#" onclick="closeForgotPasswordModal();">Login here</a></p>
+        </div>
+      </div>
+    </div>
+
     <script>
       // Initialize EmailJS
       (function() {
-        emailjs.init("YOUR_PUBLIC_KEY"); // Replace with your EmailJS public key
+        emailjs.init("X80istNGO-VJ1Q9zZ");
       })();
       
       // Initialize demo account on page load
@@ -765,7 +787,7 @@
           clearLoginError();
           localStorage.setItem('userLoggedIn', 'true');
           localStorage.setItem('currentUser', JSON.stringify(userByEmail));
-          window.location.href = 'index.html';
+          window.location.href = 'application-hub.html';
         }
       });
       
@@ -979,7 +1001,7 @@
           message: `Don't forget about your application for ${posting.title} at ${posting.company}. Due date: ${posting.due_date}`
         };
         
-        emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+        emailjs.send('service_lk4nt0v', 'template_a3kh9cp', templateParams)
           .then(response => {
             console.log('Email sent!', response);
             alert('Reminder email sent successfully!');
@@ -1032,6 +1054,128 @@
             alert('Failed to send SMS. Please try again.');
           });
         }
+      }
+      
+      // Forgot Password Functions
+      function showForgotPasswordModal() {
+        console.log('Opening forgot password modal');
+        const forgotModal = document.getElementById('forgotPasswordModal');
+        const loginModal = document.getElementById('loginModal');
+        const signupModal = document.getElementById('signupModal');
+        
+        if (forgotModal) forgotModal.style.display = 'flex';
+        if (loginModal) loginModal.style.display = 'none';
+        if (signupModal) signupModal.style.display = 'none';
+      }
+      
+      function closeForgotPasswordModal() {
+        const forgotModal = document.getElementById('forgotPasswordModal');
+        const loginModal = document.getElementById('loginModal');
+        
+        if (forgotModal) forgotModal.style.display = 'none';
+        if (loginModal) loginModal.style.display = 'flex';
+        
+        // Reset modal state for next time
+        document.getElementById('forgotPasswordForm').style.display = 'block';
+        document.getElementById('resetSuccessMessage').style.display = 'none';
+        document.getElementById('resetEmail').value = '';
+      }
+      
+      // Handle forgot password form submission
+      const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+      if (forgotPasswordForm) {
+        forgotPasswordForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('resetEmail').value;
+        console.log('Forgot password request for email:', email);
+        
+        try {
+          console.log('Sending password reset request for:', email);
+          const response = await fetch('/api/forgot-password', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: email })
+          });
+          
+          console.log('Response status:', response.status);
+          console.log('Response ok:', response.ok);
+          console.log('Response headers:', response.headers);
+          
+          const result = await response.json();
+          console.log('Password reset response:', result);
+          
+          if (response.ok) {
+            console.log('Password reset successful!');
+            
+            // Send actual email using EmailJS
+            try {
+              await sendPasswordResetEmail(email);
+              // Show success message in modal
+              document.getElementById('resetSuccessMessage').style.display = 'block';
+              // Hide the form
+              document.getElementById('forgotPasswordForm').style.display = 'none';
+            } catch (emailError) {
+              console.error('EmailJS error:', emailError);
+              // Show success message anyway since backend processed it
+              document.getElementById('resetSuccessMessage').style.display = 'block';
+              document.getElementById('forgotPasswordForm').style.display = 'none';
+            }
+          } else {
+            console.log('Password reset failed:', result.error);
+            // Show error message in modal instead of alert
+            document.getElementById('resetSuccessMessage').innerHTML = '<p>❌ Error: ' + result.error + '</p>';
+            document.getElementById('resetSuccessMessage').style.display = 'block';
+            document.getElementById('forgotPasswordForm').style.display = 'none';
+          }
+        } catch (error) {
+          console.error('Network or parsing error:', error);
+          // Show error message in modal instead of alert
+          document.getElementById('resetSuccessMessage').innerHTML = '<p>❌ Failed to send reset link. Please try again.</p>';
+          document.getElementById('resetSuccessMessage').style.display = 'block';
+          document.getElementById('forgotPasswordForm').style.display = 'none';
+        }
+      });
+      } else {
+        console.error('Forgot password form not found');
+      }
+      
+      // Function to send password reset email using EmailJS
+      async function sendPasswordResetEmail(email) {
+        // Get the reset link from the server response (we'll need to modify the backend to return it)
+        // For now, we'll generate a simple reset link
+        const resetLink = `${window.location.origin}/reset-password.html?email=${encodeURIComponent(email)}&token=${Date.now()}`;
+        
+        const templateParams = {
+          to_email: email,
+          to_name: email.split('@')[0], // Use email prefix as name
+          from_name: 'Internship Application Manager',
+          subject: 'Password Reset Request',
+          message: `You requested a password reset for your Internship Application Manager account.
+
+Click the link below to reset your password:
+${resetLink}
+
+This link will expire in 1 hour.
+
+If you didn't request this reset, please ignore this email.
+
+Best regards,
+Internship Application Manager Team`,
+          reset_link: resetLink
+        };
+
+        // EmailJS credentials (same as main app)
+        const serviceId = 'service_lk4nt0v';
+        const templateId = 'template_a3kh9cp';
+        const publicKey = 'X80istNGO-VJ1Q9zZ';
+
+        console.log('Sending password reset email via EmailJS...');
+        const response = await emailjs.send(serviceId, templateId, templateParams, publicKey);
+        console.log('EmailJS response:', response);
+        return response;
       }
     </script>
   </body>

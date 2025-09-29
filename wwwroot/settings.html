@@ -1,0 +1,744 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Settings - Internship Application Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <script src="theme.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f8fafc;
+      color: #1a202c;
+    }
+    
+    .settings-container {
+      min-height: 100vh;
+      background: #f8fafc;
+    }
+    
+    .settings-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+    
+    .settings-header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    
+    .settings-header p {
+      margin: 8px 0 0 0;
+      opacity: 0.9;
+      font-size: 16px;
+    }
+    
+    /* Header Content Layout */
+    .header-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+    }
+    
+    .header-text {
+      flex: 1;
+      text-align: center;
+    }
+    
+    /* Hamburger Menu Styles */
+    .hamburger-menu {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+    
+    .hamburger-btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      color: #2d3748;
+    }
+    
+    .hamburger-btn:hover {
+      background: white;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .hamburger-menu-content {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      padding: 8px 0;
+      min-width: 200px;
+      display: none;
+      margin-top: 8px;
+    }
+    
+    .hamburger-menu-content.show {
+      display: block;
+    }
+    
+    .hamburger-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      color: #4a5568;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    
+    .hamburger-menu-item:hover {
+      background: #f7fafc;
+      color: #2d3748;
+    }
+    
+    .hamburger-menu-item.logout {
+      color: #4a5568 !important;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 4px;
+    }
+    
+    .hamburger-menu-item.logout:hover {
+      background: #fed7d7;
+      color: #c53030;
+    }
+    
+    .hamburger-menu-item.active {
+      background: #3b82f6;
+      color: white;
+    }
+    
+    .hamburger-menu-item.active:hover {
+      background: #2563eb;
+      color: white;
+    }
+    
+    /* Dark mode logout button */
+    [data-theme="dark"] .hamburger-menu-item.logout {
+      color: #ffffff !important;
+    }
+    
+    /* Force logout button color - override any other rules */
+    .hamburger-menu-item.logout {
+      color: #4a5568 !important;
+      background: transparent !important;
+    }
+    
+    .hamburger-menu-item.logout:not(:hover) {
+      color: #4a5568 !important;
+      background: transparent !important;
+    }
+    
+    [data-theme="dark"] .hamburger-menu-item.logout {
+      color: #ffffff !important;
+      background: transparent !important;
+    }
+    
+    [data-theme="dark"] .hamburger-menu-item.logout:not(:hover) {
+      color: #ffffff !important;
+      background: transparent !important;
+    }
+    
+    .settings-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    
+    .settings-section {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .settings-section h2 {
+      margin: 0 0 20px 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: #1a202c;
+    }
+    
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+    
+    .setting-info {
+      flex: 1;
+    }
+    
+    .setting-title {
+      font-weight: 600;
+      color: #1a202c;
+      margin-bottom: 4px;
+    }
+    
+    .setting-description {
+      font-size: 14px;
+      color: #4a5568;
+    }
+    
+    .setting-control {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      width: 60px;
+      height: 28px;
+      background: #d1d5db;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+      color: #6b7280;
+    }
+    
+    .toggle-switch.active {
+      background: #10b981;
+      color: white;
+    }
+    
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 8px;
+      transform: translateY(-50%);
+      transition: all 0.3s ease;
+      font-size: 9px;
+      font-weight: 600;
+      z-index: 1;
+    }
+    
+    .toggle-switch.active::after {
+      content: 'ON';
+      left: 8px;
+      color: white;
+    }
+    
+    .toggle-switch::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 24px;
+      height: 24px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      z-index: 2;
+    }
+    
+    .toggle-switch.active::before {
+      transform: translateX(32px);
+    }
+    
+    .email-display {
+      background: white;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 14px;
+      min-width: 200px;
+    }
+    
+    .timing-select {
+      background: white;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 14px;
+      color: #1a202c;
+      min-width: 180px;
+      cursor: pointer;
+    }
+    
+    .timing-select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+    
+    .button:hover {
+      background: #2563eb;
+    }
+    
+    .button.secondary {
+      background: #e2e8f0;
+      color: #1a202c;
+      border: 1px solid #d1d5db;
+    }
+    
+    .button.secondary:hover {
+      background: #cbd5e0;
+      border-color: #a0aec0;
+    }
+    
+    .button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .theme-preview {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .theme-option {
+      padding: 12px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      min-width: 100px;
+    }
+    
+    .theme-option.active {
+      border-color: #3b82f6;
+      background: #3b82f6;
+      color: white;
+    }
+    
+    .theme-option:hover {
+      border-color: #3b82f6;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    
+    .stat-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-size: 24px;
+      font-weight: 700;
+      color: #3b82f6;
+      margin-bottom: 4px;
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      color: #4a5568;
+    }
+  </style>
+</head>
+<body>
+  <div class="settings-container">
+    <!-- Header -->
+    <div class="settings-header">
+      <div class="header-content">
+        <div class="header-text">
+          <h1>⚙️ Settings</h1>
+          <p>Customize your internship application experience</p>
+        </div>
+      </div>
+      <!-- Hamburger Menu -->
+      <div class="hamburger-menu">
+        <button class="hamburger-btn" onclick="toggleHamburgerMenu()">
+          <span>☰</span>
+          <span>Menu</span>
+        </button>
+        <div class="hamburger-menu-content" id="hamburgerMenuContent">
+          <a href="application-hub.html" class="hamburger-menu-item">
+            <span>🚀</span>
+            <span>Application Hub</span>
+          </a>
+          <a href="calendar.html" class="hamburger-menu-item">
+            <span>📅</span>
+            <span>Calendar</span>
+          </a>
+          <a href="settings.html" class="hamburger-menu-item">
+            <span>⚙️</span>
+            <span>Settings</span>
+          </a>
+          <button class="hamburger-menu-item logout" onclick="logout()">
+            <span>🚪</span>
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Settings Content -->
+    <div class="settings-content">
+      <!-- Appearance Settings -->
+      <div class="settings-section">
+      <h2>🎨 Appearance</h2>
+      
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-title">Theme</div>
+          <div class="setting-description">Choose between light and dark mode</div>
+        </div>
+        <div class="setting-control">
+          <div class="theme-preview">
+            <div class="theme-option" onclick="setTheme('light')" id="theme-light">
+              ☀️ Light
+            </div>
+            <div class="theme-option" onclick="setTheme('dark')" id="theme-dark">
+              🌙 Dark
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Notification Settings -->
+    <div class="settings-section">
+      <h2>📧 Notifications</h2>
+      
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-title">Email Notifications</div>
+          <div class="setting-description">Receive email reminders for job applications and deadlines</div>
+        </div>
+        <div class="setting-control">
+          <div class="toggle-switch" id="emailToggle" onclick="toggleEmailNotifications()"></div>
+        </div>
+      </div>
+      
+      <div class="setting-item" id="emailSettings" style="display: none;">
+        <div class="setting-info">
+          <div class="setting-title">Notification Email</div>
+          <div class="setting-description">Email address for notifications</div>
+        </div>
+        <div class="setting-control">
+          <input type="email" class="email-display" id="notificationEmail" placeholder="your@email.com">
+          <button class="button" onclick="updateNotificationEmail()">Update</button>
+          <button class="button secondary" onclick="sendTestEmail()">📧 Test Email</button>
+        </div>
+      </div>
+      
+      <div class="setting-item" id="notificationTiming" style="display: none;">
+        <div class="setting-info">
+          <div class="setting-title">Notification Timing</div>
+          <div class="setting-description">How far in advance to send reminder emails</div>
+        </div>
+        <div class="setting-control">
+          <select id="timingSelect" class="timing-select" onchange="updateNotificationTiming()">
+            <option value="1">1 day in advance</option>
+            <option value="2">2 days in advance</option>
+            <option value="3">3 days in advance</option>
+            <option value="7">1 week in advance</option>
+            <option value="14">2 weeks in advance</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    
+    <!-- Application Statistics -->
+    <div class="settings-section">
+      <h2>📊 Application Statistics</h2>
+      <div class="stats-grid" id="statsGrid">
+        <!-- Stats will be populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Check if user is logged in
+    if (!localStorage.getItem('userLoggedIn')) {
+      window.location.href = 'login.html';
+    }
+    
+    // Load settings on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      loadSettings();
+      loadStatistics();
+    });
+    
+    // Hamburger Menu Functions
+    function toggleHamburgerMenu() {
+      const menuContent = document.getElementById('hamburgerMenuContent');
+      menuContent.classList.toggle('show');
+    }
+    
+    // Close hamburger menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const hamburgerMenu = document.querySelector('.hamburger-menu');
+      const menuContent = document.getElementById('hamburgerMenuContent');
+      
+      if (!hamburgerMenu.contains(event.target)) {
+        menuContent.classList.remove('show');
+      }
+    });
+    
+    // Highlight current page in hamburger menu
+    document.addEventListener('DOMContentLoaded', function() {
+      const currentPage = 'settings.html';
+      const menuItems = document.querySelectorAll('.hamburger-menu-item');
+      
+      menuItems.forEach(item => {
+        if (item.href && item.href.includes(currentPage)) {
+          item.classList.add('active');
+        }
+      });
+      
+      // Force logout button color - run multiple times to override theme system
+      const forceLogoutColor = () => {
+        const logoutButton = document.querySelector('.hamburger-menu-item.logout');
+        if (logoutButton) {
+          logoutButton.style.color = '#4a5568';
+          logoutButton.style.backgroundColor = 'transparent';
+        }
+      };
+      
+      // Run immediately
+      forceLogoutColor();
+      
+      // Run after a short delay to override theme system
+      setTimeout(forceLogoutColor, 100);
+      setTimeout(forceLogoutColor, 500);
+      
+      // Watch for changes to the logout button and force color back
+      const logoutButton = document.querySelector('.hamburger-menu-item.logout');
+      if (logoutButton) {
+        const observer = new MutationObserver(() => {
+          forceLogoutColor();
+        });
+        observer.observe(logoutButton, { 
+          attributes: true, 
+          attributeFilter: ['style', 'class'] 
+        });
+      }
+    });
+    
+    // Logout function
+    function logout() {
+      localStorage.removeItem('userLoggedIn');
+      localStorage.removeItem('currentUser');
+      window.location.href = 'login.html';
+    }
+    
+    // Initialize EmailJS
+    (function() {
+      emailjs.init("X80istNGO-VJ1Q9zZ");
+    })();
+    
+    // Theme Functions - Use global theme manager
+    function setTheme(theme) {
+      if (window.themeManager) {
+        window.themeManager.setTheme(theme);
+      }
+      
+      // Update theme buttons
+      document.getElementById('theme-light').classList.toggle('active', theme === 'light');
+      document.getElementById('theme-dark').classList.toggle('active', theme === 'dark');
+    }
+    
+    // Email Notification Functions
+    function toggleEmailNotifications() {
+      const toggle = document.getElementById('emailToggle');
+      const emailSettings = document.getElementById('emailSettings');
+      const notificationTiming = document.getElementById('notificationTiming');
+      const isActive = toggle.classList.contains('active');
+      
+      if (isActive) {
+        toggle.classList.remove('active');
+        emailSettings.style.display = 'none';
+        notificationTiming.style.display = 'none';
+        localStorage.setItem('emailNotifications', 'false');
+      } else {
+        toggle.classList.add('active');
+        emailSettings.style.display = 'flex';
+        notificationTiming.style.display = 'flex';
+        localStorage.setItem('emailNotifications', 'true');
+      }
+    }
+    
+    function updateNotificationEmail() {
+      const email = document.getElementById('notificationEmail').value;
+      if (email && email.includes('@')) {
+        localStorage.setItem('notificationEmail', email);
+      }
+    }
+    
+    function updateNotificationTiming() {
+      const timing = document.getElementById('timingSelect').value;
+      localStorage.setItem('notificationTiming', timing);
+    }
+    
+    function sendTestEmail() {
+      const email = document.getElementById('notificationEmail').value;
+      
+      if (!email || !email.includes('@')) {
+        alert('Please enter a valid email address first');
+        return;
+      }
+      
+      // Show loading state
+      const testButton = event.target;
+      const originalText = testButton.innerHTML;
+      testButton.innerHTML = '⏳ Sending...';
+      testButton.disabled = true;
+      
+      // Send actual test email using EmailJS
+      const templateParams = {
+        to_email: email,
+        to_name: email.split('@')[0], // Use email prefix as name
+        from_name: 'Internship Application Manager',
+        subject: 'Test Email - Notification Settings',
+        message: 'This is a test email to verify your notification settings are working correctly. If you receive this email, your notification system is properly configured!'
+      };
+      
+      emailjs.send('service_lk4nt0v', 'template_a3kh9cp', templateParams)
+        .then(function(response) {
+          // Reset button
+          testButton.innerHTML = originalText;
+          testButton.disabled = false;
+          
+          // Silent success - no notification
+        })
+        .catch(function(error) {
+          // Reset button
+          testButton.innerHTML = originalText;
+          testButton.disabled = false;
+          
+          // Silent error - no notification
+        });
+    }
+    
+    
+    // Statistics Functions
+    function loadStatistics() {
+      const jobPostings = JSON.parse(localStorage.getItem('jobPostings') || '[]');
+      const resumes = JSON.parse(localStorage.getItem('resumes') || '[]');
+      
+      const stats = {
+        totalJobs: jobPostings.length,
+        appliedJobs: jobPostings.filter(job => job.status === 'applied').length,
+        interviewJobs: jobPostings.filter(job => job.status === 'interview').length,
+        offerJobs: jobPostings.filter(job => job.status === 'offer').length,
+        totalResumes: resumes.length
+      };
+      
+      const statsGrid = document.getElementById('statsGrid');
+      statsGrid.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-number">${stats.totalJobs}</div>
+          <div class="stat-label">Total Jobs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${stats.appliedJobs}</div>
+          <div class="stat-label">Applied</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${stats.interviewJobs}</div>
+          <div class="stat-label">Interviews</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${stats.offerJobs}</div>
+          <div class="stat-label">Offers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${stats.totalResumes}</div>
+          <div class="stat-label">Resumes</div>
+        </div>
+      `;
+    }
+    
+    // Load Settings
+    function loadSettings() {
+      // Load theme - global theme manager will handle this
+      const theme = localStorage.getItem('appTheme') || 'light';
+      document.getElementById(`theme-${theme}`).classList.add('active');
+      
+      // Load email notifications
+      const emailNotifications = localStorage.getItem('emailNotifications') === 'true';
+      const emailToggle = document.getElementById('emailToggle');
+      const emailSettings = document.getElementById('emailSettings');
+      const notificationTiming = document.getElementById('notificationTiming');
+      
+      if (emailNotifications) {
+        emailToggle.classList.add('active');
+        emailSettings.style.display = 'flex';
+        notificationTiming.style.display = 'flex';
+      }
+      
+      // Load notification email
+      const notificationEmail = localStorage.getItem('notificationEmail') || '';
+      document.getElementById('notificationEmail').value = notificationEmail;
+      
+      // Load notification timing
+      const savedTiming = localStorage.getItem('notificationTiming') || '1';
+      document.getElementById('timingSelect').value = savedTiming;
+    }
+  </script>
+</body>
+</html>

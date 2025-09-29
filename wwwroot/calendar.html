@@ -7,6 +7,7 @@
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="styles.css" rel="stylesheet" />
+    <script src="theme.js"></script>
   <style>
     html {
       overflow-y: scroll !important;
@@ -66,10 +67,9 @@
         font-size: 12px;
       }
       
-      .control-buttons .btn:hover {
+      .control-buttons       .btn:hover {
         background: #2563eb;
         border-color: #1d4ed8;
-        transform: translateY(-1px);
         box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
       }
       
@@ -109,10 +109,9 @@
         font-size: 12px;
       }
       
-      .view-buttons .btn:hover {
+      .view-buttons       .btn:hover {
         background: #2563eb;
         border-color: #1d4ed8;
-        transform: translateY(-1px);
         box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
       }
       
@@ -286,7 +285,6 @@
       }
 
       .week-event:hover {
-        transform: translateY(-1px);
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
       }
       
@@ -830,6 +828,157 @@
       .help-tip strong {
         color: #1e40af;
       }
+      
+      /* Header Content Layout */
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+      
+      .header-text {
+        flex: 1;
+        text-align: center;
+      }
+      
+      /* Hamburger Menu Styles */
+      .hamburger-menu {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+      }
+      
+      .hamburger-btn {
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 8px;
+        padding: 12px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        color: #2d3748;
+      }
+      
+      .hamburger-btn:hover {
+        background: white;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      }
+      
+      .hamburger-menu-content {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        padding: 8px 0;
+        min-width: 200px;
+        display: none;
+        margin-top: 8px;
+      }
+      
+      .hamburger-menu-content.show {
+        display: block;
+      }
+      
+      .hamburger-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        color: #4a5568;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      
+      .hamburger-menu-item:hover {
+        background: #f7fafc;
+        color: #2d3748;
+      }
+      
+      .hamburger-menu-item.logout {
+        color: #4a5568 !important;
+        border-top: 1px solid #e2e8f0;
+        margin-top: 4px;
+      }
+      
+      .hamburger-menu-item.logout:hover {
+        background: #fed7d7;
+        color: #c53030;
+      }
+      
+      .hamburger-menu-item.active {
+        background: #3b82f6;
+        color: white;
+      }
+      
+      .hamburger-menu-item.active:hover {
+        background: #2563eb;
+        color: white;
+      }
+      
+      /* Dark mode logout button */
+      [data-theme="dark"] .hamburger-menu-item.logout {
+        color: #ffffff !important;
+      }
+      
+      /* Force logout button color - override any other rules */
+      .hamburger-menu-item.logout {
+        color: #4a5568 !important;
+        background: transparent !important;
+      }
+      
+      .hamburger-menu-item.logout:not(:hover) {
+        color: #4a5568 !important;
+        background: transparent !important;
+      }
+      
+      [data-theme="dark"] .hamburger-menu-item.logout {
+        color: #ffffff !important;
+        background: transparent !important;
+      }
+      
+      [data-theme="dark"] .hamburger-menu-item.logout:not(:hover) {
+        color: #ffffff !important;
+        background: transparent !important;
+      }
+      
+      /* Hub Header Styles (same as Application Hub) */
+      .hub-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+      
+      .hub-header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+      }
+      
+      .hub-header p {
+        margin: 8px 0 0 0;
+        opacity: 0.9;
+        font-size: 16px;
+      }
     </style>
   </head>
   <body>
@@ -841,25 +990,37 @@
     </script>
     
     <!-- Header -->
-    <div class="header-rect">
-      <div class="header-inner" style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
-        <div>
-          <div class="brand" onclick="window.location.href='index.html'" style="cursor: pointer;">Internship Application Manager</div>
-          <div class="subtitle">Track your internship applications and manage your career journey</div>
+    <div class="hub-header">
+      <div class="header-content">
+        <div class="header-text">
+          <h1>📅 Calendar</h1>
+          <p>Manage your internship application deadlines, interviews, and important events</p>
         </div>
-        <div class="auth-buttons">
-          <button class="btn btn-sm" onclick="logout()" style="position: absolute; top: 20px; right: 20px; z-index: 1001;">Logout</button>
+        <!-- Hamburger Menu -->
+        <div class="hamburger-menu">
+          <button class="hamburger-btn" onclick="toggleHamburgerMenu()">
+            <span>☰</span>
+            <span>Menu</span>
+          </button>
+          <div class="hamburger-menu-content" id="hamburgerMenuContent">
+            <a href="application-hub.html" class="hamburger-menu-item">
+              <span>🚀</span>
+              <span>Application Hub</span>
+            </a>
+            <a href="calendar.html" class="hamburger-menu-item">
+              <span>📅</span>
+              <span>Calendar</span>
+            </a>
+            <a href="settings.html" class="hamburger-menu-item">
+              <span>⚙️</span>
+              <span>Settings</span>
+            </a>
+            <button class="hamburger-menu-item logout" onclick="logout()">
+              <span>🚪</span>
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Navigation -->
-    <div class="nav-banner-rect">
-      <div class="nav-banner-inner">
-        <button class="nav-btn" onclick="window.location.href='index.html'">📊 Dashboard</button>
-        <button class="nav-btn" onclick="window.location.href='resumes.html'">📄 Resumes</button>
-        <button class="nav-btn active" onclick="window.location.href='calendar.html'">📅 Calendar</button>
-        <button class="nav-btn" onclick="window.location.href='ai.html'">🤖 AI Assistant</button>
       </div>
     </div>
 
@@ -1051,11 +1212,10 @@
         </div>
         
         <div class="help-section">
-          <h4>💾 Export & Navigation</h4>
+          <h4>🧭 Navigation</h4>
           <ul>
             <li>Use arrow buttons to navigate between months/weeks/days</li>
             <li>Click "Today" to jump to the current date</li>
-            <li>Export your calendar events as CSV for backup</li>
             <li>Click on events to edit or delete them</li>
           </ul>
         </div>
@@ -1073,6 +1233,62 @@
         localStorage.removeItem('userLoggedIn');
         window.location.href = 'login.html';
       }
+      
+      // Hamburger Menu Functions
+      function toggleHamburgerMenu() {
+        const menuContent = document.getElementById('hamburgerMenuContent');
+        menuContent.classList.toggle('show');
+      }
+      
+      // Close hamburger menu when clicking outside
+      document.addEventListener('click', function(event) {
+        const hamburgerMenu = document.querySelector('.hamburger-menu');
+        const menuContent = document.getElementById('hamburgerMenuContent');
+        
+        if (!hamburgerMenu.contains(event.target)) {
+          menuContent.classList.remove('show');
+        }
+      });
+      
+      // Highlight current page in hamburger menu
+      document.addEventListener('DOMContentLoaded', function() {
+        const currentPage = 'calendar.html';
+        const menuItems = document.querySelectorAll('.hamburger-menu-item');
+        
+        menuItems.forEach(item => {
+          if (item.href && item.href.includes(currentPage)) {
+            item.classList.add('active');
+          }
+        });
+        
+        // Force logout button color - run multiple times to override theme system
+        const forceLogoutColor = () => {
+          const logoutButton = document.querySelector('.hamburger-menu-item.logout');
+          if (logoutButton) {
+            logoutButton.style.color = '#4a5568';
+            logoutButton.style.backgroundColor = 'transparent';
+          }
+        };
+        
+        // Run immediately
+        forceLogoutColor();
+        
+        // Run after a short delay to override theme system
+        setTimeout(forceLogoutColor, 100);
+        setTimeout(forceLogoutColor, 500);
+        
+        // Watch for changes to the logout button and force color back
+        const logoutButton = document.querySelector('.hamburger-menu-item.logout');
+        if (logoutButton) {
+          const observer = new MutationObserver(() => {
+            forceLogoutColor();
+          });
+          observer.observe(logoutButton, { 
+            attributes: true, 
+            attributeFilter: ['style', 'class'] 
+          });
+        }
+      });
     </script>
     <script src="calendar.js?v=48"></script>
     

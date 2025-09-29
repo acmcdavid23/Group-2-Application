@@ -1,0 +1,115 @@
+[2025-09-29 02:10:55] TO: acmcdavid@crimson.ua.edu
+SUBJECT: Password Reset Request - Internship Application Manager
+BODY:
+
+Hello acmcdavid@crimson.ua.edu,
+
+You requested a password reset for your Internship Application Manager account.
+
+Click the link below to reset your password:
+https://yourapp.com/reset-password.html?token=bb48b01f-17aa-4a32-b472-c74b84fc9bdb&email=acmcdavid%40crimson.ua.edu
+
+This link will expire in 1 hour.
+
+If you didn't request this reset, please ignore this email.
+
+Best regards,
+Internship Application Manager Team
+
+---
+
+[2025-09-29 02:11:31] TO: acmcdavid@crimson.ua.edu
+SUBJECT: Password Reset Request - Internship Application Manager
+BODY:
+
+Hello acmcdavid@crimson.ua.edu,
+
+You requested a password reset for your Internship Application Manager account.
+
+Click the link below to reset your password:
+https://yourapp.com/reset-password.html?token=82a95367-0a6f-4bd7-b737-60c4e259a0d6&email=acmcdavid%40crimson.ua.edu
+
+This link will expire in 1 hour.
+
+If you didn't request this reset, please ignore this email.
+
+Best regards,
+Internship Application Manager Team
+
+---
+
+[2025-09-29 02:13:13] TO: acmcdavid@crimson.ua.edu
+SUBJECT: Password Reset Request - Internship Application Manager
+BODY:
+
+Hello acmcdavid@crimson.ua.edu,
+
+You requested a password reset for your Internship Application Manager account.
+
+Click the link below to reset your password:
+https://yourapp.com/reset-password.html?token=76f603cb-bac1-4ebf-98e0-a8e4b96f3ab8&email=acmcdavid%40crimson.ua.edu
+
+This link will expire in 1 hour.
+
+If you didn't request this reset, please ignore this email.
+
+Best regards,
+Internship Application Manager Team
+
+---
+
+[2025-09-29 02:15:17] TO: acmcdavid@crimson.ua.edu
+SUBJECT: Password Reset Request - Internship Application Manager
+BODY:
+
+Hello acmcdavid@crimson.ua.edu,
+
+You requested a password reset for your Internship Application Manager account.
+
+Click the link below to reset your password:
+https://yourapp.com/reset-password.html?token=2250454a-d483-42d9-9137-a97d0a89cc81&email=acmcdavid%40crimson.ua.edu
+
+This link will expire in 1 hour.
+
+If you didn't request this reset, please ignore this email.
+
+Best regards,
+Internship Application Manager Team
+
+---
+
+[2025-09-29 02:17:56] TO: acmcdavid@crimson.ua.edu
+SUBJECT: Password Reset Request - Internship Application Manager
+BODY:
+
+Hello acmcdavid@crimson.ua.edu,
+
+You requested a password reset for your Internship Application Manager account.
+
+Click the link below to reset your password:
+https://yourapp.com/reset-password.html?token=8f3f0b94-290d-4c39-b0e1-6a5958a1d6f5&email=acmcdavid%40crimson.ua.edu
+
+This link will expire in 1 hour.
+
+If you didn't request this reset, please ignore this email.
+
+Best regards,
+Internship Application Manager Team
+
+---
+
+[2025-09-29 05:38:15] DEMO EMAIL TO: acmcdavid@crimson.ua.edu
+SUBJECT: Password Reset Request
+BODY: Click here to reset: https://yourapp.com/reset-password.html?token=03413222-0c0b-47a8-ab98-72adb533d95d&email=acmcdavid%40crimson.ua.edu
+---
+
+[2025-09-29 05:38:16] DEMO EMAIL TO: acmcdavid@crimson.ua.edu
+SUBJECT: Password Reset Request
+BODY: Click here to reset: https://yourapp.com/reset-password.html?token=94dfc900-b40d-4426-a20f-34a2831c3375&email=acmcdavid%40crimson.ua.edu
+---
+
+[2025-09-29 05:40:09] DEMO EMAIL TO: acmcdavid@crimson.ua.edu
+SUBJECT: Password Reset Request
+BODY: Click here to reset: https://yourapp.com/reset-password.html?token=102dd0c6-502c-45ab-97fe-30ebace98a46&email=acmcdavid%40crimson.ua.edu
+---
+

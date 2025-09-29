@@ -77,7 +77,7 @@ function sendEventEmailJSReminder(event) {
     message: `You have an upcoming event: ${event.title} on ${event.date}`
   };
   
-  emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+  emailjs.send('service_lk4nt0v', 'template_a3kh9cp', templateParams)
     .then(response => {
       console.log('Event reminder email sent!', response);
       alert('Event reminder email sent successfully!');
@@ -253,11 +253,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Export functionality
-    const exportEventsBtn = document.getElementById('exportEvents');
-    if (exportEventsBtn) {
-        exportEventsBtn.addEventListener('click', exportEvents);
-    }
     
     // Help modal functionality
     const helpBtn = document.getElementById('helpBtn');
@@ -500,8 +495,15 @@ function renderWeekView(year, month) {
         dayEvents.forEach(event => {
             const eventElement = document.createElement('div');
             eventElement.className = `week-event ${event.extendedProps?.type || 'custom'}`;
-            eventElement.textContent = event.title;
-            eventElement.title = `${event.title}\n${new Date(event.start).toLocaleTimeString()}`;
+            
+            // Add job posting icon if it's a job posting due date
+            if (event.extendedProps && event.extendedProps.type === 'posting') {
+                eventElement.innerHTML = `📋 ${event.title}`;
+                eventElement.title = `Job Application Due: ${event.title}`;
+            } else {
+                eventElement.textContent = event.title;
+                eventElement.title = `${event.title}\n${new Date(event.start).toLocaleTimeString()}`;
+            }
             
             // Apply custom color if set
             if (event.color) {
@@ -617,14 +619,14 @@ function renderDayView(year, month) {
         timeContent.addEventListener('mouseenter', () => {
             timeContent.style.backgroundColor = '#f1f5f9';
             timeContent.style.borderColor = '#cbd5e1';
-            timeContent.style.transform = 'translateY(-1px)';
+            // Removed transform for hover effect
             timeContent.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
         });
         
         timeContent.addEventListener('mouseleave', () => {
             timeContent.style.backgroundColor = '#f8fafc';
             timeContent.style.borderColor = '#e2e8f0';
-            timeContent.style.transform = 'translateY(0)';
+            // Removed transform reset
             timeContent.style.boxShadow = 'none';
         });
         
@@ -710,8 +712,14 @@ function createWeekDayElement(date) {
     dayEvents.forEach(event => {
         const eventElement = document.createElement('div');
         eventElement.className = `event ${event.extendedProps?.type || 'custom'}`;
-        eventElement.textContent = event.title;
-        eventElement.title = event.title;
+        // Add job posting icon if it's a job posting due date
+        if (event.extendedProps && event.extendedProps.type === 'posting') {
+            eventElement.innerHTML = `📋 ${event.title}`;
+            eventElement.title = `Job Application Due: ${event.title}`;
+        } else {
+            eventElement.textContent = event.title;
+            eventElement.title = event.title;
+        }
         eventElement.style.cssText = `
             background: #3b82f6;
             color: white;
@@ -853,8 +861,14 @@ function createDayElement(dayNumber, isOtherMonth, date) {
     dayEvents.forEach(event => {
         const eventElement = document.createElement('div');
         eventElement.className = `event ${event.extendedProps?.type || 'custom'}`;
-        eventElement.textContent = event.title;
-        eventElement.title = event.title;
+        // Add job posting icon if it's a job posting due date
+        if (event.extendedProps && event.extendedProps.type === 'posting') {
+            eventElement.innerHTML = `📋 ${event.title}`;
+            eventElement.title = `Job Application Due: ${event.title}`;
+        } else {
+            eventElement.textContent = event.title;
+            eventElement.title = event.title;
+        }
         
         // Apply custom color if set
         if (event.color) {
@@ -973,19 +987,10 @@ async function loadEvents() {
         const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
         console.log('Current user:', currentUser);
         
-        // Load user-specific job postings
+        // Load job postings from the application hub
         let userPostings = [];
-        if (currentUser.isDemo) {
-            // Load demo data
-            userPostings = JSON.parse(localStorage.getItem('demo_user_postings') || '[]');
-            console.log('Loading demo data:', userPostings.length, 'postings');
-        } else if (currentUser.id) {
-            // Load user-specific data
-            userPostings = JSON.parse(localStorage.getItem(`user_${currentUser.id}_postings`) || '[]');
-            console.log('Loading user data:', userPostings.length, 'postings');
-        } else {
-            console.log('No valid user found, using empty array');
-        }
+        userPostings = JSON.parse(localStorage.getItem('jobPostings') || '[]');
+        console.log('Loading job postings:', userPostings.length, 'postings');
         
         // Convert job postings to calendar events
         events = userPostings
@@ -1220,49 +1225,6 @@ async function deleteEventFromCalendar() {
     closeEventModal();
 }
 
-// Export events functionality
-function exportEvents() {
-    const allEvents = [...events, ...customEvents];
-    
-    if (allEvents.length === 0) {
-        alert('No events to export');
-        return;
-    }
-    
-    // Convert to CSV format
-    const headers = ['Title', 'Date', 'Time', 'Description', 'Type', 'Recurring'];
-    const csvContent = [
-        headers.join(','),
-        ...allEvents.map(event => {
-            const startDate = new Date(event.start);
-            const date = startDate.toISOString().split('T')[0];
-            const time = event.start.includes('T') ? event.start.split('T')[1] : '';
-            const description = event.extendedProps?.description || '';
-            const type = event.extendedProps?.type || 'api';
-            const recurring = event.extendedProps?.recurring ? 'Yes' : 'No';
-            
-            return [
-                `"${event.title || ''}"`,
-                `"${date}"`,
-                `"${time}"`,
-                `"${description.replace(/"/g, '""')}"`,
-                `"${type}"`,
-                `"${recurring}"`
-            ].join(',');
-        })
-    ].join('\n');
-    
-    // Create and download file
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `calendar-events-${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
 
 function showEventDetails(event) {
     const props = event.extendedProps;

@@ -25,7 +25,7 @@ function closeEditModal() {
 
 // Initialize EmailJS
 (function() {
-  emailjs.init("YOUR_PUBLIC_KEY"); // Replace with your EmailJS public key
+  emailjs.init("X80istNGO-VJ1Q9zZ");
 })();
 
 // Notification system
@@ -460,6 +460,7 @@ function renderUserPostings() {
             <div class="posting-actions">
               <button class="btn btn-sm edit-posting" onclick="editPosting(${posting.id || (index + 1)})">✏️ Edit</button>
               <button class="btn btn-sm danger delete-posting" onclick="deletePosting(${posting.id || (index + 1)})">🗑️ Delete</button>
+              ${posting.notifications?.email ? `<button class="btn btn-sm primary" onclick="sendEmailReminder(${posting.id || (index + 1)})" style="background: #059669; color: white;">📧 Email</button>` : ''}
           </div>
           <div class="posting-status-container" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e2e8f0;">
             <span class="posting-status status-${posting.status}" style="display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; background: ${getStatusColor(posting.status)}; color: white;">${posting.status.replace('_', ' ')}</span>
@@ -941,9 +942,64 @@ function deletePosting(id) {
 
 // Cancel edit function
 
+// Send email reminder function
+function sendEmailReminder(postingId) {
+  const posting = allPostings.find(p => p.id == postingId);
+  if (!posting) {
+    alert('Posting not found');
+    return;
+  }
+  
+  if (!posting.notifications?.email || !posting.notifications?.emailAddress) {
+    alert('Email notifications not enabled for this posting');
+    return;
+  }
+  
+  const subject = `Reminder: ${posting.title} - Due ${posting.dueDate}`;
+  const body = `Don't forget about your application for ${posting.title} at ${posting.company}. Due date: ${posting.dueDate}`;
+  
+  try {
+    // Check if EmailJS is loaded
+    if (typeof emailjs === 'undefined') {
+      alert('EmailJS not available. Please refresh the page and try again.');
+      return;
+    }
+
+    const templateParams = {
+      to_email: posting.notifications.emailAddress,
+      to_name: 'User',
+      from_name: 'Internship Application Manager',
+      subject: subject,
+      message: body,
+      job_title: posting.title,
+      company_name: posting.company,
+      due_date: posting.dueDate
+    };
+
+    // EmailJS credentials
+    const serviceId = 'service_lk4nt0v';
+    const templateId = 'template_a3kh9cp';
+    const publicKey = 'X80istNGO-VJ1Q9zZ';
+
+    emailjs.send(serviceId, templateId, templateParams, publicKey)
+      .then(response => {
+        console.log('Email sent successfully!', response);
+        showNotification('Email reminder sent successfully!', 'success');
+      })
+      .catch(error => {
+        console.error('Error sending email:', error);
+        showNotification('Failed to send email. Please try again.', 'error');
+      });
+  } catch (error) {
+    console.error('Error sending email:', error);
+    showNotification('Failed to send email. Please try again.', 'error');
+  }
+}
+
 // Make functions globally available
 window.editPosting = editPosting;
 window.deletePosting = deletePosting;
 window.toggleEmailFields = toggleEmailFields;
 window.toggleEditEmailFields = toggleEditEmailFields;
 window.closeEditModal = closeEditModal;
+window.sendEmailReminder = sendEmailReminder;

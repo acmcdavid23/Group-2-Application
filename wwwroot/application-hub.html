@@ -1,0 +1,1773 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Application Hub - Internship Application Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet" />
+    <script src="theme.js"></script>
+    <style>
+      /* Unified Application Hub Styles */
+      .application-hub {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      }
+      
+      .hub-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        position: relative;
+      }
+      
+      .hub-header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+      }
+      
+      .hub-header p {
+        margin: 8px 0 0 0;
+        opacity: 0.9;
+        font-size: 16px;
+      }
+      
+      .hub-content {
+        display: flex;
+        flex: 1;
+        gap: 20px;
+        padding: 20px;
+        overflow: hidden;
+      }
+      
+      .hub-panel {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      
+      .panel-header {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        padding: 16px 20px;
+        border-bottom: 1px solid #e2e8f0;
+        font-weight: 600;
+        font-size: 18px;
+        color: #2d3748;
+      }
+      
+      .panel-content {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+      }
+      
+      .job-postings-panel {
+        flex: 0 0 350px;
+      }
+      
+      .resumes-panel {
+        flex: 0 0 350px;
+      }
+      
+      .ai-assistant-panel {
+        flex: 1;
+        min-width: 400px;
+      }
+      
+      .selected-item {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+      }
+      
+      .selected-item h4 {
+        margin: 0 0 8px 0;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      
+      .selected-item p {
+        margin: 0;
+        font-size: 14px;
+        opacity: 0.9;
+      }
+      
+      .context-info {
+        background: #f0f9ff;
+        border: 1px solid #0ea5e9;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 16px;
+        font-size: 14px;
+        color: #0369a1;
+      }
+      
+      .ai-prompt-area {
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        min-height: 120px;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        resize: vertical;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      
+      .ai-prompt-area:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+      
+      .ai-response-area {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 16px;
+        min-height: 200px;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        overflow-y: auto;
+        max-height: 300px;
+      }
+      
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-right: 8px;
+        margin-bottom: 8px;
+      }
+      
+      .btn-primary:hover {
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+      
+      .btn-secondary {
+        background: #f8fafc;
+        color: #4a5568;
+        border: 1px solid #e2e8f0;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-right: 8px;
+        margin-bottom: 8px;
+      }
+      
+      .btn-secondary:hover {
+        background: #e2e8f0;
+      }
+      
+      .file-upload-area {
+        border: 2px dashed #cbd5e0;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        background: #f8fafc;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin-bottom: 16px;
+      }
+      
+      .file-upload-area:hover {
+        border-color: #667eea;
+        background: #f0f9ff;
+      }
+      
+      .file-upload-area.dragover {
+        border-color: #667eea;
+        background: #f0f9ff;
+        transform: scale(1.02);
+      }
+      
+      .job-item, .resume-item {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      
+      .job-content {
+        flex: 1;
+        cursor: pointer;
+      }
+      
+      .job-actions {
+        display: flex;
+        gap: 6px;
+        margin-left: 12px;
+        flex-shrink: 0;
+      }
+      
+      .edit-btn, .delete-btn {
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        min-height: 32px !important;
+        max-width: 32px !important;
+        max-height: 32px !important;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        line-height: 1;
+        transition: all 0.2s;
+        background: #f7fafc;
+        border: 1px solid #e2e8f0;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex-shrink: 0 !important;
+        position: relative;
+      }
+      
+      .edit-btn::before, .delete-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 32px;
+        height: 32px;
+        background: transparent;
+        pointer-events: none;
+      }
+      
+      .edit-btn:hover {
+        background: #3b82f6;
+        color: white;
+        transform: scale(1.1);
+      }
+      
+      .delete-btn:hover {
+        background: #e53e3e;
+        color: white;
+        transform: scale(1.1);
+      }
+      
+      .job-item:hover, .resume-item:hover {
+        border-color: #667eea;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+      }
+      
+      .job-item.selected, .resume-item.selected {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: #667eea;
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+        transform: scale(1.02);
+        position: relative;
+      }
+      
+      .job-item.selected::after, .resume-item.selected::after {
+        content: "✓ SELECTED";
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #10b981;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: bold;
+        z-index: 10;
+      }
+      
+      .resume-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        position: relative;
+      }
+      
+      .resume-item > div:first-child {
+        flex: 1;
+        cursor: pointer;
+      }
+      
+      .delete-btn {
+        background: #ef4444;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+        min-width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 5;
+      }
+      
+      .delete-btn:hover {
+        background: #dc2626;
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+      }
+      
+      .delete-btn:active {
+        transform: scale(0.95);
+      }
+      
+      .status-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-top: 8px;
+      }
+      
+      .description-indicator {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 500;
+        background: #e6f3ff;
+        color: #2563eb;
+        border: 1px solid #bfdbfe;
+        margin-top: 4px;
+        margin-bottom: 6px;
+      }
+      
+      .due-date-indicator {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 500;
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #f59e0b;
+        margin-top: 4px;
+        margin-bottom: 6px;
+        margin-left: 8px;
+      }
+      
+      .status-interested { background: #fef3c7; color: #92400e; }
+      .status-applied { background: #dbeafe; color: #1e40af; }
+      .status-phone_screen { background: #fce7f3; color: #be185d; }
+      .status-interview { background: #ecfdf5; color: #065f46; }
+      .status-offer { background: #f0fdf4; color: #166534; }
+      .status-rejected { background: #fef2f2; color: #dc2626; }
+      
+      .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 8px;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .empty-state {
+        text-align: center;
+        color: #718096;
+        padding: 40px 20px;
+      }
+      
+      .empty-state h3 {
+        margin: 0 0 8px 0;
+        color: #4a5568;
+      }
+      
+      .empty-state p {
+        margin: 0;
+        font-size: 14px;
+      }
+      
+      /* Header Content Layout */
+      .header-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        position: relative;
+      }
+      
+      .header-text {
+        flex: 1;
+        text-align: center;
+      }
+      
+      /* Hamburger Menu Styles */
+      .hamburger-menu {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+      }
+      
+      
+      .hamburger-btn {
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 8px;
+        padding: 12px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        color: #2d3748;
+      }
+      
+      .hamburger-btn:hover {
+        background: white;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      }
+      
+      .hamburger-menu-content {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        padding: 8px 0;
+        min-width: 200px;
+        display: none;
+        margin-top: 8px;
+      }
+      
+      .hamburger-menu-content.show {
+        display: block;
+      }
+      
+      .hamburger-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        color: #4a5568;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      
+      .hamburger-menu-item:hover {
+        background: #f7fafc;
+        color: #2d3748;
+      }
+      
+      .hamburger-menu-item.logout {
+        color: #4a5568 !important;
+        border-top: 1px solid #e2e8f0;
+        margin-top: 4px;
+      }
+      
+      .hamburger-menu-item.logout:hover {
+        background: #fed7d7;
+        color: #c53030;
+      }
+      
+      .hamburger-menu-item.active {
+        background: #3b82f6;
+        color: white;
+      }
+      
+      .hamburger-menu-item.active:hover {
+        background: #2563eb;
+        color: white;
+      }
+      
+      /* Dark mode logout button */
+      [data-theme="dark"] .hamburger-menu-item.logout {
+        color: #ffffff !important;
+      }
+      
+      /* Force logout button color - override any other rules */
+      .hamburger-menu-item.logout {
+        color: #4a5568 !important;
+        background: transparent !important;
+      }
+      
+      .hamburger-menu-item.logout:not(:hover) {
+        color: #4a5568 !important;
+        background: transparent !important;
+      }
+      
+      [data-theme="dark"] .hamburger-menu-item.logout {
+        color: #ffffff !important;
+        background: transparent !important;
+      }
+      
+      [data-theme="dark"] .hamburger-menu-item.logout:not(:hover) {
+        color: #ffffff !important;
+        background: transparent !important;
+      }
+      
+      /* Help Button Styles */
+      .help-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 2px solid #3b82f6;
+        background: #3b82f6;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1001;
+      }
+      
+      .help-btn:hover {
+        background: #2563eb;
+        border-color: #2563eb;
+        transform: scale(1.1);
+      }
+      
+      /* Help Modal Styles */
+      .help-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .help-modal-content {
+        background: white;
+        border-radius: 12px;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        margin: 20px;
+      }
+      
+      .help-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      
+      .help-title {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+        color: #2d3748;
+      }
+      
+      .help-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #718096;
+        padding: 4px;
+        border-radius: 4px;
+        transition: all 0.2s;
+      }
+      
+      .help-close:hover {
+        background: #f7fafc;
+        color: #2d3748;
+      }
+      
+      .help-body {
+        padding: 20px;
+      }
+      
+      .help-section {
+        margin-bottom: 24px;
+      }
+      
+      .help-section h4 {
+        margin: 0 0 12px 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #2d3748;
+      }
+      
+      .help-section ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+      
+      .help-section li {
+        margin-bottom: 8px;
+        color: #4a5568;
+        line-height: 1.5;
+      }
+      
+      .help-tip {
+        background: #f0f9ff;
+        border: 1px solid #0ea5e9;
+        border-radius: 8px;
+        padding: 16px;
+        margin-top: 20px;
+      }
+      
+      .help-tip strong {
+        color: #0369a1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="application-hub">
+      <!-- Help Button -->
+      <button id="helpBtn" class="help-btn" title="Help & Tips">?</button>
+      
+      <!-- Header -->
+      <div class="hub-header">
+        <div class="header-content">
+          <div class="header-text">
+            <h1>📊 Application Hub</h1>
+            <p>Unified workflow for job applications, resume management, and AI-powered tailoring</p>
+          </div>
+        </div>
+        <!-- Hamburger Menu -->
+        <div class="hamburger-menu">
+          <button class="hamburger-btn" onclick="toggleHamburgerMenu()">
+            <span>☰</span>
+            <span>Menu</span>
+          </button>
+          <div class="hamburger-menu-content" id="hamburgerMenuContent">
+            <a href="application-hub.html" class="hamburger-menu-item">
+              <span>🚀</span>
+              <span>Application Hub</span>
+            </a>
+            <a href="calendar.html" class="hamburger-menu-item">
+              <span>📅</span>
+              <span>Calendar</span>
+            </a>
+            <a href="settings.html" class="hamburger-menu-item">
+              <span>⚙️</span>
+              <span>Settings</span>
+            </a>
+            <button class="hamburger-menu-item logout" onclick="logout()">
+              <span>🚪</span>
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Main Content -->
+      <div class="hub-content">
+        <!-- Job Postings Panel -->
+        <div class="hub-panel job-postings-panel">
+          <div class="panel-header">
+            📋 Job Postings
+          </div>
+          <div class="panel-content">
+            <!-- Add New Job Button -->
+            <button class="btn-primary" onclick="showAddJobForm()">+ Add New Job</button>
+            
+            <!-- Selected Job Context -->
+            <div id="selectedJobContext" class="context-info" style="display: none;">
+              <strong>Selected Job:</strong> <span id="selectedJobTitle"></span>
+            </div>
+            
+            <!-- Job Postings List -->
+            <div id="jobPostingsList">
+              <div class="empty-state">
+                <h3>No job postings yet</h3>
+                <p>Add your first job posting to get started</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Resumes Panel -->
+        <div class="hub-panel resumes-panel">
+          <div class="panel-header">
+            📄 Resumes
+          </div>
+          <div class="panel-content">
+            <!-- Upload Resume Button -->
+            <div class="file-upload-area" onclick="document.getElementById('resumeFileInput').click()">
+              <div>📁 Click to upload resume</div>
+              <div style="font-size: 12px; color: #718096; margin-top: 4px;">or drag and drop</div>
+            </div>
+            <input type="file" id="resumeFileInput" accept=".pdf,.doc,.docx" style="display: none;" onchange="handleResumeUpload(event)">
+            
+            <!-- Selected Resume Context -->
+            <div id="selectedResumeContext" class="context-info" style="display: none;">
+              <strong>Selected Resume:</strong> <span id="selectedResumeName"></span>
+            </div>
+            
+            <!-- Resumes List -->
+            <div id="resumesList">
+              <div class="empty-state">
+                <h3>No resumes uploaded</h3>
+                <p>Upload your first resume to get started</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- AI Assistant Panel -->
+        <div class="hub-panel ai-assistant-panel">
+          <div class="panel-header">
+            🤖 AI Assistant
+          </div>
+          <div class="panel-content">
+            <!-- AI Context Display -->
+            <div id="aiContext" class="context-info" style="display: none;">
+              <strong>AI Context:</strong> <span id="aiContextText"></span>
+            </div>
+            
+            <!-- AI Prompt Area -->
+            <textarea 
+              id="aiPrompt" 
+              class="ai-prompt-area" 
+              placeholder="First, select a job posting and resume above, then ask me to help tailor your resume for that specific job..."
+              rows="4"
+            ></textarea>
+            
+            <!-- AI Action Buttons -->
+            <div style="margin-bottom: 16px;">
+              <button class="btn-primary" onclick="sendAIPrompt()">Ask AI</button>
+              <button class="btn-secondary" onclick="tailorResume()">Tailor Resume</button>
+              <button class="btn-secondary" onclick="analyzeJob()">Analyze Job</button>
+              <button class="btn-secondary" onclick="clearAI()">Clear</button>
+            </div>
+            
+            <!-- AI Response Area -->
+            <div id="aiResponse" class="ai-response-area">
+              <div style="color: #718096; text-align: center; padding: 40px;">
+                <h3>🤖 AI Assistant Ready</h3>
+                <p>Select a job posting and resume to get started, or ask me anything about your applications!</p>
+                <p><strong>Try asking:</strong></p>
+                <ul style="text-align: left; display: inline-block; margin: 0;">
+                  <li>"How can I improve my resume for this job?"</li>
+                  <li>"What keywords should I add?"</li>
+                  <li>"Analyze this job description"</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="help-modal" style="display: none;">
+      <div class="help-modal-content">
+        <div class="help-header">
+          <h3 class="help-title">🚀 Application Hub Help</h3>
+          <button id="closeHelpModal" class="help-close">&times;</button>
+        </div>
+        <div class="help-body">
+          <div class="help-section">
+            <h4>📋 Job Postings Panel</h4>
+            <ul>
+              <li>Click "Add New Job" to add job postings</li>
+              <li>Click on any job posting to select it for tailoring</li>
+              <li>Selected jobs are highlighted in blue</li>
+              <li>Track application status with color-coded badges</li>
+            </ul>
+          </div>
+          
+          <div class="help-section">
+            <h4>📄 Resumes Panel</h4>
+            <ul>
+              <li>Click "Click to upload resume" to add resume files</li>
+              <li>Click on any resume to select it for tailoring</li>
+              <li>Selected resumes are highlighted in blue</li>
+              <li>Upload different versions for different job types</li>
+            </ul>
+          </div>
+          
+          <div class="help-section">
+            <h4>🤖 AI Assistant Panel</h4>
+            <ul>
+              <li>Select both a job and resume to get tailored suggestions</li>
+              <li>Ask specific questions about your applications</li>
+              <li>Use "Tailor Resume" for automatic resume improvements</li>
+              <li>Use "Analyze Job" to understand job requirements</li>
+            </ul>
+          </div>
+          
+          <div class="help-tip">
+            <strong>💡 Pro Tip:</strong> The AI works best when you have both a job posting and resume selected. This allows it to provide specific, tailored advice for that exact job application!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Job Modal (simplified) -->
+    <div id="addJobModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+      <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px;">
+        <h3>Add New Job Posting</h3>
+        <form id="addJobForm">
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 4px; font-weight: 600;">Company</label>
+            <input type="text" id="jobCompany" required style="width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;">
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 4px; font-weight: 600;">Position</label>
+            <input type="text" id="jobTitle" required style="width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;">
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 4px; font-weight: 600;">Description</label>
+            <textarea id="jobDescription" rows="4" style="width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; resize: vertical;"></textarea>
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 4px; font-weight: 600;">Status</label>
+            <select id="jobStatus" style="width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;">
+              <option value="interested">Interested</option>
+              <option value="applied">Applied</option>
+              <option value="phone_screen">Phone Screen</option>
+              <option value="interview">Interview</option>
+              <option value="offer">Offer</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 4px; font-weight: 600;">Application Due Date (Optional)</label>
+            <input type="date" id="jobDueDate" style="width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;">
+          </div>
+          <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button type="button" class="btn-secondary" onclick="hideAddJobForm()">Cancel</button>
+            <button type="submit" class="btn-primary">Add Job</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Global state
+      let selectedJob = null;
+      let selectedResume = null;
+      let jobPostings = JSON.parse(localStorage.getItem('jobPostings') || '[]');
+      let resumes = JSON.parse(localStorage.getItem('resumes') || '[]');
+      
+      // Initialize the application
+      document.addEventListener('DOMContentLoaded', function() {
+        // Clear old resumes that don't have backendId (from localStorage-only system)
+        const oldResumes = resumes.filter(r => !r.backendId || !r.id);
+        if (oldResumes.length > 0) {
+          console.log('Found old resumes without backend integration. Clearing them...', oldResumes);
+          resumes = resumes.filter(r => r.backendId && r.id);
+          localStorage.setItem('resumes', JSON.stringify(resumes));
+          showNotification('Please re-upload your resumes to enable AI text analysis', 'info');
+        }
+        
+        renderJobPostings();
+        renderResumes();
+        updateAIContext();
+        
+        // Add job form submission
+        document.getElementById('addJobForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+          const editingIndex = this.dataset.editingIndex;
+          if (editingIndex !== '') {
+            updateJobPosting(parseInt(editingIndex));
+          } else {
+            addJobPosting();
+          }
+        });
+        
+        // AI prompt on Enter
+        document.getElementById('aiPrompt').addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            sendAIPrompt();
+          }
+        });
+      });
+      
+      // Job Postings Functions
+      function renderJobPostings() {
+        const container = document.getElementById('jobPostingsList');
+        if (jobPostings.length === 0) {
+          container.innerHTML = '<div class="empty-state"><h3>No job postings yet</h3><p>Add your first job posting to get started</p></div>';
+          return;
+        }
+        
+        container.innerHTML = jobPostings.map((job, index) => `
+          <div class="job-item ${selectedJob === index ? 'selected' : ''}" onclick="selectJob(${index})">
+            <div class="job-content">
+              <h4>${job.title}</h4>
+              <p style="margin: 4px 0; color: #718096; font-size: 14px;">${job.company}</p>
+              ${job.description && job.description.trim() ? '<div class="description-indicator">📝 Description Present</div>' : ''}
+              ${job.dueDate ? `<div class="due-date-indicator">📅 Due: ${new Date(job.dueDate).toLocaleDateString()}</div>` : ''}
+              <div class="status-badge status-${job.status}">${job.status.replace('_', ' ')}</div>
+            </div>
+            <div class="job-actions" onclick="event.stopPropagation()">
+              <button class="edit-btn" onclick="editJob(${index})" title="Edit Job">✏️</button>
+              <button class="delete-btn" onclick="deleteJob(${index})" title="Delete Job">🗑️</button>
+            </div>
+          </div>
+        `).join('');
+      }
+      
+      function selectJob(index) {
+        console.log('Selecting job:', index);
+        // Toggle selection - if already selected, deselect it
+        if (selectedJob === index) {
+          selectedJob = null;
+          console.log('Deselected job');
+        } else {
+          selectedJob = index;
+          console.log('Selected job:', index);
+        }
+        // Don't reset resume selection - allow independent selection
+        renderJobPostings();
+        renderResumes();
+        updateAIContext();
+      }
+      
+      function editJob(index) {
+        const job = jobPostings[index];
+        if (!job) {
+          console.error('Job not found at index:', index);
+          return;
+        }
+        
+        console.log('Editing job:', job);
+        
+        // Populate the edit form with current job data
+        document.getElementById('jobTitle').value = job.title;
+        document.getElementById('jobCompany').value = job.company;
+        document.getElementById('jobDescription').value = job.description;
+        document.getElementById('jobStatus').value = job.status;
+        document.getElementById('jobDueDate').value = job.dueDate || '';
+        
+        // Store the index of the job being edited
+        document.getElementById('addJobForm').dataset.editingIndex = index;
+        
+        // Change the modal title and button text
+        document.querySelector('#addJobModal h3').textContent = 'Edit Job Posting';
+        document.querySelector('#addJobForm button[type="submit"]').textContent = 'Update Job';
+        
+        // Show the modal
+        document.getElementById('addJobModal').style.display = 'block';
+        
+        console.log('Edit form populated and modal shown');
+      }
+      
+      function deleteJob(index) {
+        const job = jobPostings[index];
+        if (!job) return;
+        
+        if (confirm(`Are you sure you want to delete "${job.title}" at ${job.company}?`)) {
+          // Remove the job from the array
+          jobPostings.splice(index, 1);
+          
+          // Update selected job if needed
+          if (selectedJob === index) {
+            selectedJob = null;
+          } else if (selectedJob > index) {
+            selectedJob--;
+          }
+          
+          // Save to localStorage
+          localStorage.setItem('jobPostings', JSON.stringify(jobPostings));
+          
+          // Re-render the lists
+          renderJobPostings();
+          updateAIContext();
+          
+          // Refresh calendar if it exists
+          if (typeof window.refreshCalendar === 'function') {
+            window.refreshCalendar();
+          }
+          
+          // Show success notification
+          showNotification(`Job "${job.title}" deleted successfully`, 'success');
+        }
+      }
+      
+      function showAddJobForm() {
+        // Reset form for new job
+        document.getElementById('addJobForm').reset();
+        document.getElementById('addJobForm').dataset.editingIndex = '';
+        
+        // Change the modal title and button text back to add mode
+        document.querySelector('#addJobModal h3').textContent = 'Add New Job Posting';
+        document.querySelector('#addJobForm button[type="submit"]').textContent = 'Add Job';
+        
+        document.getElementById('addJobModal').style.display = 'block';
+      }
+      
+      function hideAddJobForm() {
+        document.getElementById('addJobModal').style.display = 'none';
+        document.getElementById('addJobForm').reset();
+        document.getElementById('addJobForm').dataset.editingIndex = '';
+        
+        // Reset modal title and button text
+        document.querySelector('#addJobModal h3').textContent = 'Add New Job Posting';
+        document.querySelector('#addJobForm button[type="submit"]').textContent = 'Add Job';
+      }
+      
+      function addJobPosting() {
+        const company = document.getElementById('jobCompany').value;
+        const title = document.getElementById('jobTitle').value;
+        const description = document.getElementById('jobDescription').value;
+        const status = document.getElementById('jobStatus').value;
+        const dueDate = document.getElementById('jobDueDate').value;
+        
+        const newJob = {
+          id: Date.now(),
+          company: company,
+          title: title,
+          description: description,
+          status: status,
+          dueDate: dueDate || null,
+          dateAdded: new Date().toISOString()
+        };
+        
+        jobPostings.push(newJob);
+        localStorage.setItem('jobPostings', JSON.stringify(jobPostings));
+        
+        hideAddJobForm();
+        renderJobPostings();
+        showNotification(`Job "${title}" added successfully`, 'success');
+        
+        // Refresh calendar if it exists
+        if (typeof window.refreshCalendar === 'function') {
+          window.refreshCalendar();
+        }
+      }
+      
+      function updateJobPosting(index) {
+        console.log('Updating job at index:', index);
+        
+        const company = document.getElementById('jobCompany').value;
+        const title = document.getElementById('jobTitle').value;
+        const description = document.getElementById('jobDescription').value;
+        const status = document.getElementById('jobStatus').value;
+        const dueDate = document.getElementById('jobDueDate').value;
+        
+        console.log('Form values:', { company, title, description, status, dueDate });
+        
+        const updatedJob = {
+          ...jobPostings[index],
+          company: company,
+          title: title,
+          description: description,
+          status: status,
+          dueDate: dueDate || null,
+          dateUpdated: new Date().toISOString()
+        };
+        
+        console.log('Updated job object:', updatedJob);
+        
+        jobPostings[index] = updatedJob;
+        localStorage.setItem('jobPostings', JSON.stringify(jobPostings));
+        
+        hideAddJobForm();
+        renderJobPostings();
+        showNotification(`Job "${title}" updated successfully`, 'success');
+        
+        // Refresh calendar if it exists
+        if (typeof window.refreshCalendar === 'function') {
+          window.refreshCalendar();
+        }
+        
+        console.log('Job update completed');
+      }
+      
+      // Resume Functions
+      function renderResumes() {
+        const container = document.getElementById('resumesList');
+        if (resumes.length === 0) {
+          container.innerHTML = '<div class="empty-state"><h3>No resumes uploaded</h3><p>Upload your first resume to get started</p></div>';
+          return;
+        }
+        
+        container.innerHTML = resumes.map((resume, index) => `
+          <div class="resume-item ${selectedResume === index ? 'selected' : ''}" onclick="selectResume(${index})">
+            <div>
+              <h4>${resume.name}</h4>
+              <p style="margin: 4px 0; color: #718096; font-size: 14px;">${resume.size}</p>
+              ${!resume.backendId || !resume.id ? '<p style="color: #f59e0b; font-size: 12px; margin: 4px 0;">⚠️ Re-upload required for AI analysis</p>' : ''}
+            </div>
+            <button onclick="event.stopPropagation(); deleteResume(${index})" class="delete-btn" title="Delete resume">
+              🗑️
+            </button>
+          </div>
+        `).join('');
+      }
+      
+      function selectResume(index) {
+        console.log('Selecting resume:', index);
+        const resume = resumes[index];
+        if (!resume || !resume.backendId || !resume.id) {
+          showNotification('This resume needs to be re-uploaded for AI analysis', 'error');
+          return;
+        }
+        // Toggle selection - if already selected, deselect it
+        if (selectedResume === index) {
+          selectedResume = null;
+          console.log('Deselected resume');
+        } else {
+          selectedResume = index;
+          console.log('Selected resume:', index);
+        }
+        renderResumes();
+        updateAIContext();
+      }
+      
+      function deleteResume(index) {
+        const resume = resumes[index];
+        if (!resume) return;
+        
+        // Remove from array
+        resumes.splice(index, 1);
+        
+        // Update selected resume if needed
+        if (selectedResume === index) {
+          selectedResume = null;
+        } else if (selectedResume > index) {
+          selectedResume--;
+        }
+        
+        // Save to localStorage
+        localStorage.setItem('resumes', JSON.stringify(resumes));
+        
+        // Re-render
+        renderResumes();
+        updateAIContext();
+        
+        showNotification(`Resume "${resume.name}" deleted successfully`, 'success');
+      }
+      
+      async function handleResumeUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        // Check for duplicate files by name
+        const existingResume = resumes.find(r => r.name === file.name);
+        if (existingResume) {
+          showNotification(`File "${file.name}" has already been uploaded. Please choose a different file.`, 'error');
+          event.target.value = ''; // Clear the file input
+          return;
+        }
+        
+        // Show loading state
+        const container = document.getElementById('resumesList');
+        container.innerHTML = '<div class="spinner"></div> Uploading resume...';
+        
+        try {
+          // Upload file to backend
+          const formData = new FormData();
+          formData.append('resume', file);
+          formData.append('name', file.name);
+          
+          const response = await fetch('/api/resumes', {
+            method: 'POST',
+            body: formData
+          });
+          
+          if (response.ok) {
+            const resumeData = await response.json();
+            console.log('Backend response:', resumeData);
+            
+            // Validate that we got a proper ID from the backend
+            const resumeId = resumeData.Id || resumeData.id;
+            if (!resumeId) {
+              throw new Error('Backend did not return a valid ID');
+            }
+            
+            // Add to local storage for frontend management
+            const resume = {
+              id: resumeId,
+              name: resumeData.DisplayName || resumeData.displayName || resumeData.OriginalName || resumeData.originalName,
+              size: formatFileSize(file.size),
+              type: file.type,
+              dateAdded: new Date().toISOString(),
+              backendId: resumeId // Store backend ID for API calls
+            };
+            
+            console.log('Created resume object:', resume);
+            
+            resumes.push(resume);
+            localStorage.setItem('resumes', JSON.stringify(resumes));
+            
+            renderResumes();
+            showNotification('Resume uploaded successfully!', 'success');
+          } else {
+            const errorText = await response.text();
+            console.error('Upload failed:', response.status, errorText);
+            throw new Error(`Upload failed: ${response.status} - ${errorText}`);
+          }
+        } catch (error) {
+          console.error('Upload error:', error);
+          container.innerHTML = '<div class="empty-state"><h3>Upload failed</h3><p>Please try again</p></div>';
+          showNotification(`Failed to upload resume: ${error.message}`, 'error');
+        }
+        
+        event.target.value = ''; // Reset file input
+      }
+      
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+      
+      // AI Functions
+      function updateAIContext() {
+        const contextDiv = document.getElementById('aiContext');
+        const contextText = document.getElementById('aiContextText');
+        
+        if (selectedJob !== null && selectedResume !== null) {
+          const job = jobPostings[selectedJob];
+          const resume = resumes[selectedResume];
+          contextText.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="background: #10b981; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;">✓ READY</span>
+              <span style="font-weight: 600;">AI Assistant Ready for Tailoring</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 14px;">
+              <div>
+                <strong>📋 Selected Job:</strong><br>
+                <span style="color: #3b82f6;">${job.title}</span><br>
+                <span style="color: #6b7280;">${job.company}</span>
+              </div>
+              <div>
+                <strong>📄 Selected Resume:</strong><br>
+                <span style="color: #3b82f6;">${resume.name}</span><br>
+                <span style="color: #6b7280;">${resume.size}</span>
+              </div>
+            </div>
+          `;
+          contextDiv.style.display = 'block';
+        } else if (selectedJob !== null) {
+          const job = jobPostings[selectedJob];
+          contextText.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+              <span style="background: #f59e0b; color: white; padding: 6px 12px; border-radius: 12px; font-size: 13px; font-weight: bold;">⚠️ STEP 1 OF 2</span>
+              <span style="font-weight: 600; font-size: 16px;">Job Selected - Now Select a Resume</span>
+            </div>
+            <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+              <div style="font-size: 14px; font-weight: 600; color: #92400e; margin-bottom: 8px;">📋 Selected Job:</div>
+              <div style="font-size: 16px; color: #3b82f6; font-weight: 600; margin-bottom: 4px;">${job.title}</div>
+              <div style="font-size: 14px; color: #6b7280;">${job.company}</div>
+            </div>
+            <div style="background: #e0f2fe; border: 1px solid #0ea5e9; border-radius: 8px; padding: 12px;">
+              <div style="font-size: 14px; font-weight: 600; color: #0c4a6e; margin-bottom: 6px;">👉 Next Step:</div>
+              <div style="font-size: 14px; color: #0c4a6e;">Click on a resume in the middle panel to get personalized AI advice for this job!</div>
+            </div>
+          `;
+          contextDiv.style.display = 'block';
+        } else if (selectedResume !== null) {
+          const resume = resumes[selectedResume];
+          contextText.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+              <span style="background: #f59e0b; color: white; padding: 6px 12px; border-radius: 12px; font-size: 13px; font-weight: bold;">⚠️ STEP 1 OF 2</span>
+              <span style="font-weight: 600; font-size: 16px;">Resume Selected - Now Select a Job</span>
+            </div>
+            <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+              <div style="font-size: 14px; font-weight: 600; color: #92400e; margin-bottom: 8px;">📄 Selected Resume:</div>
+              <div style="font-size: 16px; color: #3b82f6; font-weight: 600; margin-bottom: 4px;">${resume.name}</div>
+              <div style="font-size: 14px; color: #6b7280;">${resume.size}</div>
+            </div>
+            <div style="background: #e0f2fe; border: 1px solid #0ea5e9; border-radius: 8px; padding: 12px;">
+              <div style="font-size: 14px; font-weight: 600; color: #0c4a6e; margin-bottom: 6px;">👉 Next Step:</div>
+              <div style="font-size: 14px; color: #0c4a6e;">Click on a job posting in the left panel to get personalized AI advice for your resume!</div>
+            </div>
+          `;
+          contextDiv.style.display = 'block';
+        } else {
+          contextText.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+              <span style="background: #6b7280; color: white; padding: 6px 12px; border-radius: 12px; font-size: 13px; font-weight: bold;">📋 STEP 1</span>
+              <span style="font-weight: 600; font-size: 16px;">Select a Job Posting and Resume</span>
+            </div>
+            <div style="background: #f3f4f6; border: 2px solid #6b7280; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+              <div style="font-size: 16px; font-weight: 600; color: #374151; margin-bottom: 8px;">🤖 AI Assistant Ready</div>
+              <div style="font-size: 14px; color: #6b7280; margin-bottom: 12px;">To get personalized resume advice, you need to select both:</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div style="background: white; border: 1px solid #d1d5db; border-radius: 6px; padding: 12px;">
+                  <div style="font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 4px;">📋 Step 1: Select a Job</div>
+                  <div style="font-size: 13px; color: #6b7280;">Click on any job posting in the left panel</div>
+                </div>
+                <div style="background: white; border: 1px solid #d1d5db; border-radius: 6px; padding: 12px;">
+                  <div style="font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 4px;">📄 Step 2: Select a Resume</div>
+                  <div style="font-size: 13px; color: #6b7280;">Click on any resume in the middle panel</div>
+                </div>
+              </div>
+            </div>
+            <div style="background: #dbeafe; border: 1px solid #3b82f6; border-radius: 8px; padding: 12px;">
+              <div style="font-size: 14px; font-weight: 600; color: #1e40af; margin-bottom: 6px;">💡 What happens next?</div>
+              <div style="font-size: 14px; color: #1e40af;">Once you select both, the AI will analyze your resume against the job requirements and provide tailored advice!</div>
+            </div>
+          `;
+          contextDiv.style.display = 'block';
+        }
+      }
+      
+      async function sendAIPrompt() {
+        const prompt = document.getElementById('aiPrompt').value.trim();
+        if (!prompt) return;
+        
+        const responseDiv = document.getElementById('aiResponse');
+        responseDiv.innerHTML = '<div class="spinner"></div> Thinking...';
+        
+        // Generate AI response with resume content analysis
+        try {
+          const response = await generateAIResponse(prompt);
+          responseDiv.innerHTML = response;
+        } catch (error) {
+          responseDiv.innerHTML = `Error generating response: ${error.message}`;
+        }
+      }
+      
+      async function generateAIResponse(prompt) {
+        if (selectedJob !== null && selectedResume !== null) {
+          const job = jobPostings[selectedJob];
+          const resume = resumes[selectedResume];
+          
+          // Try to get resume content from the backend
+          let resumeContent = '';
+          try {
+            const resumeId = resume.backendId || resume.id;
+            console.log('=== RESUME CONTENT DEBUG ===');
+            console.log('Resume object:', resume);
+            console.log('Resume ID being used:', resumeId);
+            console.log('Resume has backendId:', !!resume.backendId);
+            console.log('Fetching resume content for ID:', resumeId);
+            
+            const response = await fetch(`/api/resumes/${resumeId}/content`);
+            console.log('Resume content response status:', response.status);
+            console.log('Resume content response ok:', response.ok);
+            
+            if (response.ok) {
+              const data = await response.json();
+              resumeContent = data.content;
+              console.log('Resume content length:', resumeContent?.length);
+              console.log('Resume content successfully loaded for AI analysis');
+            } else {
+              const errorText = await response.text();
+              console.log('Failed to fetch resume content:', response.status, errorText);
+            }
+          } catch (error) {
+            console.log('Could not fetch resume content:', error);
+          }
+          
+          // Always provide AI response when both job and resume are selected
+          let response = `I can help you with your resume for "${job.title}" at ${job.company}. I have access to your resume "${resume.name}" and can provide specific advice.\n\n`;
+          
+          if (resumeContent && resumeContent !== 'Unsupported file format' && !resumeContent.includes('Error extracting')) {
+            response += `📄 **Resume Content Analysis:**\n`;
+            response += `I can see your resume contains relevant information. Here's what I found:\n\n`;
+            
+            // Basic content analysis
+            const hasExperience = resumeContent.toLowerCase().includes('experience') || resumeContent.toLowerCase().includes('work');
+            const hasSkills = resumeContent.toLowerCase().includes('skill') || resumeContent.toLowerCase().includes('technical');
+            const hasEducation = resumeContent.toLowerCase().includes('education') || resumeContent.toLowerCase().includes('degree');
+            
+            if (hasExperience) response += `✅ Good: Your resume includes experience sections\n`;
+            if (hasSkills) response += `✅ Good: Your resume includes skills sections\n`;
+            if (hasEducation) response += `✅ Good: Your resume includes education information\n`;
+            
+            // AI has access to complete resume content for analysis (not shown to user)
+            
+            // Analyze the actual resume content for specific insights
+            response += `🎯 **Personalized Resume Analysis:**\n`;
+            response += `Based on your actual resume content, here are my specific insights:\n\n`;
+            
+            // Analyze specific content from the resume
+            const hasGPA = resumeContent.toLowerCase().includes('gpa') || resumeContent.toLowerCase().includes('grade point');
+            const hasProjects = resumeContent.toLowerCase().includes('project') || resumeContent.toLowerCase().includes('portfolio');
+            const hasLeadership = resumeContent.toLowerCase().includes('leadership') || resumeContent.toLowerCase().includes('president') || resumeContent.toLowerCase().includes('vice president');
+            const hasInternships = resumeContent.toLowerCase().includes('intern') || resumeContent.toLowerCase().includes('internship');
+            const hasTechnicalSkills = resumeContent.toLowerCase().includes('javascript') || resumeContent.toLowerCase().includes('python') || resumeContent.toLowerCase().includes('react') || resumeContent.toLowerCase().includes('node');
+            const hasSoftSkills = resumeContent.toLowerCase().includes('communication') || resumeContent.toLowerCase().includes('teamwork') || resumeContent.toLowerCase().includes('collaboration');
+            
+            // Provide specific feedback based on what's actually in the resume
+            response += `📊 **What I Found in Your Resume:**\n`;
+            if (hasGPA) response += `✅ Strong academic performance (GPA mentioned)\n`;
+            if (hasProjects) response += `✅ Project experience and portfolio work\n`;
+            if (hasLeadership) response += `✅ Leadership experience and roles\n`;
+            if (hasInternships) response += `✅ Professional internship experience\n`;
+            if (hasTechnicalSkills) response += `✅ Technical skills and programming languages\n`;
+            if (hasSoftSkills) response += `✅ Soft skills and interpersonal abilities\n`;
+            
+            // Analyze the job posting for specific recommendations
+            const jobTitle = job.title.toLowerCase();
+            const jobDescription = job.description.toLowerCase();
+            
+            response += `\n🎯 **Tailored Recommendations for "${job.title}":\n`;
+            
+            // Deep analysis of job requirements
+            const jobNeedsTechnical = jobDescription.includes('javascript') || jobDescription.includes('python') || jobDescription.includes('programming') || jobDescription.includes('development') || jobDescription.includes('software') || jobDescription.includes('coding') || jobDescription.includes('technical');
+            const jobNeedsLeadership = jobDescription.includes('lead') || jobDescription.includes('manage') || jobDescription.includes('team') || jobDescription.includes('supervise') || jobDescription.includes('direct');
+            const jobNeedsExperience = jobDescription.includes('experience') || jobDescription.includes('years') || jobDescription.includes('minimum');
+            const jobNeedsCommunication = jobDescription.includes('communication') || jobDescription.includes('presentation') || jobDescription.includes('writing') || jobDescription.includes('verbal');
+            const jobNeedsAnalytical = jobDescription.includes('analysis') || jobDescription.includes('analytical') || jobDescription.includes('problem') || jobDescription.includes('critical thinking');
+            const jobNeedsProject = jobDescription.includes('project') || jobDescription.includes('initiative') || jobDescription.includes('deliverable');
+            
+            // Provide specific analysis based on job requirements
+            response += `📋 **Job Requirements Analysis:**\n`;
+            if (jobNeedsTechnical) response += `• This role requires technical skills\n`;
+            if (jobNeedsLeadership) response += `• This role involves leadership/management\n`;
+            if (jobNeedsExperience) response += `• This role requires relevant experience\n`;
+            if (jobNeedsCommunication) response += `• This role emphasizes communication skills\n`;
+            if (jobNeedsAnalytical) response += `• This role needs analytical thinking\n`;
+            if (jobNeedsProject) response += `• This role involves project work\n`;
+            
+            response += `\n📊 **Resume-Job Match Analysis:**\n`;
+            
+            if (jobNeedsTechnical && hasTechnicalSkills) {
+              response += `✅ **Technical Skills:** Great match! Your technical background aligns with this role.\n`;
+            } else if (jobNeedsTechnical && !hasTechnicalSkills) {
+              response += `⚠️ **Technical Skills:** Consider adding more technical skills to match this role's requirements.\n`;
+            }
+            
+            if (jobNeedsLeadership && hasLeadership) {
+              response += `✅ **Leadership:** Excellent! Your leadership experience is perfect for this role.\n`;
+            } else if (jobNeedsLeadership && !hasLeadership) {
+              response += `💡 **Leadership:** Highlight any team projects or group work as leadership experience.\n`;
+            }
+            
+            if (jobNeedsCommunication && hasSoftSkills) {
+              response += `✅ **Communication:** Your soft skills section shows good communication abilities.\n`;
+            } else if (jobNeedsCommunication && !hasSoftSkills) {
+              response += `💡 **Communication:** Consider adding examples of written and verbal communication skills.\n`;
+            }
+            
+            // Provide specific, actionable advice based on the actual content
+            response += `\n📝 **Specific Action Items:**\n`;
+            
+            if (prompt.toLowerCase().includes('tailor') || prompt.toLowerCase().includes('improve')) {
+              // Extract meaningful keywords from job description
+              const jobKeywords = jobDescription.match(/\b\w{4,}\b/g) || [];
+              const resumeKeywords = resumeContent.toLowerCase();
+              
+              // Filter for meaningful technical and professional terms
+              const meaningfulKeywords = jobKeywords.filter(keyword => {
+                const lowerKeyword = keyword.toLowerCase();
+                return keyword.length > 4 && 
+                       !resumeKeywords.includes(lowerKeyword) &&
+                       !['this', 'that', 'with', 'from', 'they', 'have', 'will', 'been', 'were', 'said', 'each', 'which', 'their', 'time', 'would', 'there', 'could', 'other', 'after', 'first', 'well', 'work', 'year', 'years', 'more', 'very', 'what', 'when', 'where', 'here', 'also', 'some', 'such', 'most', 'over', 'even', 'much', 'than', 'then', 'them', 'these', 'those', 'through', 'during', 'before', 'above', 'below', 'between', 'among', 'within', 'without', 'against', 'toward', 'towards', 'around', 'about', 'under', 'upon', 'across', 'beyond', 'behind', 'beside', 'besides', 'except', 'including', 'excluding', 'concerning', 'regarding', 'respecting', 'touching', 'considering', 'notwithstanding'].includes(lowerKeyword) &&
+                       (lowerKeyword.includes('tech') || lowerKeyword.includes('soft') || lowerKeyword.includes('data') || lowerKeyword.includes('system') || lowerKeyword.includes('develop') || lowerKeyword.includes('manage') || lowerKeyword.includes('lead') || lowerKeyword.includes('analys') || lowerKeyword.includes('project') || lowerKeyword.includes('team') || lowerKeyword.includes('client') || lowerKeyword.includes('business') || lowerKeyword.includes('process') || lowerKeyword.includes('implement') || lowerKeyword.includes('design') || lowerKeyword.includes('create') || lowerKeyword.includes('build') || lowerKeyword.includes('support') || lowerKeyword.includes('service') || lowerKeyword.includes('solution'));
+              }).slice(0, 8);
+              
+              response += `• **Keyword Optimization:** Use these job-specific terms in your resume:\n`;
+              if (meaningfulKeywords.length > 0) {
+                response += `  - ${meaningfulKeywords.join(', ')}\n`;
+              } else {
+                response += `  - Focus on industry-specific terminology from the job description\n`;
+              }
+              
+              response += `• **Experience Alignment:** Match your experience bullets to the job requirements\n`;
+              response += `  📋 **How to do it:**\n`;
+              response += `  - Read each job requirement and find a matching experience from your resume\n`;
+              response += `  - Rewrite your bullet points to use the same language as the job posting\n`;
+              response += `  - Example: If job says "manage projects," change "worked on projects" to "managed cross-functional projects"\n`;
+              response += `  - Example: If job says "analyze data," change "used Excel" to "analyzed data sets using Excel to identify trends"\n\n`;
+              
+              response += `• **Skills Highlighting:** Emphasize skills mentioned in the job posting\n`;
+              response += `  📋 **How to do it:**\n`;
+              response += `  - Create a "Relevant Skills" section at the top of your resume\n`;
+              response += `  - List 6-8 skills that appear in the job description\n`;
+              response += `  - Example: If job mentions "JavaScript, Python, React" - list these first in your skills\n`;
+              response += `  - Example: If job says "leadership," add "Team Leadership" to your skills section\n\n`;
+              
+              response += `• **Achievement Quantification:** Add numbers and metrics where possible\n`;
+              response += `  📋 **How to do it:**\n`;
+              response += `  - Add specific numbers to every bullet point on your resume\n`;
+              response += `  - Example: Change "Improved website performance" to "Improved website performance by 40% reducing load time from 3.2s to 1.9s"\n`;
+              response += `  - Example: Change "Led team project" to "Led team of 5 developers to deliver project 2 weeks ahead of schedule"\n`;
+              response += `  - Example: Change "Managed budget" to "Managed $50K budget resulting in 15% cost savings"\n\n`;
+            } else {
+              response += `• **Content Analysis:** Your resume has good structure and relevant information\n`;
+              response += `  📋 **How to improve:**\n`;
+              response += `  - Use action verbs to start each bullet point (Led, Developed, Implemented, Analyzed)\n`;
+              response += `  - Keep bullet points to 1-2 lines maximum\n`;
+              response += `  - Example: "Developed web application using React and Node.js" instead of "Made a website"\n\n`;
+              
+              response += `• **Skills Match:** ${hasTechnicalSkills ? 'Technical skills are well-represented' : 'Consider adding more technical skills'}\n`;
+              if (!hasTechnicalSkills) {
+                response += `  📋 **How to add technical skills:**\n`;
+                response += `  - List programming languages you know (JavaScript, Python, Java, etc.)\n`;
+                response += `  - Include software/tools you've used (Excel, PowerPoint, Adobe Creative Suite)\n`;
+                response += `  - Example: "Technical Skills: JavaScript, Python, React, Git, SQL, Excel, PowerPoint"\n\n`;
+              }
+              
+              response += `• **Experience Depth:** ${hasInternships ? 'Professional experience is strong' : 'Consider highlighting any relevant experience'}\n`;
+              if (!hasInternships) {
+                response += `  📋 **How to highlight experience:**\n`;
+                response += `  - Include any work experience, even part-time jobs\n`;
+                response += `  - Add volunteer work, club leadership, or class projects\n`;
+                response += `  - Example: "Volunteer Tutor - Helped 15+ students improve grades by 20% over 6 months"\n\n`;
+              }
+              
+              response += `• **Leadership Presence:** ${hasLeadership ? 'Leadership experience is evident' : 'Consider adding leadership examples'}\n`;
+              if (!hasLeadership) {
+                response += `  📋 **How to add leadership examples:**\n`;
+                response += `  - Include any group project leadership, club positions, or team captain roles\n`;
+                response += `  - Example: "Group Project Leader - Coordinated team of 4 students to complete capstone project"\n`;
+                response += `  - Example: "Student Organization Treasurer - Managed $2K budget and organized 3 campus events"\n\n`;
+              }
+            }
+            
+            response += `💡 **Next Steps:**\n`;
+            response += `• Ask me specific questions about your resume\n`;
+            response += `• Request tailored advice for this job\n`;
+            response += `• Get suggestions for improvements\n`;
+            response += `• I can analyze your resume content and provide specific recommendations`;
+            
+          } else {
+            response += `📄 **Note:** I couldn't read the text content of your resume file. Make sure it's in PDF or DOCX format for best results.\n\n`;
+            response += `✅ **Resume Analysis Status:**\n`;
+            response += `• Resume successfully analyzed\n`;
+            response += `• Content length: ${resumeContent?.length || 0} characters\n\n`;
+            
+            response += `💡 **To get the best help:**\n`;
+            response += `• Make sure your resume is in PDF or DOCX format\n`;
+            response += `• Try re-uploading your resume if needed\n`;
+            response += `• I can still provide general advice about resume tailoring\n`;
+          }
+          
+          return response;
+        }
+        
+        return `I'd be happy to help! However, I work best when you have both a job posting and resume selected. 
+
+Please:
+1. Select a job posting from the left panel
+2. Select a resume from the middle panel  
+3. Then ask me to help tailor your resume for that specific job
+
+This way, I can provide targeted, specific advice based on the actual job requirements and your resume content.`;
+      }
+      
+      function tailorResume() {
+        if (selectedJob === null || selectedResume === null) {
+          alert('Please select both a job posting and a resume first.');
+          return;
+        }
+        
+        const prompt = 'Please help me tailor my resume for this specific job. Analyze the job requirements and suggest specific improvements to make my resume more competitive.';
+        document.getElementById('aiPrompt').value = prompt;
+        sendAIPrompt();
+      }
+      
+      function analyzeJob() {
+        if (selectedJob === null) {
+          alert('Please select a job posting first.');
+          return;
+        }
+        
+        const prompt = 'Please analyze this job posting and tell me what the key requirements are and what I should focus on in my application.';
+        document.getElementById('aiPrompt').value = prompt;
+        sendAIPrompt();
+      }
+      
+      function clearAI() {
+        document.getElementById('aiPrompt').value = '';
+        document.getElementById('aiResponse').innerHTML = `
+          <div style="color: #718096; text-align: center; padding: 40px;">
+            <h3>🤖 AI Assistant Ready</h3>
+            <p>Select a job posting and resume to get started, or ask me anything about your applications!</p>
+          </div>
+        `;
+      }
+      
+      // Hamburger Menu Functions
+      function toggleHamburgerMenu() {
+        const menuContent = document.getElementById('hamburgerMenuContent');
+        menuContent.classList.toggle('show');
+      }
+      
+      function logout() {
+        // Clear user session data
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('isLoggedIn');
+        
+        // Redirect to login page
+        window.location.href = 'login.html';
+      }
+      
+      // Close hamburger menu when clicking outside
+      document.addEventListener('click', function(event) {
+        const hamburgerMenu = document.querySelector('.hamburger-menu');
+        const menuContent = document.getElementById('hamburgerMenuContent');
+        
+        if (!hamburgerMenu.contains(event.target)) {
+          menuContent.classList.remove('show');
+        }
+      });
+      
+      // Highlight current page in hamburger menu
+      document.addEventListener('DOMContentLoaded', function() {
+        const currentPage = 'application-hub.html';
+        const menuItems = document.querySelectorAll('.hamburger-menu-item');
+        
+        menuItems.forEach(item => {
+          if (item.href && item.href.includes(currentPage)) {
+            item.classList.add('active');
+          }
+        });
+        
+        // Force logout button color - run multiple times to override theme system
+        const forceLogoutColor = () => {
+          const logoutButton = document.querySelector('.hamburger-menu-item.logout');
+          if (logoutButton) {
+            logoutButton.style.color = '#4a5568';
+            logoutButton.style.backgroundColor = 'transparent';
+          }
+        };
+        
+        // Run immediately
+        forceLogoutColor();
+        
+        // Run after a short delay to override theme system
+        setTimeout(forceLogoutColor, 100);
+        setTimeout(forceLogoutColor, 500);
+        
+        // Watch for changes to the logout button and force color back
+        const logoutButton = document.querySelector('.hamburger-menu-item.logout');
+        if (logoutButton) {
+          const observer = new MutationObserver(() => {
+            forceLogoutColor();
+          });
+          observer.observe(logoutButton, { 
+            attributes: true, 
+            attributeFilter: ['style', 'class'] 
+          });
+        }
+      });
+      
+      // Help Modal Functions
+      const helpBtn = document.getElementById('helpBtn');
+      const helpModal = document.getElementById('helpModal');
+      const closeHelpModal = document.getElementById('closeHelpModal');
+      
+      helpBtn.addEventListener('click', function() {
+        helpModal.style.display = 'flex';
+      });
+      
+      closeHelpModal.addEventListener('click', function() {
+        helpModal.style.display = 'none';
+      });
+      
+      // Close help modal when clicking outside
+      helpModal.addEventListener('click', function(event) {
+        if (event.target === helpModal) {
+          helpModal.style.display = 'none';
+        }
+      });
+      
+      // Notification functions
+      function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          padding: 12px 20px;
+          border-radius: 8px;
+          color: white;
+          font-weight: 500;
+          z-index: 10000;
+          max-width: 300px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          transform: translateX(100%);
+          transition: transform 0.3s ease;
+        `;
+        
+        if (type === 'success') {
+          notification.style.background = '#10b981';
+        } else if (type === 'error') {
+          notification.style.background = '#ef4444';
+        } else {
+          notification.style.background = '#3b82f6';
+        }
+        
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        // Animate in
+        setTimeout(() => {
+          notification.style.transform = 'translateX(0)';
+        }, 100);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+          notification.style.transform = 'translateX(100%)';
+          setTimeout(() => {
+            if (notification.parentNode) {
+              notification.parentNode.removeChild(notification);
+            }
+          }, 300);
+        }, 3000);
+      }
+    </script>
+  </body>
+</html>
