@@ -1276,6 +1276,34 @@
         color: #ffffff !important;
       }
       
+      /* Validation Messages Styles */
+      .validation-messages {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 16px;
+        color: #dc2626;
+        font-size: 14px;
+        line-height: 1.4;
+      }
+      
+      [data-theme="dark"] .validation-messages {
+        background: #2d1b1b !important;
+        border: 1px solid #7f1d1d !important;
+        color: #fca5a5 !important;
+      }
+      
+      .validation-messages ul {
+        margin: 0;
+        padding-left: 16px;
+        list-style-type: disc;
+      }
+      
+      .validation-messages li {
+        margin-bottom: 4px;
+      }
+      
       /* Force logout button color - override any other rules */
       .hamburger-menu-item.logout {
         color: #4a5568 !important;
@@ -1413,6 +1441,9 @@
         </div>
         <div class="modal-body">
           <form id="eventForm" class="form-vertical">
+            <div id="validationMessages" class="validation-messages" style="display: none;">
+              <!-- Validation messages will be displayed here -->
+            </div>
             <input name="title" placeholder="Event Title" required />
             <input name="date" type="date" required />
             <select name="time" class="time-dropdown">

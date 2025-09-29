@@ -1077,6 +1077,11 @@ function openEventModal(dateStr = null, timeStr = null) {
         eventForm.time.value = timeStr;
     }
     
+    // Clear validation messages
+    const validationMessages = document.getElementById('validationMessages');
+    validationMessages.style.display = 'none';
+    validationMessages.innerHTML = '';
+    
     // Color picker removed - no need to set color
     
     // Hide delete button for new events
@@ -1091,6 +1096,11 @@ function openEventModal(dateStr = null, timeStr = null) {
 
 function editEvent(event) {
     editingEvent = event;
+    
+    // Clear validation messages
+    const validationMessages = document.getElementById('validationMessages');
+    validationMessages.style.display = 'none';
+    validationMessages.innerHTML = '';
     
     // Fill form with event data
     eventForm.title.value = event.title;
@@ -1124,6 +1134,11 @@ function closeEventModal() {
     editingEvent = null;
     deleteEvent.style.display = 'none';
     document.getElementById('emailEvent').style.display = 'none';
+    
+    // Clear validation messages
+    const validationMessages = document.getElementById('validationMessages');
+    validationMessages.style.display = 'none';
+    validationMessages.innerHTML = '';
 }
 
 // Create recurring events
@@ -1184,8 +1199,24 @@ async function saveEventToCalendar() {
     // Color picker removed - use default color
     const color = '#3b82f6';
     
-    if (!title || !date) {
-        alert('Title and date are required');
+    // Clear previous validation messages
+    const validationMessages = document.getElementById('validationMessages');
+    validationMessages.style.display = 'none';
+    validationMessages.innerHTML = '';
+    
+    // Validate required fields
+    const validationErrors = [];
+    if (!title || title.trim() === '') {
+        validationErrors.push('Event title is required');
+    }
+    if (!date || date.trim() === '') {
+        validationErrors.push('Event date is required');
+    }
+    
+    if (validationErrors.length > 0) {
+        // Show validation messages in the panel
+        validationMessages.innerHTML = '<ul>' + validationErrors.map(error => `<li>${error}</li>`).join('') + '</ul>';
+        validationMessages.style.display = 'block';
         return;
     }
     
