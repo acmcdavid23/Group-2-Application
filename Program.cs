@@ -253,7 +253,11 @@ async Task SaveResumesToFile()
     }
 }
 
-app.UseDefaultFiles();
+// Configure default files to serve login.html first
+app.UseDefaultFiles(new DefaultFilesOptions
+{
+    DefaultFileNames = new List<string> { "login.html", "index.html" }
+});
 app.UseStaticFiles();
 
 // Resume endpoints (updated for SQLite)

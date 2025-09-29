@@ -16,6 +16,10 @@
         background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
       }
       
+      [data-theme="dark"] .application-hub {
+        background: #0d1117 !important;
+      }
+      
       .hub-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
@@ -54,6 +58,11 @@
         overflow: hidden;
       }
       
+      [data-theme="dark"] .hub-panel {
+        background: #161b22 !important;
+        border: 1px solid #30363d !important;
+      }
+      
       .panel-header {
         background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
         padding: 16px 20px;
@@ -63,10 +72,21 @@
         color: #2d3748;
       }
       
+      [data-theme="dark"] .panel-header {
+        background: #21262d !important;
+        color: #f0f6fc !important;
+        border-bottom: 1px solid #30363d !important;
+      }
+      
       .panel-content {
         flex: 1;
         padding: 20px;
         overflow-y: auto;
+      }
+      
+      [data-theme="dark"] .panel-content {
+        background: #161b22 !important;
+        color: #f0f6fc !important;
       }
       
       .job-postings-panel {
@@ -160,6 +180,12 @@
         margin-bottom: 8px;
       }
       
+      [data-theme="dark"] .btn-primary {
+        background: #238636 !important;
+        color: #ffffff !important;
+        border: 1px solid #238636 !important;
+      }
+      
       .btn-primary:hover {
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
       }
@@ -177,6 +203,12 @@
         margin-bottom: 8px;
       }
       
+      [data-theme="dark"] .btn-secondary {
+        background: #21262d !important;
+        color: #ffffff !important;
+        border: 1px solid #30363d !important;
+      }
+      
       .btn-secondary:hover {
         background: #e2e8f0;
       }
@@ -190,6 +222,12 @@
         transition: all 0.3s ease;
         cursor: pointer;
         margin-bottom: 16px;
+      }
+      
+      [data-theme="dark"] .file-upload-area {
+        background: #161b22 !important;
+        color: #8b949e !important;
+        border: 2px dashed #30363d !important;
       }
       
       .file-upload-area:hover {
@@ -485,6 +523,12 @@
         margin-top: 8px;
       }
       
+      [data-theme="dark"] .hamburger-menu-content {
+        background: #161b22 !important;
+        border: 1px solid #30363d !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+      }
+      
       .hamburger-menu-content.show {
         display: block;
       }
@@ -506,9 +550,69 @@
         cursor: pointer;
       }
       
+      [data-theme="dark"] .hamburger-menu-item {
+        color: #f0f6fc !important;
+      }
+      
       .hamburger-menu-item:hover {
         background: #f7fafc;
         color: #2d3748;
+      }
+      
+      [data-theme="dark"] .hamburger-menu-item:hover {
+        background: #21262d !important;
+        color: #ffffff !important;
+      }
+      
+      [data-theme="dark"] .hamburger-menu-item.active:hover {
+        background: #2ea043 !important;
+        color: #ffffff !important;
+      }
+      
+      /* Add Job Modal Dark Mode */
+      .add-job-modal-content {
+        background: white;
+        color: #1a202c;
+      }
+      
+      [data-theme="dark"] .add-job-modal-content {
+        background: #161b22 !important;
+        color: #f0f6fc !important;
+        border: 1px solid #30363d !important;
+      }
+      
+      [data-theme="dark"] .add-job-modal-content h3 {
+        color: #f0f6fc !important;
+      }
+      
+      [data-theme="dark"] .add-job-modal-content label {
+        color: #f0f6fc !important;
+      }
+      
+      [data-theme="dark"] .add-job-modal-content input,
+      [data-theme="dark"] .add-job-modal-content textarea,
+      [data-theme="dark"] .add-job-modal-content select {
+        background: #21262d !important;
+        border: 1px solid #30363d !important;
+        color: #f0f6fc !important;
+      }
+      
+      [data-theme="dark"] .add-job-modal-content input:focus,
+      [data-theme="dark"] .add-job-modal-content textarea:focus,
+      [data-theme="dark"] .add-job-modal-content select:focus {
+        border-color: #58a6ff !important;
+        box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1) !important;
+      }
+      
+      [data-theme="dark"] .add-job-modal-content button {
+        background: #238636 !important;
+        color: #ffffff !important;
+        border: 1px solid #238636 !important;
+      }
+      
+      [data-theme="dark"] .add-job-modal-content button:hover {
+        background: #2ea043 !important;
+        border-color: #2ea043 !important;
       }
       
       .hamburger-menu-item.logout {
@@ -517,9 +621,19 @@
         margin-top: 4px;
       }
       
+      [data-theme="dark"] .hamburger-menu-item.logout {
+        color: #f85149 !important;
+        border-top: 1px solid #30363d !important;
+      }
+      
       .hamburger-menu-item.logout:hover {
         background: #fed7d7;
         color: #c53030;
+      }
+      
+      [data-theme="dark"] .hamburger-menu-item.logout:hover {
+        background: #da3633 !important;
+        color: #ffffff !important;
       }
       
       .hamburger-menu-item.active {
@@ -527,9 +641,19 @@
         color: white;
       }
       
+      [data-theme="dark"] .hamburger-menu-item.active {
+        background: #238636 !important;
+        color: #ffffff !important;
+      }
+      
       .hamburger-menu-item.active:hover {
         background: #2563eb;
         color: white;
+      }
+      
+      [data-theme="dark"] .hamburger-menu-item.active:hover {
+        background: #2ea043 !important;
+        color: #ffffff !important;
       }
       
       /* Dark mode logout button */
@@ -610,12 +734,24 @@
         margin: 20px;
       }
       
+      [data-theme="dark"] .help-modal-content {
+        background: #161b22 !important;
+        color: #f0f6fc !important;
+        border: 1px solid #30363d !important;
+      }
+      
       .help-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 20px;
         border-bottom: 1px solid #e2e8f0;
+      }
+      
+      [data-theme="dark"] .help-header {
+        background: #21262d !important;
+        color: #f0f6fc !important;
+        border-bottom: 1px solid #30363d !important;
       }
       
       .help-title {
@@ -636,13 +772,26 @@
         transition: all 0.2s;
       }
       
+      [data-theme="dark"] .help-close {
+        color: #f0f6fc !important;
+      }
+      
       .help-close:hover {
         background: #f7fafc;
         color: #2d3748;
       }
       
+      [data-theme="dark"] .help-close:hover {
+        background: #30363d !important;
+        color: #ffffff !important;
+      }
+      
       .help-body {
         padding: 20px;
+      }
+      
+      [data-theme="dark"] .help-body {
+        color: #f0f6fc !important;
       }
       
       .help-section {
@@ -866,7 +1015,7 @@
 
     <!-- Add Job Modal (simplified) -->
     <div id="addJobModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
-      <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px;">
+      <div class="add-job-modal-content" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px;">
         <h3>Add New Job Posting</h3>
         <form id="addJobForm">
           <div style="margin-bottom: 16px;">

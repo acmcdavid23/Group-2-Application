@@ -26,6 +26,10 @@
         position: relative;
       }
       
+      [data-theme="dark"] body {
+        background: #0d1117 !important;
+      }
+      
       body::before {
         content: '';
         position: fixed;
@@ -103,6 +107,12 @@
         border: 1px solid rgba(255,255,255,0.3);
       }
       
+      [data-theme="dark"] .login-card {
+        background: rgba(22, 27, 34, 0.95) !important;
+        border: 1px solid #30363d !important;
+        color: #f0f6fc !important;
+      }
+      
       @keyframes slideUp {
         from {
           opacity: 0;
@@ -125,12 +135,23 @@
         letter-spacing: -0.5px;
       }
       
+      [data-theme="dark"] .login-logo {
+        background: linear-gradient(135deg, #58a6ff 0%, #79c0ff 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        background-clip: text !important;
+      }
+      
       .login-subtitle {
         color: #64748b;
         margin-bottom: 40px;
         font-size: 16px;
         font-weight: 400;
         line-height: 1.5;
+      }
+      
+      [data-theme="dark"] .login-subtitle {
+        color: #8b949e !important;
       }
       
       .login-form {
@@ -152,9 +173,19 @@
         position: relative;
       }
       
+      [data-theme="dark"] .login-form input {
+        background: #21262d !important;
+        border: 2px solid #30363d !important;
+        color: #f0f6fc !important;
+      }
+      
       .login-form input::placeholder {
         color: #94a3b8;
         font-weight: 400;
+      }
+      
+      [data-theme="dark"] .login-form input::placeholder {
+        color: #6e7681 !important;
       }
       
       .login-form input:focus {
@@ -164,6 +195,14 @@
           0 0 0 4px rgba(102, 126, 234, 0.1),
           0 4px 12px rgba(102, 126, 234, 0.15);
         background: white;
+      }
+      
+      [data-theme="dark"] .login-form input:focus {
+        border-color: #58a6ff !important;
+        box-shadow: 
+          0 0 0 4px rgba(88, 166, 255, 0.1),
+          0 4px 12px rgba(88, 166, 255, 0.15) !important;
+        background: #21262d !important;
       }
       
       .login-buttons {
@@ -186,6 +225,11 @@
         position: relative;
         overflow: hidden;
         box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      }
+      
+      [data-theme="dark"] .btn-login {
+        background: #238636 !important;
+        color: #ffffff !important;
       }
       
       .btn-login::before {
@@ -220,6 +264,11 @@
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         overflow: hidden;
+      }
+      
+      [data-theme="dark"] .btn-signup {
+        color: #58a6ff !important;
+        border: 2px solid #58a6ff !important;
       }
       
       .btn-signup::before {

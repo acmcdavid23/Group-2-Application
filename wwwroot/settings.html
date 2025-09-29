@@ -16,9 +16,18 @@
       color: #1a202c;
     }
     
+    [data-theme="dark"] body {
+      background: #0d1117 !important;
+      color: #f0f6fc !important;
+    }
+    
     .settings-container {
       min-height: 100vh;
       background: #f8fafc;
+    }
+    
+    [data-theme="dark"] .settings-container {
+      background: #0d1117 !important;
     }
     
     .settings-header {
@@ -28,6 +37,11 @@
       text-align: center;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       position: relative;
+    }
+    
+    [data-theme="dark"] .settings-header {
+      background: linear-gradient(135deg, #161b22 0%, #21262d 100%) !important;
+      color: #f0f6fc !important;
     }
     
     .settings-header h1 {
@@ -100,6 +114,12 @@
       margin-top: 8px;
     }
     
+    [data-theme="dark"] .hamburger-menu-content {
+      background: #161b22 !important;
+      border: 1px solid #30363d !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+    }
+    
     .hamburger-menu-content.show {
       display: block;
     }
@@ -121,9 +141,18 @@
       cursor: pointer;
     }
     
+    [data-theme="dark"] .hamburger-menu-item {
+      color: #f0f6fc !important;
+    }
+    
     .hamburger-menu-item:hover {
       background: #f7fafc;
       color: #2d3748;
+    }
+    
+    [data-theme="dark"] .hamburger-menu-item:hover {
+      background: #21262d !important;
+      color: #ffffff !important;
     }
     
     .hamburger-menu-item.logout {
@@ -132,9 +161,19 @@
       margin-top: 4px;
     }
     
+    [data-theme="dark"] .hamburger-menu-item.logout {
+      color: #f85149 !important;
+      border-top: 1px solid #30363d !important;
+    }
+    
     .hamburger-menu-item.logout:hover {
       background: #fed7d7;
       color: #c53030;
+    }
+    
+    [data-theme="dark"] .hamburger-menu-item.logout:hover {
+      background: #da3633 !important;
+      color: #ffffff !important;
     }
     
     .hamburger-menu-item.active {
@@ -142,9 +181,19 @@
       color: white;
     }
     
+    [data-theme="dark"] .hamburger-menu-item.active {
+      background: #238636 !important;
+      color: #ffffff !important;
+    }
+    
     .hamburger-menu-item.active:hover {
       background: #2563eb;
       color: white;
+    }
+    
+    [data-theme="dark"] .hamburger-menu-item.active:hover {
+      background: #2ea043 !important;
+      color: #ffffff !important;
     }
     
     /* Dark mode logout button */
@@ -188,11 +237,21 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     
+    [data-theme="dark"] .settings-section {
+      background: #161b22 !important;
+      border: 1px solid #30363d !important;
+      color: #f0f6fc !important;
+    }
+    
     .settings-section h2 {
       margin: 0 0 20px 0;
       font-size: 20px;
       font-weight: 600;
       color: #1a202c;
+    }
+    
+    [data-theme="dark"] .settings-section h2 {
+      color: #f0f6fc !important;
     }
     
     .setting-item {
@@ -324,14 +383,29 @@
       font-size: 14px;
     }
     
+    [data-theme="dark"] .button {
+      background: #238636 !important;
+      color: #ffffff !important;
+    }
+    
     .button:hover {
       background: #2563eb;
+    }
+    
+    [data-theme="dark"] .button:hover {
+      background: #2ea043 !important;
     }
     
     .button.secondary {
       background: #e2e8f0;
       color: #1a202c;
       border: 1px solid #d1d5db;
+    }
+    
+    [data-theme="dark"] .button.secondary {
+      background: #21262d !important;
+      color: #ffffff !important;
+      border: 1px solid #30363d !important;
     }
     
     .button.secondary:hover {

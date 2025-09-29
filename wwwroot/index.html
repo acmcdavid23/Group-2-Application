@@ -150,11 +150,14 @@
     </style>
   </head>
   <body>
-    <!-- Redirect to login if not authenticated -->
+    <!-- Redirect to login if not authenticated, or to application-hub if authenticated -->
     <script>
       // Check if user is logged in (in a real app, this would check localStorage or cookies)
       if (!localStorage.getItem('userLoggedIn')) {
         window.location.href = 'login.html';
+      } else {
+        // Redirect authenticated users to the new application hub
+        window.location.href = 'application-hub.html';
       }
     </script>
     
@@ -162,7 +165,7 @@
     <div class="header-rect">
       <div class="header-inner" style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
         <div>
-          <div class="brand" onclick="window.location.href='index.html'" style="cursor: pointer;">Internship Application Manager</div>
+          <div class="brand" onclick="window.location.href='application-hub.html'" style="cursor: pointer;">Internship Application Manager</div>
           <div class="subtitle">Track your internship applications and manage your career journey</div>
         </div>
         <div class="auth-buttons">
@@ -174,8 +177,8 @@
     <!-- Navigation -->
     <div class="nav-banner-rect">
       <div class="nav-banner-inner">
-        <button class="nav-btn active" onclick="window.location.href='index.html'">📊 Dashboard</button>
-        <button class="nav-btn" onclick="window.location.href='application-hub.html'">🚀 Application Hub</button>
+        <button class="nav-btn" onclick="window.location.href='application-hub.html'">📊 Dashboard</button>
+        <button class="nav-btn active" onclick="window.location.href='application-hub.html'">🚀 Application Hub</button>
         <button class="nav-btn" onclick="window.location.href='calendar.html'">📅 Calendar</button>
       </div>
     </div>

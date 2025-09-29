@@ -611,6 +611,48 @@ function renderDayView(year, month) {
             margin: 0;
         `;
         
+        // Add events for this time slot
+        const allEvents = [...events, ...customEvents];
+        const hourEvents = allEvents.filter(event => {
+            const eventDate = new Date(event.start);
+            const eventHour = eventDate.getHours();
+            return eventDate.toDateString() === targetDate.toDateString() && eventHour === hour;
+        });
+        
+        // Add event elements to time content
+        hourEvents.forEach(event => {
+            const eventElement = document.createElement('div');
+            eventElement.className = `day-event ${event.extendedProps?.type || 'custom'}`;
+            eventElement.style.cssText = `
+                background: #3b82f6;
+                color: white;
+                padding: 2px 6px;
+                margin: 1px 2px;
+                border-radius: 3px;
+                font-size: 11px;
+                cursor: pointer;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            `;
+            
+            if (event.extendedProps && event.extendedProps.type === 'posting') {
+                eventElement.innerHTML = `📋 ${event.title}`;
+                eventElement.title = `Job Application Due: ${event.title}`;
+            } else {
+                eventElement.textContent = event.title;
+                eventElement.title = event.title;
+            }
+            
+            eventElement.addEventListener('click', (e) => {
+                e.stopPropagation();
+                editEvent(event);
+            });
+            
+            timeContent.appendChild(eventElement);
+        });
+        
         timeContent.addEventListener('click', () => {
             const timeStr = hour.toString().padStart(2, '0') + ':00';
             openEventModal(targetDate.toISOString().split('T')[0], timeStr);
