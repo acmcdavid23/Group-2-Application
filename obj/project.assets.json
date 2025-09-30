@@ -5068,31 +5068,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\yooho\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\Gunba\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\acmcdavid\\MIS\\Group-2-Application\\InternApp.csproj",
+      "projectUniqueName": "C:\\Users\\Gunba\\Documents\\Source\\expo.2025\\mis321\\Group-2-Application\\InternApp.csproj",
       "projectName": "InternApp",
-      "projectPath": "C:\\Users\\acmcdavid\\MIS\\Group-2-Application\\InternApp.csproj",
-      "packagesPath": "C:\\Users\\yooho\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\acmcdavid\\MIS\\Group-2-Application\\obj\\",
+      "projectPath": "C:\\Users\\Gunba\\Documents\\Source\\expo.2025\\mis321\\Group-2-Application\\InternApp.csproj",
+      "packagesPath": "C:\\Users\\Gunba\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Gunba\\Documents\\Source\\expo.2025\\mis321\\Group-2-Application\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\yooho\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\Gunba\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -5149,7 +5142,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
