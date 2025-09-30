@@ -1664,62 +1664,52 @@
       
       // General AI Chat - can discuss ANY topic
       async function generateGeneralAIResponse(prompt) {
-        // This is a general chatbot that can discuss anything
+        // This is a general chatbot that responds naturally to anything
         let response = '';
         
-        // Handle greetings naturally
-        if (prompt.toLowerCase().includes('hello') || prompt.toLowerCase().includes('hi') || prompt.toLowerCase().includes('hey')) {
-          response = `Hey there! 👋\n\n`;
-          response += `I'm doing great, thanks for asking! I'm here to chat about anything you'd like - career stuff, general questions, or just have a conversation.\n\n`;
-          response += `What's on your mind today?`;
+        // Convert prompt to lowercase for easier matching
+        const lowerPrompt = prompt.toLowerCase();
+        
+        // Handle greetings
+        if (lowerPrompt.includes('hello') || lowerPrompt.includes('hi ') || lowerPrompt.includes('hey')) {
+          response = `Hey there! 👋\n\nI'm doing great! What's on your mind?`;
         }
-        else if (prompt.toLowerCase().includes('thank') || prompt.toLowerCase().includes('thanks')) {
-          response = `😊 **You're Welcome!**\n\n`;
-          response += `I'm glad I could help! Feel free to ask me anything else - I'm here to chat about whatever you'd like! 🍀`;
+        // Handle "how are you"
+        else if (lowerPrompt.includes('how are you') || lowerPrompt.includes('how\'s it going') || lowerPrompt.includes('whats up')) {
+          response = `I'm doing great, thanks for asking! 😊\n\nHow about you? What would you like to chat about?`;
         }
-        else if (prompt.toLowerCase().includes('how are you') || prompt.toLowerCase().includes('how\'s it going')) {
-          response = `I'm doing great! 😊\n\n`;
-          response += `I'm here and ready to chat about anything you'd like - whether it's career advice, general questions, or just having a conversation. What would you like to talk about?`;
+        // Handle thanks
+        else if (lowerPrompt.includes('thank') || lowerPrompt.includes('thanks')) {
+          response = `You're welcome! 😊\n\nFeel free to ask me anything else!`;
         }
-        else if (prompt.toLowerCase().includes('what can you do') || prompt.toLowerCase().includes('what do you do')) {
-          response = `🤖 **I'm your AI chat assistant!**\n\n`;
-          response += `I can chat about pretty much anything:\n\n`;
-          response += `• **General conversation** - Just talk about whatever's on your mind\n`;
-          response += `• **Career advice** - Resume help, interview tips, job search strategies\n`;
-          response += `• **Learning** - Explain concepts, help with questions, brainstorm ideas\n`;
-          response += `• **Problem solving** - Work through challenges together\n`;
-          response += `• **Creative stuff** - Writing, brainstorming, planning\n\n`;
-          response += `**For specialized career help:**\n`;
-          response += `• Use "Analyze Job" to get detailed job insights\n`;
-          response += `• Use "Tailor Resume" for personalized resume advice\n\n`;
-          response += `But for everything else, just ask me anything! What would you like to chat about?`;
+        // Handle questions about names
+        else if (lowerPrompt.includes('name') && (lowerPrompt.includes('cool') || lowerPrompt.includes('good') || lowerPrompt.includes('nice'))) {
+          response = `Yeah, that's actually a pretty cool name! It has a nice sound to it and feels professional yet approachable.\n\nWhat made you think of that name?`;
         }
-        else if (prompt.toLowerCase().includes('help') || prompt.toLowerCase().includes('can you') || prompt.toLowerCase().includes('assist') || prompt.toLowerCase().includes('support')) {
-          response = `🤝 **Absolutely! I'm here to help!**\n\n`;
-          response += `I can help with all sorts of things:\n\n`;
-          response += `• **📄 Career & Resume Help** - Writing, tailoring, job search advice\n`;
-          response += `• **🔍 Job Analysis** - Understanding job postings and requirements\n`;
-          response += `• **🎤 Interview Prep** - Practice questions and strategies\n`;
-          response += `• **📚 Learning & Education** - Explain concepts, help with assignments\n`;
-          response += `• **💡 Problem Solving** - Work through challenges together\n`;
-          response += `• **✍️ Writing & Communication** - Help with essays, emails, presentations\n`;
-          response += `• **🎯 Planning & Organization** - Goals, projects, time management\n`;
-          response += `• **💬 General Chat** - Just talk about whatever you want!\n\n`;
-          response += `**What would you like help with?** Be specific and I'll do my best to assist you!`;
+        // Handle "what can you do"
+        else if (lowerPrompt.includes('what can you') || lowerPrompt.includes('what do you do')) {
+          response = `I'm your AI chat assistant! I can chat about anything:\n\n`;
+          response += `• General conversation and casual chat\n`;
+          response += `• Answer questions and explain things\n`;
+          response += `• Give opinions and thoughts\n`;
+          response += `• Career advice and job help\n`;
+          response += `• Brainstorming and problem solving\n\n`;
+          response += `Just ask me anything and I'll do my best to help!`;
         }
+        // Default: Try to give a relevant response based on the question
         else {
-          // For any other topic, provide a helpful general response
-          response = `🤖 **AI Chat Assistant:**\n\n`;
-          response += `I'm here to chat about anything you'd like! I can help with:\n\n`;
-          response += `• **Career & job search advice**\n`;
-          response += `• **Learning and explaining concepts**\n`;
-          response += `• **Problem solving and brainstorming**\n`;
-          response += `• **Writing and communication help**\n`;
-          response += `• **General conversation**\n\n`;
-          response += `**For specialized career features:**\n`;
-          response += `• Click "Analyze Job" for detailed job insights\n`;
-          response += `• Click "Tailor Resume" for personalized resume advice\n\n`;
-          response += `**What would you like to talk about?** Feel free to ask me anything specific!`;
+          // Just acknowledge their question and respond naturally
+          response = `That's an interesting question!\n\n`;
+          response += `Based on what you're asking, here's my take: `;
+          
+          // Try to extract the main topic and respond
+          if (lowerPrompt.includes('?')) {
+            response += `I'd be happy to discuss this with you. Could you give me a bit more context or detail about what you're thinking?\n\n`;
+          } else {
+            response += `I hear what you're saying. What would you like to know more about?\n\n`;
+          }
+          
+          response += `Feel free to ask me anything specific - whether it's opinions, advice, explanations, or just casual conversation!`;
         }
         
         return response;
