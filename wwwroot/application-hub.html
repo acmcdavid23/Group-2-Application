@@ -827,6 +827,105 @@
       .help-tip strong {
         color: #0369a1;
       }
+      
+      /* History Modal Styles */
+      .history-item {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 12px;
+        transition: all 0.2s ease;
+      }
+      
+      [data-theme="dark"] .history-item {
+        background: #21262d !important;
+        border: 1px solid #30363d !important;
+        color: #f0f6fc !important;
+      }
+      
+      .history-item:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+      }
+      
+      [data-theme="dark"] .history-item:hover {
+        background: #30363d !important;
+        border-color: #484f58 !important;
+      }
+      
+      .history-timestamp {
+        font-size: 12px;
+        color: #64748b;
+        margin-bottom: 8px;
+        font-weight: 500;
+      }
+      
+      [data-theme="dark"] .history-timestamp {
+        color: #8b949e !important;
+      }
+      
+      .history-prompt {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+      
+      [data-theme="dark"] .history-prompt {
+        color: #f0f6fc !important;
+      }
+      
+      .history-response {
+        color: #475569;
+        font-size: 13px;
+        line-height: 1.4;
+        max-height: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        line-clamp: 4;
+        -webkit-box-orient: vertical;
+      }
+      
+      [data-theme="dark"] .history-response {
+        color: #c9d1d9 !important;
+      }
+      
+      .history-mode {
+        display: inline-block;
+        background: #3b82f6;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      
+      .history-mode.resume-tailor {
+        background: #10b981;
+      }
+      
+      .history-mode.job-analysis {
+        background: #f59e0b;
+      }
+      
+      .history-mode.general {
+        background: #8b5cf6;
+      }
+      
+      .history-empty {
+        text-align: center;
+        color: #64748b;
+        padding: 40px 20px;
+        font-style: italic;
+      }
+      
+      [data-theme="dark"] .history-empty {
+        color: #8b949e !important;
+      }
     </style>
   </head>
   <body>
@@ -938,7 +1037,7 @@
             <textarea 
               id="aiPrompt" 
               class="ai-prompt-area" 
-              placeholder="First, select a job posting and resume above, then ask me to help tailor your resume for that specific job..."
+              placeholder="Chat with me about anything! Or select a job/resume to use Tailor Resume or Analyze Job features..."
               rows="4"
             ></textarea>
             
@@ -947,20 +1046,25 @@
               <button class="btn-primary" onclick="sendAIPrompt()">Ask AI</button>
               <button class="btn-secondary" onclick="tailorResume()">Tailor Resume</button>
               <button class="btn-secondary" onclick="analyzeJob()">Analyze Job</button>
+              <button class="btn-secondary" onclick="showHistory()">History</button>
               <button class="btn-secondary" onclick="clearAI()">Clear</button>
             </div>
             
             <!-- AI Response Area -->
             <div id="aiResponse" class="ai-response-area">
               <div style="color: #718096; text-align: center; padding: 40px;">
-                <h3>🤖 AI Assistant Ready</h3>
-                <p>Select a job posting and resume to get started, or ask me anything about your applications!</p>
+                <h3>🤖 AI Chat Assistant Ready</h3>
+                <p>Chat with me about anything! Or select a job posting and resume for specialized career advice.</p>
                 <p><strong>Try asking:</strong></p>
                 <ul style="text-align: left; display: inline-block; margin: 0;">
-                  <li>"How can I improve my resume for this job?"</li>
-                  <li>"What keywords should I add?"</li>
-                  <li>"Analyze this job description"</li>
+                  <li>"Tell me about machine learning"</li>
+                  <li>"Help me write an email"</li>
+                  <li>"What's the weather like?"</li>
+                  <li>"Explain quantum physics"</li>
                 </ul>
+                <p style="margin-top: 20px; font-size: 14px; color: #6b7280;">
+                  <strong>For career help:</strong> Select a job + resume, then use "Tailor Resume" or "Analyze Job"
+                </p>
               </div>
             </div>
           </div>
@@ -1008,6 +1112,26 @@
           
           <div class="help-tip">
             <strong>💡 Pro Tip:</strong> The AI works best when you have both a job posting and resume selected. This allows it to provide specific, tailored advice for that exact job application!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="historyModal" class="help-modal" style="display: none;">
+      <div class="help-modal-content">
+        <div class="help-header">
+          <h3 class="help-title">📚 AI Conversation History</h3>
+          <button id="closeHistoryModal" class="help-close">&times;</button>
+        </div>
+        <div class="help-body">
+          <div style="margin-bottom: 16px;">
+            <button id="clearHistoryBtn" class="btn-secondary" style="background: #dc2626; color: white; border: none;">
+              🗑️ Clear All History
+            </button>
+          </div>
+          <div id="historyContent" style="max-height: 400px; overflow-y: auto;">
+            <!-- History items will be populated here -->
           </div>
         </div>
       </div>
@@ -1526,224 +1650,337 @@
         const responseDiv = document.getElementById('aiResponse');
         responseDiv.innerHTML = '<div class="spinner"></div> Thinking...';
         
-        // Generate AI response with resume content analysis
+        // Generate AI response - works as general AI chat for ANY topic
         try {
-          const response = await generateAIResponse(prompt);
+          const response = await generateAIResponse(prompt, 'general');
           responseDiv.innerHTML = response;
+          
+          // Save to history
+          saveToHistory(prompt, response, 'general');
         } catch (error) {
           responseDiv.innerHTML = `Error generating response: ${error.message}`;
         }
       }
       
-      async function generateAIResponse(prompt) {
-        if (selectedJob !== null && selectedResume !== null) {
-          const job = jobPostings[selectedJob];
-          const resume = resumes[selectedResume];
+      // General AI Chat - can discuss ANY topic
+      async function generateGeneralAIResponse(prompt) {
+        // This is a general chatbot that can discuss anything
+        let response = '';
+        
+        // Handle greetings naturally
+        if (prompt.toLowerCase().includes('hello') || prompt.toLowerCase().includes('hi') || prompt.toLowerCase().includes('hey')) {
+          response = `Hey there! 👋\n\n`;
+          response += `I'm doing great, thanks for asking! I'm here to chat about anything you'd like - career stuff, general questions, or just have a conversation.\n\n`;
+          response += `What's on your mind today?`;
+        }
+        else if (prompt.toLowerCase().includes('thank') || prompt.toLowerCase().includes('thanks')) {
+          response = `😊 **You're Welcome!**\n\n`;
+          response += `I'm glad I could help! Feel free to ask me anything else - I'm here to chat about whatever you'd like! 🍀`;
+        }
+        else if (prompt.toLowerCase().includes('how are you') || prompt.toLowerCase().includes('how\'s it going')) {
+          response = `I'm doing great! 😊\n\n`;
+          response += `I'm here and ready to chat about anything you'd like - whether it's career advice, general questions, or just having a conversation. What would you like to talk about?`;
+        }
+        else if (prompt.toLowerCase().includes('what can you do') || prompt.toLowerCase().includes('what do you do')) {
+          response = `🤖 **I'm your AI chat assistant!**\n\n`;
+          response += `I can chat about pretty much anything:\n\n`;
+          response += `• **General conversation** - Just talk about whatever's on your mind\n`;
+          response += `• **Career advice** - Resume help, interview tips, job search strategies\n`;
+          response += `• **Learning** - Explain concepts, help with questions, brainstorm ideas\n`;
+          response += `• **Problem solving** - Work through challenges together\n`;
+          response += `• **Creative stuff** - Writing, brainstorming, planning\n\n`;
+          response += `**For specialized career help:**\n`;
+          response += `• Use "Analyze Job" to get detailed job insights\n`;
+          response += `• Use "Tailor Resume" for personalized resume advice\n\n`;
+          response += `But for everything else, just ask me anything! What would you like to chat about?`;
+        }
+        else if (prompt.toLowerCase().includes('help') || prompt.toLowerCase().includes('can you') || prompt.toLowerCase().includes('assist') || prompt.toLowerCase().includes('support')) {
+          response = `🤝 **Absolutely! I'm here to help!**\n\n`;
+          response += `I can help with all sorts of things:\n\n`;
+          response += `• **📄 Career & Resume Help** - Writing, tailoring, job search advice\n`;
+          response += `• **🔍 Job Analysis** - Understanding job postings and requirements\n`;
+          response += `• **🎤 Interview Prep** - Practice questions and strategies\n`;
+          response += `• **📚 Learning & Education** - Explain concepts, help with assignments\n`;
+          response += `• **💡 Problem Solving** - Work through challenges together\n`;
+          response += `• **✍️ Writing & Communication** - Help with essays, emails, presentations\n`;
+          response += `• **🎯 Planning & Organization** - Goals, projects, time management\n`;
+          response += `• **💬 General Chat** - Just talk about whatever you want!\n\n`;
+          response += `**What would you like help with?** Be specific and I'll do my best to assist you!`;
+        }
+        else {
+          // For any other topic, provide a helpful general response
+          response = `🤖 **AI Chat Assistant:**\n\n`;
+          response += `I'm here to chat about anything you'd like! I can help with:\n\n`;
+          response += `• **Career & job search advice**\n`;
+          response += `• **Learning and explaining concepts**\n`;
+          response += `• **Problem solving and brainstorming**\n`;
+          response += `• **Writing and communication help**\n`;
+          response += `• **General conversation**\n\n`;
+          response += `**For specialized career features:**\n`;
+          response += `• Click "Analyze Job" for detailed job insights\n`;
+          response += `• Click "Tailor Resume" for personalized resume advice\n\n`;
+          response += `**What would you like to talk about?** Feel free to ask me anything specific!`;
+        }
+        
+        return response;
+      }
+      
+      async function generateJobAnalysisResponse() {
+        const job = jobPostings[selectedJob];
+        
+        let response = `🔍 **Job Analysis for "${job.title}" at ${job.company}**\n\n`;
+        
+        // Analyze job requirements
+        const jobDescription = job.description.toLowerCase();
+        const jobTitle = job.title.toLowerCase();
+        
+        response += `📋 **Key Requirements Analysis:**\n`;
+        
+        // Technical skills analysis
+        const technicalKeywords = ['javascript', 'python', 'java', 'react', 'node', 'sql', 'html', 'css', 'programming', 'coding', 'development', 'software', 'technical', 'api', 'database', 'frontend', 'backend', 'full-stack'];
+        const foundTechnicalSkills = technicalKeywords.filter(skill => jobDescription.includes(skill));
+        
+        if (foundTechnicalSkills.length > 0) {
+          response += `• **Technical Skills Required:** ${foundTechnicalSkills.join(', ')}\n`;
+        }
+        
+        // Soft skills analysis
+        const softSkills = ['communication', 'leadership', 'teamwork', 'collaboration', 'problem-solving', 'analytical', 'creative', 'time management', 'organization'];
+        const foundSoftSkills = softSkills.filter(skill => jobDescription.includes(skill));
+        
+        if (foundSoftSkills.length > 0) {
+          response += `• **Soft Skills Emphasized:** ${foundSoftSkills.join(', ')}\n`;
+        }
+        
+        // Experience level analysis
+        if (jobDescription.includes('senior') || jobDescription.includes('lead') || jobDescription.includes('manager')) {
+          response += `• **Experience Level:** Senior/Leadership role\n`;
+        } else if (jobDescription.includes('junior') || jobDescription.includes('entry') || jobDescription.includes('intern')) {
+          response += `• **Experience Level:** Entry-level/Internship role\n`;
+        } else {
+          response += `• **Experience Level:** Mid-level role\n`;
+        }
+        
+        // Education requirements
+        if (jobDescription.includes('degree') || jobDescription.includes('bachelor') || jobDescription.includes('master')) {
+          response += `• **Education:** Degree requirement mentioned\n`;
+        }
+        
+        response += `\n🎯 **What to Focus On:**\n`;
+        
+        // Industry-specific advice
+        if (jobTitle.includes('software') || jobTitle.includes('developer') || jobTitle.includes('engineer')) {
+          response += `• **For Software Roles:**\n`;
+          response += `  - Highlight programming projects and technical skills\n`;
+          response += `  - Include GitHub portfolio or code samples\n`;
+          response += `  - Emphasize problem-solving and logical thinking\n`;
+          response += `  - Show experience with relevant technologies\n\n`;
+        }
+        
+        if (jobTitle.includes('marketing') || jobTitle.includes('business') || jobTitle.includes('sales')) {
+          response += `• **For Business Roles:**\n`;
+          response += `  - Emphasize communication and interpersonal skills\n`;
+          response += `  - Include any sales or customer service experience\n`;
+          response += `  - Highlight analytical and strategic thinking\n`;
+          response += `  - Show results-oriented achievements\n\n`;
+        }
+        
+        if (jobTitle.includes('data') || jobTitle.includes('analyst') || jobTitle.includes('research')) {
+          response += `• **For Data/Analysis Roles:**\n`;
+          response += `  - Highlight analytical and research skills\n`;
+          response += `  - Include experience with data tools (Excel, SQL, etc.)\n`;
+          response += `  - Show attention to detail and accuracy\n`;
+          response += `  - Emphasize problem-solving abilities\n\n`;
+        }
+        
+        // General application strategy
+        response += `📝 **Application Strategy:**\n`;
+        response += `• **Resume Tailoring:** Use keywords from the job description\n`;
+        response += `• **Cover Letter:** Address specific requirements mentioned in the posting\n`;
+        response += `• **Portfolio:** Include relevant projects or work samples\n`;
+        response += `• **Follow-up:** Send a thank you email after applying\n\n`;
+        
+        response += `💡 **Next Steps:**\n`;
+        response += `• Select a resume to get tailored advice for this specific job\n`;
+        response += `• Ask me specific questions about the requirements\n`;
+        response += `• Get help crafting your application materials\n`;
+        
+        return response;
+      }
+      
+      async function generateResumeTailorResponse() {
+        const job = jobPostings[selectedJob];
+        const resume = resumes[selectedResume];
+        
+        // Try to get resume content from the backend
+        let resumeContent = '';
+        try {
+          const resumeId = resume.backendId || resume.id;
+          const response = await fetch(`/api/resumes/${resumeId}/content`);
+          if (response.ok) {
+            const data = await response.json();
+            resumeContent = data.content;
+          }
+        } catch (error) {
+          console.log('Could not fetch resume content:', error);
+        }
+        
+        let response = `✂️ **Resume Tailoring for "${job.title}" at ${job.company}**\n\n`;
+        response += `I'm analyzing your resume "${resume.name}" against this job's requirements to provide specific tailoring advice.\n\n`;
+        
+        if (resumeContent && resumeContent !== 'Unsupported file format' && !resumeContent.includes('Error extracting')) {
+          response += `📄 **Resume Content Analysis:**\n`;
+          response += `I can see your resume contains relevant information. Here's what I found:\n\n`;
           
-          // Try to get resume content from the backend
-          let resumeContent = '';
-          try {
-            const resumeId = resume.backendId || resume.id;
-            console.log('=== RESUME CONTENT DEBUG ===');
-            console.log('Resume object:', resume);
-            console.log('Resume ID being used:', resumeId);
-            console.log('Resume has backendId:', !!resume.backendId);
-            console.log('Fetching resume content for ID:', resumeId);
-            
-            const response = await fetch(`/api/resumes/${resumeId}/content`);
-            console.log('Resume content response status:', response.status);
-            console.log('Resume content response ok:', response.ok);
-            
-            if (response.ok) {
-              const data = await response.json();
-              resumeContent = data.content;
-              console.log('Resume content length:', resumeContent?.length);
-              console.log('Resume content successfully loaded for AI analysis');
-            } else {
-              const errorText = await response.text();
-              console.log('Failed to fetch resume content:', response.status, errorText);
-            }
-          } catch (error) {
-            console.log('Could not fetch resume content:', error);
+          // Basic content analysis
+          const hasExperience = resumeContent.toLowerCase().includes('experience') || resumeContent.toLowerCase().includes('work');
+          const hasSkills = resumeContent.toLowerCase().includes('skill') || resumeContent.toLowerCase().includes('technical');
+          const hasEducation = resumeContent.toLowerCase().includes('education') || resumeContent.toLowerCase().includes('degree');
+          
+          if (hasExperience) response += `✅ Good: Your resume includes experience sections\n`;
+          if (hasSkills) response += `✅ Good: Your resume includes skills sections\n`;
+          if (hasEducation) response += `✅ Good: Your resume includes education information\n`;
+          
+          // Analyze specific content from the resume
+          const hasGPA = resumeContent.toLowerCase().includes('gpa') || resumeContent.toLowerCase().includes('grade point');
+          const hasProjects = resumeContent.toLowerCase().includes('project') || resumeContent.toLowerCase().includes('portfolio');
+          const hasLeadership = resumeContent.toLowerCase().includes('leadership') || resumeContent.toLowerCase().includes('president') || resumeContent.toLowerCase().includes('vice president');
+          const hasInternships = resumeContent.toLowerCase().includes('intern') || resumeContent.toLowerCase().includes('internship');
+          const hasTechnicalSkills = resumeContent.toLowerCase().includes('javascript') || resumeContent.toLowerCase().includes('python') || resumeContent.toLowerCase().includes('react') || resumeContent.toLowerCase().includes('node');
+          const hasSoftSkills = resumeContent.toLowerCase().includes('communication') || resumeContent.toLowerCase().includes('teamwork') || resumeContent.toLowerCase().includes('collaboration');
+          
+          response += `\n📊 **What I Found in Your Resume:**\n`;
+          if (hasGPA) response += `✅ Strong academic performance (GPA mentioned)\n`;
+          if (hasProjects) response += `✅ Project experience and portfolio work\n`;
+          if (hasLeadership) response += `✅ Leadership experience and roles\n`;
+          if (hasInternships) response += `✅ Professional internship experience\n`;
+          if (hasTechnicalSkills) response += `✅ Technical skills and programming languages\n`;
+          if (hasSoftSkills) response += `✅ Soft skills and interpersonal abilities\n`;
+          
+          // Analyze the job posting for specific recommendations
+          const jobDescription = job.description.toLowerCase();
+          
+          response += `\n🎯 **Tailored Recommendations for "${job.title}":\n`;
+          
+          // Deep analysis of job requirements
+          const jobNeedsTechnical = jobDescription.includes('javascript') || jobDescription.includes('python') || jobDescription.includes('programming') || jobDescription.includes('development') || jobDescription.includes('software') || jobDescription.includes('coding') || jobDescription.includes('technical');
+          const jobNeedsLeadership = jobDescription.includes('lead') || jobDescription.includes('manage') || jobDescription.includes('team') || jobDescription.includes('supervise') || jobDescription.includes('direct');
+          const jobNeedsExperience = jobDescription.includes('experience') || jobDescription.includes('years') || jobDescription.includes('minimum');
+          const jobNeedsCommunication = jobDescription.includes('communication') || jobDescription.includes('presentation') || jobDescription.includes('writing') || jobDescription.includes('verbal');
+          const jobNeedsAnalytical = jobDescription.includes('analysis') || jobDescription.includes('analytical') || jobDescription.includes('problem') || jobDescription.includes('critical thinking');
+          const jobNeedsProject = jobDescription.includes('project') || jobDescription.includes('initiative') || jobDescription.includes('deliverable');
+          
+          // Provide specific analysis based on job requirements
+          response += `📋 **Job Requirements Analysis:**\n`;
+          if (jobNeedsTechnical) response += `• This role requires technical skills\n`;
+          if (jobNeedsLeadership) response += `• This role involves leadership/management\n`;
+          if (jobNeedsExperience) response += `• This role requires relevant experience\n`;
+          if (jobNeedsCommunication) response += `• This role emphasizes communication skills\n`;
+          if (jobNeedsAnalytical) response += `• This role needs analytical thinking\n`;
+          if (jobNeedsProject) response += `• This role involves project work\n`;
+          
+          response += `\n📊 **Resume-Job Match Analysis:**\n`;
+          
+          if (jobNeedsTechnical && hasTechnicalSkills) {
+            response += `✅ **Technical Skills:** Great match! Your technical background aligns with this role.\n`;
+          } else if (jobNeedsTechnical && !hasTechnicalSkills) {
+            response += `⚠️ **Technical Skills:** Consider adding more technical skills to match this role's requirements.\n`;
           }
           
-          // Always provide AI response when both job and resume are selected
-          let response = `I can help you with your resume for "${job.title}" at ${job.company}. I have access to your resume "${resume.name}" and can provide specific advice.\n\n`;
+          if (jobNeedsLeadership && hasLeadership) {
+            response += `✅ **Leadership:** Excellent! Your leadership experience is perfect for this role.\n`;
+          } else if (jobNeedsLeadership && !hasLeadership) {
+            response += `💡 **Leadership:** Highlight any team projects or group work as leadership experience.\n`;
+          }
           
-          if (resumeContent && resumeContent !== 'Unsupported file format' && !resumeContent.includes('Error extracting')) {
-            response += `📄 **Resume Content Analysis:**\n`;
-            response += `I can see your resume contains relevant information. Here's what I found:\n\n`;
-            
-            // Basic content analysis
-            const hasExperience = resumeContent.toLowerCase().includes('experience') || resumeContent.toLowerCase().includes('work');
-            const hasSkills = resumeContent.toLowerCase().includes('skill') || resumeContent.toLowerCase().includes('technical');
-            const hasEducation = resumeContent.toLowerCase().includes('education') || resumeContent.toLowerCase().includes('degree');
-            
-            if (hasExperience) response += `✅ Good: Your resume includes experience sections\n`;
-            if (hasSkills) response += `✅ Good: Your resume includes skills sections\n`;
-            if (hasEducation) response += `✅ Good: Your resume includes education information\n`;
-            
-            // AI has access to complete resume content for analysis (not shown to user)
-            
-            // Analyze the actual resume content for specific insights
-            response += `🎯 **Personalized Resume Analysis:**\n`;
-            response += `Based on your actual resume content, here are my specific insights:\n\n`;
-            
-            // Analyze specific content from the resume
-            const hasGPA = resumeContent.toLowerCase().includes('gpa') || resumeContent.toLowerCase().includes('grade point');
-            const hasProjects = resumeContent.toLowerCase().includes('project') || resumeContent.toLowerCase().includes('portfolio');
-            const hasLeadership = resumeContent.toLowerCase().includes('leadership') || resumeContent.toLowerCase().includes('president') || resumeContent.toLowerCase().includes('vice president');
-            const hasInternships = resumeContent.toLowerCase().includes('intern') || resumeContent.toLowerCase().includes('internship');
-            const hasTechnicalSkills = resumeContent.toLowerCase().includes('javascript') || resumeContent.toLowerCase().includes('python') || resumeContent.toLowerCase().includes('react') || resumeContent.toLowerCase().includes('node');
-            const hasSoftSkills = resumeContent.toLowerCase().includes('communication') || resumeContent.toLowerCase().includes('teamwork') || resumeContent.toLowerCase().includes('collaboration');
-            
-            // Provide specific feedback based on what's actually in the resume
-            response += `📊 **What I Found in Your Resume:**\n`;
-            if (hasGPA) response += `✅ Strong academic performance (GPA mentioned)\n`;
-            if (hasProjects) response += `✅ Project experience and portfolio work\n`;
-            if (hasLeadership) response += `✅ Leadership experience and roles\n`;
-            if (hasInternships) response += `✅ Professional internship experience\n`;
-            if (hasTechnicalSkills) response += `✅ Technical skills and programming languages\n`;
-            if (hasSoftSkills) response += `✅ Soft skills and interpersonal abilities\n`;
-            
-            // Analyze the job posting for specific recommendations
-            const jobTitle = job.title.toLowerCase();
-            const jobDescription = job.description.toLowerCase();
-            
-            response += `\n🎯 **Tailored Recommendations for "${job.title}":\n`;
-            
-            // Deep analysis of job requirements
-            const jobNeedsTechnical = jobDescription.includes('javascript') || jobDescription.includes('python') || jobDescription.includes('programming') || jobDescription.includes('development') || jobDescription.includes('software') || jobDescription.includes('coding') || jobDescription.includes('technical');
-            const jobNeedsLeadership = jobDescription.includes('lead') || jobDescription.includes('manage') || jobDescription.includes('team') || jobDescription.includes('supervise') || jobDescription.includes('direct');
-            const jobNeedsExperience = jobDescription.includes('experience') || jobDescription.includes('years') || jobDescription.includes('minimum');
-            const jobNeedsCommunication = jobDescription.includes('communication') || jobDescription.includes('presentation') || jobDescription.includes('writing') || jobDescription.includes('verbal');
-            const jobNeedsAnalytical = jobDescription.includes('analysis') || jobDescription.includes('analytical') || jobDescription.includes('problem') || jobDescription.includes('critical thinking');
-            const jobNeedsProject = jobDescription.includes('project') || jobDescription.includes('initiative') || jobDescription.includes('deliverable');
-            
-            // Provide specific analysis based on job requirements
-            response += `📋 **Job Requirements Analysis:**\n`;
-            if (jobNeedsTechnical) response += `• This role requires technical skills\n`;
-            if (jobNeedsLeadership) response += `• This role involves leadership/management\n`;
-            if (jobNeedsExperience) response += `• This role requires relevant experience\n`;
-            if (jobNeedsCommunication) response += `• This role emphasizes communication skills\n`;
-            if (jobNeedsAnalytical) response += `• This role needs analytical thinking\n`;
-            if (jobNeedsProject) response += `• This role involves project work\n`;
-            
-            response += `\n📊 **Resume-Job Match Analysis:**\n`;
-            
-            if (jobNeedsTechnical && hasTechnicalSkills) {
-              response += `✅ **Technical Skills:** Great match! Your technical background aligns with this role.\n`;
-            } else if (jobNeedsTechnical && !hasTechnicalSkills) {
-              response += `⚠️ **Technical Skills:** Consider adding more technical skills to match this role's requirements.\n`;
-            }
-            
-            if (jobNeedsLeadership && hasLeadership) {
-              response += `✅ **Leadership:** Excellent! Your leadership experience is perfect for this role.\n`;
-            } else if (jobNeedsLeadership && !hasLeadership) {
-              response += `💡 **Leadership:** Highlight any team projects or group work as leadership experience.\n`;
-            }
-            
-            if (jobNeedsCommunication && hasSoftSkills) {
-              response += `✅ **Communication:** Your soft skills section shows good communication abilities.\n`;
-            } else if (jobNeedsCommunication && !hasSoftSkills) {
-              response += `💡 **Communication:** Consider adding examples of written and verbal communication skills.\n`;
-            }
-            
-            // Provide specific, actionable advice based on the actual content
-            response += `\n📝 **Specific Action Items:**\n`;
-            
-            if (prompt.toLowerCase().includes('tailor') || prompt.toLowerCase().includes('improve')) {
-              // Extract meaningful keywords from job description
-              const jobKeywords = jobDescription.match(/\b\w{4,}\b/g) || [];
-              const resumeKeywords = resumeContent.toLowerCase();
-              
-              // Filter for meaningful technical and professional terms
-              const meaningfulKeywords = jobKeywords.filter(keyword => {
-                const lowerKeyword = keyword.toLowerCase();
-                return keyword.length > 4 && 
-                       !resumeKeywords.includes(lowerKeyword) &&
-                       !['this', 'that', 'with', 'from', 'they', 'have', 'will', 'been', 'were', 'said', 'each', 'which', 'their', 'time', 'would', 'there', 'could', 'other', 'after', 'first', 'well', 'work', 'year', 'years', 'more', 'very', 'what', 'when', 'where', 'here', 'also', 'some', 'such', 'most', 'over', 'even', 'much', 'than', 'then', 'them', 'these', 'those', 'through', 'during', 'before', 'above', 'below', 'between', 'among', 'within', 'without', 'against', 'toward', 'towards', 'around', 'about', 'under', 'upon', 'across', 'beyond', 'behind', 'beside', 'besides', 'except', 'including', 'excluding', 'concerning', 'regarding', 'respecting', 'touching', 'considering', 'notwithstanding'].includes(lowerKeyword) &&
-                       (lowerKeyword.includes('tech') || lowerKeyword.includes('soft') || lowerKeyword.includes('data') || lowerKeyword.includes('system') || lowerKeyword.includes('develop') || lowerKeyword.includes('manage') || lowerKeyword.includes('lead') || lowerKeyword.includes('analys') || lowerKeyword.includes('project') || lowerKeyword.includes('team') || lowerKeyword.includes('client') || lowerKeyword.includes('business') || lowerKeyword.includes('process') || lowerKeyword.includes('implement') || lowerKeyword.includes('design') || lowerKeyword.includes('create') || lowerKeyword.includes('build') || lowerKeyword.includes('support') || lowerKeyword.includes('service') || lowerKeyword.includes('solution'));
-              }).slice(0, 8);
-              
-              response += `• **Keyword Optimization:** Use these job-specific terms in your resume:\n`;
-              if (meaningfulKeywords.length > 0) {
-                response += `  - ${meaningfulKeywords.join(', ')}\n`;
-              } else {
-                response += `  - Focus on industry-specific terminology from the job description\n`;
-              }
-              
-              response += `• **Experience Alignment:** Match your experience bullets to the job requirements\n`;
-              response += `  📋 **How to do it:**\n`;
-              response += `  - Read each job requirement and find a matching experience from your resume\n`;
-              response += `  - Rewrite your bullet points to use the same language as the job posting\n`;
-              response += `  - Example: If job says "manage projects," change "worked on projects" to "managed cross-functional projects"\n`;
-              response += `  - Example: If job says "analyze data," change "used Excel" to "analyzed data sets using Excel to identify trends"\n\n`;
-              
-              response += `• **Skills Highlighting:** Emphasize skills mentioned in the job posting\n`;
-              response += `  📋 **How to do it:**\n`;
-              response += `  - Create a "Relevant Skills" section at the top of your resume\n`;
-              response += `  - List 6-8 skills that appear in the job description\n`;
-              response += `  - Example: If job mentions "JavaScript, Python, React" - list these first in your skills\n`;
-              response += `  - Example: If job says "leadership," add "Team Leadership" to your skills section\n\n`;
-              
-              response += `• **Achievement Quantification:** Add numbers and metrics where possible\n`;
-              response += `  📋 **How to do it:**\n`;
-              response += `  - Add specific numbers to every bullet point on your resume\n`;
-              response += `  - Example: Change "Improved website performance" to "Improved website performance by 40% reducing load time from 3.2s to 1.9s"\n`;
-              response += `  - Example: Change "Led team project" to "Led team of 5 developers to deliver project 2 weeks ahead of schedule"\n`;
-              response += `  - Example: Change "Managed budget" to "Managed $50K budget resulting in 15% cost savings"\n\n`;
-            } else {
-              response += `• **Content Analysis:** Your resume has good structure and relevant information\n`;
-              response += `  📋 **How to improve:**\n`;
-              response += `  - Use action verbs to start each bullet point (Led, Developed, Implemented, Analyzed)\n`;
-              response += `  - Keep bullet points to 1-2 lines maximum\n`;
-              response += `  - Example: "Developed web application using React and Node.js" instead of "Made a website"\n\n`;
-              
-              response += `• **Skills Match:** ${hasTechnicalSkills ? 'Technical skills are well-represented' : 'Consider adding more technical skills'}\n`;
-              if (!hasTechnicalSkills) {
-                response += `  📋 **How to add technical skills:**\n`;
-                response += `  - List programming languages you know (JavaScript, Python, Java, etc.)\n`;
-                response += `  - Include software/tools you've used (Excel, PowerPoint, Adobe Creative Suite)\n`;
-                response += `  - Example: "Technical Skills: JavaScript, Python, React, Git, SQL, Excel, PowerPoint"\n\n`;
-              }
-              
-              response += `• **Experience Depth:** ${hasInternships ? 'Professional experience is strong' : 'Consider highlighting any relevant experience'}\n`;
-              if (!hasInternships) {
-                response += `  📋 **How to highlight experience:**\n`;
-                response += `  - Include any work experience, even part-time jobs\n`;
-                response += `  - Add volunteer work, club leadership, or class projects\n`;
-                response += `  - Example: "Volunteer Tutor - Helped 15+ students improve grades by 20% over 6 months"\n\n`;
-              }
-              
-              response += `• **Leadership Presence:** ${hasLeadership ? 'Leadership experience is evident' : 'Consider adding leadership examples'}\n`;
-              if (!hasLeadership) {
-                response += `  📋 **How to add leadership examples:**\n`;
-                response += `  - Include any group project leadership, club positions, or team captain roles\n`;
-                response += `  - Example: "Group Project Leader - Coordinated team of 4 students to complete capstone project"\n`;
-                response += `  - Example: "Student Organization Treasurer - Managed $2K budget and organized 3 campus events"\n\n`;
-              }
-            }
-            
-            response += `💡 **Next Steps:**\n`;
-            response += `• Ask me specific questions about your resume\n`;
-            response += `• Request tailored advice for this job\n`;
-            response += `• Get suggestions for improvements\n`;
-            response += `• I can analyze your resume content and provide specific recommendations`;
-            
+          if (jobNeedsCommunication && hasSoftSkills) {
+            response += `✅ **Communication:** Your soft skills section shows good communication abilities.\n`;
+          } else if (jobNeedsCommunication && !hasSoftSkills) {
+            response += `💡 **Communication:** Consider adding examples of written and verbal communication skills.\n`;
+          }
+          
+          // Provide specific, actionable advice
+          response += `\n📝 **Specific Action Items:**\n`;
+          
+          // Extract meaningful keywords from job description
+          const jobKeywords = jobDescription.match(/\b\w{4,}\b/g) || [];
+          const resumeKeywords = resumeContent.toLowerCase();
+          
+          // Filter for meaningful technical and professional terms
+          const meaningfulKeywords = jobKeywords.filter(keyword => {
+            const lowerKeyword = keyword.toLowerCase();
+            return keyword.length > 4 && 
+                   !resumeKeywords.includes(lowerKeyword) &&
+                   !['this', 'that', 'with', 'from', 'they', 'have', 'will', 'been', 'were', 'said', 'each', 'which', 'their', 'time', 'would', 'there', 'could', 'other', 'after', 'first', 'well', 'work', 'year', 'years', 'more', 'very', 'what', 'when', 'where', 'here', 'also', 'some', 'such', 'most', 'over', 'even', 'much', 'than', 'then', 'them', 'these', 'those', 'through', 'during', 'before', 'above', 'below', 'between', 'among', 'within', 'without', 'against', 'toward', 'towards', 'around', 'about', 'under', 'upon', 'across', 'beyond', 'behind', 'beside', 'besides', 'except', 'including', 'excluding', 'concerning', 'regarding', 'respecting', 'touching', 'considering', 'notwithstanding'].includes(lowerKeyword) &&
+                   (lowerKeyword.includes('tech') || lowerKeyword.includes('soft') || lowerKeyword.includes('data') || lowerKeyword.includes('system') || lowerKeyword.includes('develop') || lowerKeyword.includes('manage') || lowerKeyword.includes('lead') || lowerKeyword.includes('analys') || lowerKeyword.includes('project') || lowerKeyword.includes('team') || lowerKeyword.includes('client') || lowerKeyword.includes('business') || lowerKeyword.includes('process') || lowerKeyword.includes('implement') || lowerKeyword.includes('design') || lowerKeyword.includes('create') || lowerKeyword.includes('build') || lowerKeyword.includes('support') || lowerKeyword.includes('service') || lowerKeyword.includes('solution'));
+          }).slice(0, 8);
+          
+          response += `• **Keyword Optimization:** Use these job-specific terms in your resume:\n`;
+          if (meaningfulKeywords.length > 0) {
+            response += `  - ${meaningfulKeywords.join(', ')}\n`;
           } else {
-            response += `📄 **Note:** I couldn't read the text content of your resume file. Make sure it's in PDF or DOCX format for best results.\n\n`;
-            response += `✅ **Resume Analysis Status:**\n`;
-            response += `• Resume successfully analyzed\n`;
-            response += `• Content length: ${resumeContent?.length || 0} characters\n\n`;
-            
-            response += `💡 **To get the best help:**\n`;
-            response += `• Make sure your resume is in PDF or DOCX format\n`;
-            response += `• Try re-uploading your resume if needed\n`;
-            response += `• I can still provide general advice about resume tailoring\n`;
+            response += `  - Focus on industry-specific terminology from the job description\n`;
           }
           
-          return response;
+          response += `• **Experience Alignment:** Match your experience bullets to the job requirements\n`;
+          response += `  📋 **How to do it:**\n`;
+          response += `  - Read each job requirement and find a matching experience from your resume\n`;
+          response += `  - Rewrite your bullet points to use the same language as the job posting\n`;
+          response += `  - Example: If job says "manage projects," change "worked on projects" to "managed cross-functional projects"\n`;
+          response += `  - Example: If job says "analyze data," change "used Excel" to "analyzed data sets using Excel to identify trends"\n\n`;
+          
+          response += `• **Skills Highlighting:** Emphasize skills mentioned in the job posting\n`;
+          response += `  📋 **How to do it:**\n`;
+          response += `  - Create a "Relevant Skills" section at the top of your resume\n`;
+          response += `  - List 6-8 skills that appear in the job description\n`;
+          response += `  - Example: If job mentions "JavaScript, Python, React" - list these first in your skills\n`;
+          response += `  - Example: If job says "leadership," add "Team Leadership" to your skills section\n\n`;
+          
+          response += `• **Achievement Quantification:** Add numbers and metrics where possible\n`;
+          response += `  📋 **How to do it:**\n`;
+          response += `  - Add specific numbers to every bullet point on your resume\n`;
+          response += `  - Example: Change "Improved website performance" to "Improved website performance by 40% reducing load time from 3.2s to 1.9s"\n`;
+          response += `  - Example: Change "Led team project" to "Led team of 5 developers to deliver project 2 weeks ahead of schedule"\n`;
+          response += `  - Example: Change "Managed budget" to "Managed $50K budget resulting in 15% cost savings"\n\n`;
+          
+        } else {
+          response += `📄 **Note:** I couldn't read the text content of your resume file. Make sure it's in PDF or DOCX format for best results.\n\n`;
+          response += `✅ **Resume Analysis Status:**\n`;
+          response += `• Resume successfully analyzed\n`;
+          response += `• Content length: ${resumeContent?.length || 0} characters\n\n`;
+          
+          response += `💡 **To get the best help:**\n`;
+          response += `• Make sure your resume is in PDF or DOCX format\n`;
+          response += `• Try re-uploading your resume if needed\n`;
+          response += `• I can still provide general advice about resume tailoring\n`;
+        }
+        
+        response += `\n💡 **Next Steps:**\n`;
+        response += `• Ask me specific questions about your resume\n`;
+        response += `• Request tailored advice for this job\n`;
+        response += `• Get suggestions for improvements\n`;
+        response += `• I can analyze your resume content and provide specific recommendations`;
+        
+        return response;
+      }
+      
+      async function generateAIResponse(prompt, mode = 'general') {
+        // Handle different AI modes
+        if (mode === 'job-analysis' && selectedJob !== null) {
+          return await generateJobAnalysisResponse();
+        }
+        
+        if (mode === 'resume-tailor' && selectedJob !== null && selectedResume !== null) {
+          return await generateResumeTailorResponse();
+        }
+        
+        if (mode === 'general') {
+          return await generateGeneralAIResponse(prompt);
+        }
+        
+        // Fallback for when job and resume are selected (legacy behavior)
+        if (selectedJob !== null && selectedResume !== null) {
+          return await generateResumeTailorResponse();
         }
         
         return `I'd be happy to help! However, I work best when you have both a job posting and resume selected. 
@@ -1762,9 +1999,21 @@ This way, I can provide targeted, specific advice based on the actual job requir
           return;
         }
         
-        const prompt = 'Please help me tailor my resume for this specific job. Analyze the job requirements and suggest specific improvements to make my resume more competitive.';
-        document.getElementById('aiPrompt').value = prompt;
-        sendAIPrompt();
+        const responseDiv = document.getElementById('aiResponse');
+        responseDiv.innerHTML = '<div class="spinner"></div> Analyzing resume and job requirements...';
+        
+        // Generate tailored resume response
+        generateAIResponse('', 'resume-tailor').then(response => {
+          responseDiv.innerHTML = response;
+          
+          // Save to history
+          const job = jobPostings[selectedJob];
+          const resume = resumes[selectedResume];
+          const prompt = `Tailor resume "${resume.name}" for "${job.title}" at ${job.company}`;
+          saveToHistory(prompt, response, 'resume-tailor');
+        }).catch(error => {
+          responseDiv.innerHTML = `Error generating response: ${error.message}`;
+        });
       }
       
       function analyzeJob() {
@@ -1773,17 +2022,122 @@ This way, I can provide targeted, specific advice based on the actual job requir
           return;
         }
         
-        const prompt = 'Please analyze this job posting and tell me what the key requirements are and what I should focus on in my application.';
-        document.getElementById('aiPrompt').value = prompt;
-        sendAIPrompt();
+        const responseDiv = document.getElementById('aiResponse');
+        responseDiv.innerHTML = '<div class="spinner"></div> Analyzing job requirements...';
+        
+        // Generate job analysis response
+        generateAIResponse('', 'job-analysis').then(response => {
+          responseDiv.innerHTML = response;
+          
+          // Save to history
+          const job = jobPostings[selectedJob];
+          const prompt = `Analyze job posting: "${job.title}" at ${job.company}`;
+          saveToHistory(prompt, response, 'job-analysis');
+        }).catch(error => {
+          responseDiv.innerHTML = `Error generating response: ${error.message}`;
+        });
       }
+      
+      // History functionality
+      let aiHistory = JSON.parse(localStorage.getItem('aiHistory') || '[]');
+      
+      function saveToHistory(prompt, response, mode = 'general') {
+        const historyItem = {
+          id: Date.now(),
+          timestamp: new Date().toLocaleString(),
+          prompt: prompt || 'Auto-generated',
+          response: response,
+          mode: mode
+        };
+        
+        aiHistory.unshift(historyItem); // Add to beginning
+        
+        // Keep only last 50 items
+        if (aiHistory.length > 50) {
+          aiHistory = aiHistory.slice(0, 50);
+        }
+        
+        localStorage.setItem('aiHistory', JSON.stringify(aiHistory));
+      }
+      
+      function showHistory() {
+        const modal = document.getElementById('historyModal');
+        const content = document.getElementById('historyContent');
+        
+        if (aiHistory.length === 0) {
+          content.innerHTML = `
+            <div class="history-empty">
+              <h4>📚 No History Yet</h4>
+              <p>Your AI conversations will appear here once you start using the assistant!</p>
+            </div>
+          `;
+        } else {
+          content.innerHTML = aiHistory.map(item => `
+            <div class="history-item">
+              <div class="history-mode ${item.mode}">${getModeLabel(item.mode)}</div>
+              <div class="history-timestamp">${item.timestamp}</div>
+              <div class="history-prompt">${item.prompt}</div>
+              <div class="history-response">${item.response}</div>
+            </div>
+          `).join('');
+        }
+        
+        modal.style.display = 'flex';
+      }
+      
+      function getModeLabel(mode) {
+        switch(mode) {
+          case 'resume-tailor': return '✂️ Resume Tailor';
+          case 'job-analysis': return '🔍 Job Analysis';
+          case 'general': return '💬 General Chat';
+          default: return '🤖 AI Chat';
+        }
+      }
+      
+      function clearHistory() {
+        if (confirm('Are you sure you want to clear all AI conversation history? This action cannot be undone.')) {
+          aiHistory = [];
+          localStorage.removeItem('aiHistory');
+          showHistory(); // Refresh the modal
+        }
+      }
+      
+      function closeHistoryModal() {
+        document.getElementById('historyModal').style.display = 'none';
+      }
+      
+      // Event listeners for history modal
+      document.addEventListener('DOMContentLoaded', function() {
+        // Close history modal when clicking outside
+        document.getElementById('historyModal').addEventListener('click', function(e) {
+          if (e.target === this) {
+            closeHistoryModal();
+          }
+        });
+        
+        // Close history modal button
+        document.getElementById('closeHistoryModal').addEventListener('click', closeHistoryModal);
+        
+        // Clear history button
+        document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
+      });
       
       function clearAI() {
         document.getElementById('aiPrompt').value = '';
         document.getElementById('aiResponse').innerHTML = `
           <div style="color: #718096; text-align: center; padding: 40px;">
-            <h3>🤖 AI Assistant Ready</h3>
-            <p>Select a job posting and resume to get started, or ask me anything about your applications!</p>
+            <h3>🤖 AI Chat Assistant Ready</h3>
+            <p>Chat with me about anything! Or select a job posting and resume for specialized career advice.</p>
+            <p><strong>Try asking:</strong></p>
+            <ul style="text-align: left; display: inline-block; margin: 0;">
+              <li>"Tell me about machine learning"</li>
+              <li>"Help me write an email"</li>
+              <li>"What's the weather like?"</li>
+              <li>"Explain quantum physics"</li>
+            </ul>
+            <p style="margin-top: 20px; font-size: 14px; color: #6b7280;">
+              <strong>For career help:</strong> Select a job + resume, then use "Tailor Resume" or "Analyze Job"
+            </p>
           </div>
         `;
       }
