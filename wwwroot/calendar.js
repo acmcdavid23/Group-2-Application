@@ -1,4 +1,5 @@
 console.log('Calendar.js is loading...');
+console.log('Calendar.js file loaded successfully');
 const api = (path, opts) => fetch(path, opts).then(r=>{ if(!r.ok) return r.json().then(e=>{throw e}); return r.json(); });
 
 // Body scroll lock functions
@@ -89,7 +90,8 @@ function sendEventEmailJSReminder(event) {
 }
 
 // Calendar state
-let currentDate = new Date(2025, 8, 1); // September 2025
+let currentDate = new Date(2025, 8, 30); // September 30, 2025 (job posting date)
+console.log('Initial currentDate:', currentDate);
 let events = [];
 let customEvents = []; // Separate array for custom events
 let editingEvent = null; // Track which event we're editing
@@ -102,11 +104,25 @@ let dayViewBtn, weekViewBtn, monthViewBtn;
 // Current view state
 let currentView = 'month';
 
+// Debug: Track when currentView changes
+let originalCurrentView = currentView;
+Object.defineProperty(window, 'currentView', {
+    get: function() { return currentView; },
+    set: function(value) {
+        console.log('currentView changed from', currentView, 'to', value);
+        console.trace('Stack trace for currentView change:');
+        currentView = value;
+    }
+});
+
 // Initialize calendar
+console.log('Setting up DOMContentLoaded event listener');
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Initializing custom calendar...');
+    console.log('DOMContentLoaded event fired');
     
     // Initialize DOM elements
+    console.log('Getting DOM elements...');
     calendarTitle = document.getElementById('calendarTitle');
     calendarGrid = document.getElementById('calendarGrid');
     prevMonthBtn = document.getElementById('prevMonth');
@@ -123,6 +139,20 @@ document.addEventListener('DOMContentLoaded', function() {
     dayViewBtn = document.getElementById('dayViewBtn');
     weekViewBtn = document.getElementById('weekViewBtn');
     monthViewBtn = document.getElementById('monthViewBtn');
+    console.log('DOM elements retrieved');
+    
+    console.log('View buttons found:', {
+        dayViewBtn: !!dayViewBtn,
+        weekViewBtn: !!weekViewBtn,
+        monthViewBtn: !!monthViewBtn
+    });
+    
+    // Debug: Check if buttons exist in DOM
+    console.log('Button elements in DOM:', {
+        dayViewBtn: document.getElementById('dayViewBtn'),
+        weekViewBtn: document.getElementById('weekViewBtn'),
+        monthViewBtn: document.getElementById('monthViewBtn')
+    });
     
     // Check if elements exist
     console.log('Calendar elements:', {
@@ -181,18 +211,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // View button event listeners
     if (dayViewBtn) {
         dayViewBtn.addEventListener('click', () => {
+            console.log('Day view button clicked');
             setView('day');
         });
     }
     
     if (weekViewBtn) {
         weekViewBtn.addEventListener('click', () => {
+            console.log('Week view button clicked');
             setView('week');
         });
     }
     
     if (monthViewBtn) {
         monthViewBtn.addEventListener('click', () => {
+            console.log('Month view button clicked');
             setView('month');
         });
     }
@@ -239,19 +272,6 @@ document.addEventListener('DOMContentLoaded', function() {
         calendarGrid.classList.add('month-view');
     }
     
-    // Recurring event functionality
-    const isRecurringCheckbox = document.getElementById('isRecurring');
-    const recurringOptions = document.getElementById('recurringOptions');
-    
-    if (isRecurringCheckbox && recurringOptions) {
-        isRecurringCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                recurringOptions.style.display = 'flex';
-            } else {
-                recurringOptions.style.display = 'none';
-            }
-        });
-    }
     
     
     // Help modal functionality
@@ -286,10 +306,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Ensure calendar renders
-    setTimeout(() => {
+    setTimeout(async () => {
         clearOldEvents(); // Clear any old/duplicate events first
-        renderCalendar();
-        loadEvents();
+        await loadEvents(); // Load events first
+        renderCalendar(); // Then render calendar with events
         
         // Lock scroll if starting in day view
         if (currentView === 'day') {
@@ -300,6 +320,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Set calendar view
 function setView(view) {
+    console.log('setView called with:', view);
+    console.log('setView: Changing currentView from', currentView, 'to', view);
     currentView = view;
     
     // Update button states
@@ -313,6 +335,16 @@ function setView(view) {
         calendarGrid.classList.add(`${view}-view`);
     }
     
+    // Show/hide weekday header based on view
+    const weekdayHeader = document.getElementById('weekdayHeader');
+    if (weekdayHeader) {
+        if (view === 'month') {
+            weekdayHeader.style.display = 'grid';
+        } else {
+            weekdayHeader.style.display = 'none';
+        }
+    }
+    
     // Lock body scroll for day view (since it has its own scrollable area)
     if (view === 'day') {
         lockBodyScroll();
@@ -321,7 +353,11 @@ function setView(view) {
     }
     
     // Re-render calendar
-    renderCalendar();
+    console.log('setView: Loading events before rendering', view);
+    loadEvents().then(() => {
+        console.log('setView: Events loaded, now rendering', view, 'events:', events.length);
+        renderCalendar();
+    });
 }
 
 // Render the calendar
@@ -386,6 +422,7 @@ function renderCalendar() {
         renderMonthView(year, month);
     } else if (currentView === 'week') {
         console.log('Rendering week view for:', year, month);
+        console.log('Week view - currentView was set to:', currentView);
         renderWeekView(year, month);
     } else if (currentView === 'day') {
         console.log('Rendering day view for:', year, month);
@@ -446,8 +483,10 @@ function renderWeekView(year, month) {
     
     // Get the current date and find the start of the week (Sunday)
     const targetDate = new Date(year, month, currentDate.getDate() || 1);
+    console.log('Week view - targetDate:', targetDate);
     const startOfWeek = new Date(targetDate);
     startOfWeek.setDate(targetDate.getDate() - targetDate.getDay());
+    console.log('Week view - startOfWeek:', startOfWeek);
     
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const today = new Date();
@@ -486,10 +525,14 @@ function renderWeekView(year, month) {
         
         // Get events for this day
         const allEvents = [...events, ...customEvents];
+        console.log(`Week view - Processing day ${dayDate.toDateString()}, allEvents:`, allEvents);
         const dayEvents = allEvents.filter(event => {
             const eventDate = new Date(event.start);
-            return eventDate.toDateString() === dayDate.toDateString();
+            const matches = eventDate.toDateString() === dayDate.toDateString();
+            console.log(`Week view - Event "${event.title}" on ${eventDate.toDateString()} matches ${dayDate.toDateString()}: ${matches}`);
+            return matches;
         });
+        console.log(`Week view - Filtered events for ${dayDate.toDateString()}:`, dayEvents);
         
         // Add events to this day
         dayEvents.forEach(event => {
@@ -613,11 +656,16 @@ function renderDayView(year, month) {
         
         // Add events for this time slot
         const allEvents = [...events, ...customEvents];
+        console.log(`Day view - Processing hour ${hour} for ${targetDate.toDateString()}, allEvents:`, allEvents);
         const hourEvents = allEvents.filter(event => {
             const eventDate = new Date(event.start);
             const eventHour = eventDate.getHours();
-            return eventDate.toDateString() === targetDate.toDateString() && eventHour === hour;
+            const matches = eventDate.toDateString() === targetDate.toDateString() && 
+                   (eventHour === hour || (event.allDay && hour === 0));
+            console.log(`Day view - Event "${event.title}" on ${eventDate.toDateString()} at hour ${eventHour} (allDay: ${event.allDay}) matches hour ${hour}: ${matches}`);
+            return matches;
         });
+        console.log(`Day view - Filtered events for hour ${hour}:`, hourEvents);
         
         // Add event elements to time content
         hourEvents.forEach(event => {
@@ -1026,6 +1074,7 @@ function clearOldEvents() {
 async function loadEvents() {
     try {
         console.log('loadEvents() called - loading user-specific data');
+        console.log('loadEvents: Current events array length before loading:', events.length);
         const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
         console.log('Current user:', currentUser);
         
@@ -1059,6 +1108,11 @@ async function loadEvents() {
         console.log('Job posting events:', events);
         console.log('Custom events:', customEvents);
         console.log('Total events:', events.length + customEvents.length);
+        
+        // Debug: Check if we have job postings in localStorage
+        const jobPostings = JSON.parse(localStorage.getItem('jobPostings') || '[]');
+        console.log('Raw job postings from localStorage:', jobPostings);
+        console.log('loadEvents: Events array length after loading:', events.length);
         renderCalendar(); // Re-render to show events
     } catch (error) {
         console.error('Failed to load events:', error);
@@ -1141,50 +1195,6 @@ function closeEventModal() {
     validationMessages.innerHTML = '';
 }
 
-// Create recurring events
-function createRecurringEvents(title, startDate, time, description, color, recurringType, endDate, category) {
-    const events = [];
-    const start = new Date(startDate);
-    const end = endDate ? new Date(endDate) : new Date(start.getTime() + (365 * 24 * 60 * 60 * 1000)); // Default to 1 year
-    const current = new Date(start);
-    
-    let eventId = `custom-${Date.now()}`;
-    let eventCounter = 0;
-    
-    while (current <= end && eventCounter < 100) { // Limit to 100 events max
-        const eventDate = current.toISOString().split('T')[0];
-        const startDateTime = time ? `${eventDate}T${time}` : eventDate;
-        
-        const event = {
-            id: `${eventId}-${eventCounter}`,
-            title: title,
-            start: startDateTime,
-            color: color,
-            extendedProps: {
-                type: 'custom',
-                description: description,
-                recurring: true,
-                recurringType: recurringType,
-                category: category
-            }
-        };
-        
-        events.push(event);
-        
-        // Move to next occurrence
-        if (recurringType === 'daily') {
-            current.setDate(current.getDate() + 1);
-        } else if (recurringType === 'weekly') {
-            current.setDate(current.getDate() + 7);
-        } else if (recurringType === 'monthly') {
-            current.setMonth(current.getMonth() + 1);
-        }
-        
-        eventCounter++;
-    }
-    
-    return events;
-}
 
 async function saveEventToCalendar() {
     const formData = new FormData(eventForm);
@@ -1192,9 +1202,6 @@ async function saveEventToCalendar() {
     const date = formData.get('date');
     const time = formData.get('time');
     const description = formData.get('description');
-    const isRecurring = formData.get('isRecurring') === 'on';
-    const recurringType = formData.get('recurringType');
-    const recurringEnd = formData.get('recurringEnd');
     const category = formData.get('category') || 'other';
     // Color picker removed - use default color
     const color = '#3b82f6';
@@ -1240,26 +1247,19 @@ async function saveEventToCalendar() {
             }
         }
     } else {
-        // Create new event(s)
-        if (isRecurring && recurringType) {
-            // Create recurring events
-            const events = createRecurringEvents(title, date, time, description, color, recurringType, recurringEnd, category);
-            customEvents.push(...events);
-        } else {
-            // Create single event
-            const event = {
-                id: `custom-${Date.now()}`,
-                title: title,
-                start: startDateTime,
-                color: color,
-                extendedProps: {
-                    type: 'custom',
-                    description: description,
-                    category: category
-                }
-            };
-            customEvents.push(event);
-        }
+        // Create new event
+        const event = {
+            id: `custom-${Date.now()}`,
+            title: title,
+            start: startDateTime,
+            color: color,
+            extendedProps: {
+                type: 'custom',
+                description: description,
+                category: category
+            }
+        };
+        customEvents.push(event);
     }
     
     // Save to localStorage

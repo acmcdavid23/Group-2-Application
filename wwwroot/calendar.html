@@ -4,7 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Calendar - Internship Application Manager</title>
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="styles.css" rel="stylesheet" />
     <script src="theme.js"></script>
@@ -640,6 +639,7 @@
         font-size: 14px;
       }
       
+      
       .weekday {
         padding: 12px 8px;
         text-align: center;
@@ -930,60 +930,6 @@
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
       }
       
-      /* Recurring Event Styles */
-      .recurring-section {
-        margin-bottom: 16px;
-        padding: 12px;
-        background: #f8fafc;
-        border-radius: 8px;
-        border: 1px solid #e2e8f0;
-      }
-      
-      .recurring-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-weight: 500;
-        color: #374151;
-        cursor: pointer;
-        margin-bottom: 12px;
-      }
-      
-      .recurring-label input[type="checkbox"] {
-        width: 16px;
-        height: 16px;
-        accent-color: #3b82f6;
-      }
-      
-      .recurring-options {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        flex-wrap: wrap;
-      }
-      
-      .recurring-type, .recurring-end {
-        padding: 8px 12px;
-        border: 2px solid #e2e8f0;
-        border-radius: 6px;
-        font-size: 14px;
-        background: white;
-        transition: all 0.2s;
-      }
-      
-      .recurring-type {
-        min-width: 100px;
-      }
-      
-      .recurring-end {
-        min-width: 150px;
-      }
-      
-      .recurring-type:focus, .recurring-end:focus {
-        outline: none;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-      }
       
       /* Help System Styles */
       .site-header {
@@ -1505,20 +1451,6 @@
               <option value="meeting">Meeting</option>
               <option value="other">Other</option>
             </select>
-            <div class="recurring-section">
-              <label class="recurring-label">
-                <input type="checkbox" name="isRecurring" id="isRecurring" />
-                <span>Make this a recurring event</span>
-              </label>
-              <div id="recurringOptions" class="recurring-options" style="display: none;">
-                <select name="recurringType" class="recurring-type">
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                </select>
-                <input name="recurringEnd" type="date" placeholder="End date (optional)" class="recurring-end" />
-              </div>
-            </div>
             <textarea name="description" placeholder="Description (optional)" rows="3" style="resize: none;"></textarea>
           </form>
         </div>
@@ -1558,15 +1490,6 @@
           </ul>
         </div>
         
-        <div class="help-section">
-          <h4>🔄 Recurring Events</h4>
-          <ul>
-            <li>Check "Make this a recurring event" for regular events</li>
-            <li>Choose frequency: Daily, Weekly, or Monthly</li>
-            <li>Set an end date to limit how long events repeat</li>
-            <li>Perfect for weekly deadlines or regular meetings</li>
-          </ul>
-        </div>
         
         <div class="help-section">
           <h4>📊 Event Categories</h4>
@@ -1590,12 +1513,11 @@
         </div>
         
         <div class="help-tip">
-          <strong>💡 Pro Tip:</strong> Use recurring events for weekly application deadlines and set up interview reminders to stay organized during your job search!
+          <strong>💡 Pro Tip:</strong> Set up interview reminders and track application deadlines to stay organized during your job search!
         </div>
       </div>
     </div>
 
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
     <!-- Logout Function -->
     <script>
       function logout() {
@@ -1659,7 +1581,7 @@
         }
       });
     </script>
-    <script src="calendar.js?v=48"></script>
+    <script src="calendar.js?v=49"></script>
     
     <!-- Help Modal JavaScript -->
     <script>
