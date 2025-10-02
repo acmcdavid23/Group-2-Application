@@ -118,8 +118,3 @@ SUBJECT: Password Reset Request
 BODY: Click here to reset: https://yourapp.com/reset-password.html?token=27bc65c6-ed60-4573-9bfe-16e712a73091&email=acmcdavid%40crimson.ua.edu
 ---
 
-[2025-09-30 05:32:31] DEMO EMAIL TO: acmcdavid@crimson.ua.edu
-SUBJECT: Password Reset Request
-BODY: Click here to reset: https://yourapp.com/reset-password.html?token=476de996-538b-4eb9-bf33-997f1503101f&email=acmcdavid%40crimson.ua.edu
----
-
