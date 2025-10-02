@@ -4,7 +4,9 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
+    <StaticWebAssetsEnabled>true</StaticWebAssetsEnabled>
+    <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+    <StaticWebAssetMergeTarget>$(MSBuildProjectName)</StaticWebAssetMergeTarget>
   </PropertyGroup>
 
   <ItemGroup>
